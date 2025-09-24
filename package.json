@@ -19,7 +19,8 @@
     "dotenv": "^17.2.2",
     "pg": "^8.16.3",
     "bcrypt": "^6.0.0",
-    "node-fetch": "^3.3.2"
+    "node-fetch": "^3.3.2",
+     "cloudinary": "^1.40.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"
