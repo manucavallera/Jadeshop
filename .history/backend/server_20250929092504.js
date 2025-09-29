@@ -87,6 +87,76 @@ app.use("/api/admin", require("./routes/admin"));
 app.use("/api/comerciantes", require("./routes/comerciantes"));
 app.use("/api/auth", require("./routes/auth"));
 
+// ===== MIGRACIÓN CATEGORÍAS (TEMPORAL - ELIMINAR DESPUÉS) =====
+app.get("/api/setup-categorias", async (req, res) => {
+  try {
+    const pool = require("./config/database");
+
+    // 1. ELIMINAR tabla categorias si existe (con CASCADE para no romper nada)
+    await pool.query(`DROP TABLE IF EXISTS categorias CASCADE`);
+    console.log("✅ Tabla categorias eliminada");
+
+    // 2. CREAR tabla categorias correctamente
+    await pool.query(`
+      CREATE TABLE categorias (
+        id SERIAL PRIMARY KEY,
+        nombre VARCHAR(100) NOT NULL,
+        descripcion TEXT,
+        comerciante_id INTEGER REFERENCES comerciantes(id) ON DELETE CASCADE,
+        activa BOOLEAN DEFAULT true,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(nombre, comerciante_id)
+      )
+    `);
+    console.log("✅ Tabla categorias creada");
+
+    // 3. Agregar columna categoria_id a productos
+    try {
+      await pool.query(
+        `ALTER TABLE productos ADD COLUMN categoria_id INTEGER REFERENCES categorias(id)`
+      );
+      console.log("✅ Columna categoria_id agregada");
+    } catch (e) {
+      if (e.message.includes("already exists")) {
+        console.log("ℹ️ Columna categoria_id ya existe");
+      } else throw e;
+    }
+
+    // 4. Migrar categorías existentes
+    const result = await pool.query(`
+      INSERT INTO categorias (nombre, comerciante_id) 
+      SELECT DISTINCT categoria, comerciante_id 
+      FROM productos 
+      WHERE categoria IS NOT NULL AND categoria != ''
+      RETURNING *
+    `);
+    console.log(`✅ ${result.rowCount} categorías insertadas`);
+
+    // 5. Vincular productos con categorías
+    const updated = await pool.query(`
+      UPDATE productos 
+      SET categoria_id = c.id 
+      FROM categorias c 
+      WHERE productos.categoria = c.nombre 
+      AND productos.comerciante_id = c.comerciante_id
+    `);
+    console.log(`✅ ${updated.rowCount} productos vinculados`);
+
+    res.json({
+      success: true,
+      message: `✅ Sistema completo. ${result.rowCount} categorías migradas, ${updated.rowCount} productos vinculados`,
+      categorias: result.rows,
+    });
+  } catch (error) {
+    console.error("❌ Error migración:", error);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+      hint: "Revisa los logs para más detalles",
+    });
+  }
+});
+
 // 🗑️ ELIMINAR esta ruta duplicada - ya existe en /api/comerciantes/:slug
 // ❌ COMENTAR O ELIMINAR ESTAS LÍNEAS (90-110):
 /*
