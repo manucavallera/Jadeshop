@@ -732,135 +732,20 @@
     <!-- JavaScript del registro -->
     <script>
       let selectedPlan = null;
-      let checkSlugTimeout = null;
-
-      // Lista de slugs reservados
-      const RESERVED_SLUGS = [
-        "admin",
-        "api",
-        "tienda",
-        "www",
-        "app",
-        "mail",
-        "ftp",
-        "blog",
-        "shop",
-        "store",
-        "help",
-        "support",
-        "login",
-        "register",
-        "signup",
-        "dashboard",
-        "panel",
-        "config",
-        "settings",
-        "home",
-        "index",
-        "assets",
-        "static",
-        "public",
-        "js",
-        "css",
-        "img",
-        "images",
-        "favicon",
-        "robots",
-        "sitemap",
-        "manifest",
-        "sw",
-        "service-worker",
-      ];
-
-      // Función para validar slug
-      function validateSlug(slug) {
-        if (!slug || slug.length < 3) {
-          return {
-            valid: false,
-            message: "El nombre debe tener al menos 3 caracteres.",
-          };
-        }
-
-        if (slug.length > 30) {
-          return {
-            valid: false,
-            message: "El nombre no puede tener más de 30 caracteres.",
-          };
-        }
-
-        if (RESERVED_SLUGS.includes(slug.toLowerCase())) {
-          return {
-            valid: false,
-            message: "Este nombre no está disponible. Prueba con otro.",
-          };
-        }
-
-        return { valid: true, message: "" };
-      }
-
-      // Función para verificar disponibilidad en el servidor
-      async function checkSlugAvailability(slug) {
-        try {
-          const response = await fetch(`/api/check-slug/${slug}`);
-          const data = await response.json();
-          return data.available;
-        } catch (error) {
-          console.error("Error verificando slug:", error);
-          return true; // En caso de error, asumir disponible
-        }
-      }
-
-      // Función para mostrar estado del slug
-      function updateSlugStatus(slug, isValid, message, isChecking = false) {
-        const input = document.getElementById("nombreUsuario");
-        const preview = document.getElementById("slugPreview");
-        let statusMsg = input.parentNode.querySelector(".slug-status");
-
-        // Crear elemento de status si no existe
-        if (!statusMsg) {
-          statusMsg = document.createElement("small");
-          statusMsg.className =
-            "form-text slug-status d-flex align-items-center";
-          input.parentNode.appendChild(statusMsg);
-        }
-
-        // Actualizar preview
-        preview.textContent = slug || "mi-tienda";
-
-        if (isChecking) {
-          input.style.borderColor = "#ffc107";
-          preview.style.color = "#ffc107";
-          statusMsg.innerHTML =
-            '<i class="fas fa-spinner fa-spin me-2"></i>Verificando disponibilidad...';
-          statusMsg.className =
-            "form-text slug-status text-warning d-flex align-items-center";
-          input.setCustomValidity("Verificando...");
-        } else if (!isValid) {
-          input.style.borderColor = "#dc3545";
-          preview.style.color = "#dc3545";
-          statusMsg.innerHTML = `<i class="fas fa-times me-2"></i>${message}`;
-          statusMsg.className =
-            "form-text slug-status text-danger d-flex align-items-center";
-          input.setCustomValidity(message);
-        } else {
-          input.style.borderColor = "#198754";
-          preview.style.color = "#198754";
-          statusMsg.innerHTML =
-            '<i class="fas fa-check me-2"></i>Nombre disponible';
-          statusMsg.className =
-            "form-text slug-status text-success d-flex align-items-center";
-          input.setCustomValidity("");
-        }
-      }
 
       // Manejo de selección de planes
       document.querySelectorAll(".plan-card").forEach((card) => {
         card.addEventListener("click", function () {
+          // Remover selección anterior
           document
             .querySelectorAll(".plan-card")
             .forEach((c) => c.classList.remove("selected"));
+
+          // Seleccionar nuevo plan
           this.classList.add("selected");
           selectedPlan = this.dataset.plan;
+
+          // Habilitar botón continuar
           document.getElementById("continueToForm").disabled = false;
         });
       });
@@ -871,13 +756,17 @@
         .addEventListener("click", function () {
           if (!selectedPlan) return;
 
+          // Actualizar indicadores de paso
           document.getElementById("stepPlan").classList.remove("active");
           document.getElementById("stepInfo").classList.add("active");
+
+          // Mostrar formulario y ocultar selección de planes
           document.getElementById("planSelection").classList.add("hidden");
           document
             .getElementById("registrationForm")
             .classList.remove("hidden");
 
+          // Configurar información del plan seleccionado
           const planInfo = getPlanInfo(selectedPlan);
           document.getElementById("selectedPlanName").textContent =
             planInfo.name;
@@ -885,6 +774,7 @@
             planInfo.price;
           document.getElementById("selectedPlan").value = selectedPlan;
 
+          // Scroll al inicio
           window.scrollTo(0, 0);
         });
 
@@ -892,10 +782,13 @@
       document
         .getElementById("changePlan")
         .addEventListener("click", function () {
+          // Volver al paso 1
           document.getElementById("stepInfo").classList.remove("active");
           document.getElementById("stepPlan").classList.add("active");
+
           document.getElementById("registrationForm").classList.add("hidden");
           document.getElementById("planSelection").classList.remove("hidden");
+
           window.scrollTo(0, 0);
         });
 
@@ -913,43 +806,14 @@
         return plans[plan] || { name: "Plan", price: "" };
       }
 
-      // Preview del slug con validación completa
+      // Preview del slug
       document
         .getElementById("nombreUsuario")
         .addEventListener("input", function () {
           const slug = this.value.toLowerCase().replace(/[^a-z0-9\-]/g, "");
           this.value = slug;
-
-          // Limpiar timeout anterior
-          if (checkSlugTimeout) {
-            clearTimeout(checkSlugTimeout);
-          }
-
-          // Validación inmediata
-          const validation = validateSlug(slug);
-
-          if (!validation.valid) {
-            updateSlugStatus(slug, false, validation.message);
-            return;
-          }
-
-          // Mostrar estado "verificando"
-          updateSlugStatus(slug, false, "", true);
-
-          // Verificar disponibilidad con debounce
-          checkSlugTimeout = setTimeout(async () => {
-            const isAvailable = await checkSlugAvailability(slug);
-
-            if (isAvailable) {
-              updateSlugStatus(slug, true, "Nombre disponible");
-            } else {
-              updateSlugStatus(
-                slug,
-                false,
-                "Este nombre ya está en uso. Prueba con otro."
-              );
-            }
-          }, 800); // Esperar 800ms después de que el usuario deje de escribir
+          document.getElementById("slugPreview").textContent =
+            slug || "mi-tienda";
         });
 
       // Envío del formulario
@@ -957,13 +821,6 @@
         .getElementById("storeRegistrationForm")
         .addEventListener("submit", function (e) {
           e.preventDefault();
-
-          // Verificar que el slug sea válido
-          const slugInput = document.getElementById("nombreUsuario");
-          if (slugInput.checkValidity() === false) {
-            alert("Por favor, elige un nombre de usuario válido y disponible.");
-            return;
-          }
 
           // Verificar contraseñas
           const password = document.getElementById("password").value;
@@ -997,7 +854,9 @@
           // Enviar al backend
           fetch("/api/register", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+              "Content-Type": "application/json",
+            },
             body: JSON.stringify(formData),
           })
             .then((response) => response.json())
@@ -1023,11 +882,12 @@
             });
         });
 
-      // Detectar parámetro de plan en URL
+      // Detectar parámetro de plan en URL (si vienen del landing)
       const urlParams = new URLSearchParams(window.location.search);
       const planFromUrl = urlParams.get("plan");
 
       if (planFromUrl) {
+        // Auto-seleccionar plan y continuar al formulario
         const planCard = document.querySelector(`[data-plan="${planFromUrl}"]`);
         if (planCard) {
           planCard.click();

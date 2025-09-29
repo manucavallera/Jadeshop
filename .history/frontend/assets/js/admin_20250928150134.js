@@ -467,7 +467,6 @@ class AdminPanel {
       "ID:",
       this.editingProduct
     );
-    console.log("🖼️ Imagen preservada en memoria:", this.currentProductImage);
 
     const form = document.getElementById("productoForm");
     if (!form.checkValidity()) {
@@ -475,14 +474,17 @@ class AdminPanel {
       return;
     }
 
-    // Usar imagen de variable de clase como fallback
-    let imagen_url = this.currentProductImage;
+    // Obtener imagen existente (para edición)
+    const imagenUrlField = document.getElementById("productoImagen");
+    let imagen_url = imagenUrlField.value.trim();
+
+    console.log("🖼️ Imagen URL del campo:", imagen_url);
 
     // Verificar si hay nueva imagen para subir
     const imagenFile = document.getElementById("productoImagenFile").files[0];
     console.log("📁 Archivo nuevo seleccionado:", !!imagenFile);
 
-    // Si hay archivo nuevo, subirlo (sobrescribe la imagen existente)
+    // Si hay archivo nuevo, subirlo
     if (imagenFile) {
       console.log("⬆️ Subiendo nueva imagen...");
       this.showAlert("Subiendo nueva imagen...", "info");
@@ -495,16 +497,9 @@ class AdminPanel {
         console.log("❌ Error subiendo nueva imagen");
         return;
       }
+    } else {
+      console.log("🔄 Manteniendo imagen existente:", imagen_url);
     }
-
-    // Si usuario modificó URL manualmente, usar esa
-    const manualUrl = document.getElementById("productoImagen").value.trim();
-    if (manualUrl && manualUrl !== this.currentProductImage) {
-      imagen_url = manualUrl;
-      console.log("🔧 Usuario modificó URL manualmente:", manualUrl);
-    }
-
-    console.log("🔄 Imagen final a usar:", imagen_url);
 
     const productData = {
       nombre: document.getElementById("productoNombre").value.trim(),
@@ -552,9 +547,6 @@ class AdminPanel {
           "success"
         );
 
-        // Limpiar variable de imagen
-        this.currentProductImage = null;
-
         this.loadProductos();
         this.loadDashboard();
       } else {
@@ -570,7 +562,6 @@ class AdminPanel {
       );
     }
   }
-
   async editProduct(id) {
     try {
       console.log("🔍 DEBUG: Iniciando edición del producto", id);
@@ -677,33 +668,24 @@ class AdminPanel {
       return;
     }
 
-    console.log("🗑️ DEBUG: Eliminando producto", id);
-
     try {
       const response = await fetch(`/api/admin/productos/${id}`, {
         method: "DELETE",
       });
 
-      console.log("📡 Response status:", response.status);
-      console.log("📡 Response ok:", response.ok);
-
       if (response.ok) {
-        const result = await response.text(); // Cambiar a .text() para ver respuesta raw
-        console.log("✅ Respuesta del servidor:", result);
-
         this.showAlert("Producto eliminado correctamente", "success");
         this.loadProductos();
-        this.loadDashboard();
+        this.loadDashboard(); // Actualizar dashboard
       } else {
-        const errorText = await response.text();
-        console.log("❌ Error del servidor:", errorText);
         throw new Error("Error al eliminar producto");
       }
     } catch (error) {
-      console.error("❌ Error eliminando producto:", error);
+      console.error("Error eliminando producto:", error);
       this.showAlert("Error al eliminar el producto", "danger");
     }
   }
+
   resetProductForm() {
     document.getElementById("productoForm").reset();
     document.getElementById("productoModalTitle").textContent =
@@ -718,9 +700,6 @@ class AdminPanel {
     // Limpiar campos de imagen
     document.getElementById("productoImagenFile").value = "";
     document.getElementById("productoImagen").value = "";
-
-    // NUEVO: Limpiar variable de imagen
-    this.currentProductImage = null;
 
     this.editingProduct = null;
   }

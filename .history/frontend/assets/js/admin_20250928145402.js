@@ -7,7 +7,6 @@ class AdminPanel {
       ventas: null,
       productos: null,
     };
-    this.currentProductImage = null; // NUEVA LÍNEA
 
     this.currentUser = null;
 
@@ -460,51 +459,31 @@ class AdminPanel {
   }
 
   async saveProduct() {
-    console.log("💾 DEBUG: Iniciando saveProduct()");
-    console.log(
-      "📝 Modo edición:",
-      !!this.editingProduct,
-      "ID:",
-      this.editingProduct
-    );
-    console.log("🖼️ Imagen preservada en memoria:", this.currentProductImage);
-
     const form = document.getElementById("productoForm");
     if (!form.checkValidity()) {
       form.reportValidity();
       return;
     }
 
-    // Usar imagen de variable de clase como fallback
-    let imagen_url = this.currentProductImage;
+    // Obtener imagen existente (para edición)
+    let imagen_url = document.getElementById("productoImagen").value.trim();
 
     // Verificar si hay nueva imagen para subir
     const imagenFile = document.getElementById("productoImagenFile").files[0];
-    console.log("📁 Archivo nuevo seleccionado:", !!imagenFile);
 
-    // Si hay archivo nuevo, subirlo (sobrescribe la imagen existente)
+    // Si hay archivo nuevo, subirlo
     if (imagenFile) {
-      console.log("⬆️ Subiendo nueva imagen...");
       this.showAlert("Subiendo nueva imagen...", "info");
       const nuevaImagen = await this.uploadImagen(imagenFile);
 
       if (nuevaImagen) {
-        imagen_url = nuevaImagen;
-        console.log("✅ Nueva imagen subida:", nuevaImagen);
+        imagen_url = nuevaImagen; // Usar la nueva imagen
       } else {
-        console.log("❌ Error subiendo nueva imagen");
-        return;
+        return; // Error en la subida
       }
     }
-
-    // Si usuario modificó URL manualmente, usar esa
-    const manualUrl = document.getElementById("productoImagen").value.trim();
-    if (manualUrl && manualUrl !== this.currentProductImage) {
-      imagen_url = manualUrl;
-      console.log("🔧 Usuario modificó URL manualmente:", manualUrl);
-    }
-
-    console.log("🔄 Imagen final a usar:", imagen_url);
+    // Si no hay archivo nuevo pero estamos editando, mantener imagen existente
+    // (imagen_url ya tiene el valor del campo URL)
 
     const productData = {
       nombre: document.getElementById("productoNombre").value.trim(),
@@ -512,10 +491,8 @@ class AdminPanel {
       precio: parseFloat(document.getElementById("productoPrecio").value),
       stock: parseInt(document.getElementById("productoStock").value),
       categoria: document.getElementById("productoCategoria").value.trim(),
-      imagen_url: imagen_url || null,
+      imagen_url: imagen_url || null, // Usar imagen existente o nueva
     };
-
-    console.log("📤 Datos a enviar:", productData);
 
     try {
       const url = this.editingProduct
@@ -523,8 +500,6 @@ class AdminPanel {
         : "/api/admin/productos";
 
       const method = this.editingProduct ? "PUT" : "POST";
-
-      console.log("🌐 Request:", method, url);
 
       const response = await fetch(url, {
         method: method,
@@ -534,12 +509,7 @@ class AdminPanel {
         body: JSON.stringify(productData),
       });
 
-      console.log("📡 Response status:", response.status);
-
       if (response.ok) {
-        const result = await response.json();
-        console.log("✅ Producto guardado:", result);
-
         const modal = bootstrap.Modal.getInstance(
           document.getElementById("productoModal")
         );
@@ -552,29 +522,22 @@ class AdminPanel {
           "success"
         );
 
-        // Limpiar variable de imagen
-        this.currentProductImage = null;
-
         this.loadProductos();
         this.loadDashboard();
       } else {
         const errorData = await response.json();
-        console.log("❌ Error del servidor:", errorData);
         throw new Error(errorData.message || "Error al guardar producto");
       }
     } catch (error) {
-      console.error("❌ Error guardando producto:", error);
+      console.error("Error guardando producto:", error);
       this.showAlert(
         "Error al guardar el producto: " + error.message,
         "danger"
       );
     }
   }
-
   async editProduct(id) {
     try {
-      console.log("🔍 DEBUG: Iniciando edición del producto", id);
-
       const response = await fetch("/api/admin/productos");
       const productos = await response.json();
       const producto = productos.find((p) => p.id === id);
@@ -584,9 +547,6 @@ class AdminPanel {
         return;
       }
 
-      console.log("📦 Producto encontrado:", producto);
-      console.log("🖼️ Imagen URL del producto:", producto.imagen_url);
-
       // Llenar formulario con datos existentes
       document.getElementById("productoNombre").value = producto.nombre;
       document.getElementById("productoDescripcion").value =
@@ -595,21 +555,12 @@ class AdminPanel {
       document.getElementById("productoStock").value = producto.stock;
       document.getElementById("productoCategoria").value = producto.categoria;
 
-      // CRÍTICO: Guardar imagen en variable de clase (no en campo del formulario)
-      this.currentProductImage = producto.imagen_url || null;
-      console.log(
-        "💾 Imagen guardada en variable de clase:",
-        this.currentProductImage
-      );
-
-      // También llenar el campo para mostrar en UI
+      // IMPORTANTE: Preservar imagen actual en el campo URL
       document.getElementById("productoImagen").value =
         producto.imagen_url || "";
 
       // Si hay imagen existente, mostrar preview y cambiar a pestaña URL
       if (producto.imagen_url) {
-        console.log("🖼️ Configurando preview para imagen existente");
-
         const preview = document.getElementById("imagenPreview");
         const previewContainer = document.getElementById(
           "imagenPreviewContainer"
@@ -623,14 +574,12 @@ class AdminPanel {
           previewContainer.innerHTML = `
           <div class="text-center mb-3">
             <img src="${producto.imagen_url}" alt="Imagen actual" class="img-thumbnail" style="max-width: 200px;">
-            <div class="small text-success mt-2">
-              <i class="fas fa-check-circle"></i> 
-              Imagen preservada en memoria - Se mantendrá automáticamente
+            <div class="small text-muted mt-2">
+              <i class="fas fa-info-circle text-info"></i> 
+              Imagen actual - Se mantendrá si no subes una nueva
             </div>
           </div>
         `;
-
-          console.log("✅ Preview configurado correctamente");
         }
 
         // Activar pestaña de URL automáticamente si hay imagen
@@ -644,11 +593,7 @@ class AdminPanel {
           urlPane.classList.add("show", "active");
           uploadTab.classList.remove("active");
           uploadPane.classList.remove("show", "active");
-
-          console.log("✅ Pestaña URL activada automáticamente");
         }
-      } else {
-        this.currentProductImage = null;
       }
 
       // Cambiar título del modal
@@ -657,17 +602,13 @@ class AdminPanel {
 
       this.editingProduct = id;
 
-      console.log("🏷️ editingProduct establecido a:", this.editingProduct);
-
       // Mostrar modal
       const modal = new bootstrap.Modal(
         document.getElementById("productoModal")
       );
       modal.show();
-
-      console.log("🎯 Modal mostrado, editProduct() completado");
     } catch (error) {
-      console.error("❌ Error cargando producto para editar:", error);
+      console.error("Error cargando producto para editar:", error);
       this.showAlert("Error cargando el producto", "danger");
     }
   }
@@ -677,33 +618,24 @@ class AdminPanel {
       return;
     }
 
-    console.log("🗑️ DEBUG: Eliminando producto", id);
-
     try {
       const response = await fetch(`/api/admin/productos/${id}`, {
         method: "DELETE",
       });
 
-      console.log("📡 Response status:", response.status);
-      console.log("📡 Response ok:", response.ok);
-
       if (response.ok) {
-        const result = await response.text(); // Cambiar a .text() para ver respuesta raw
-        console.log("✅ Respuesta del servidor:", result);
-
         this.showAlert("Producto eliminado correctamente", "success");
         this.loadProductos();
-        this.loadDashboard();
+        this.loadDashboard(); // Actualizar dashboard
       } else {
-        const errorText = await response.text();
-        console.log("❌ Error del servidor:", errorText);
         throw new Error("Error al eliminar producto");
       }
     } catch (error) {
-      console.error("❌ Error eliminando producto:", error);
+      console.error("Error eliminando producto:", error);
       this.showAlert("Error al eliminar el producto", "danger");
     }
   }
+
   resetProductForm() {
     document.getElementById("productoForm").reset();
     document.getElementById("productoModalTitle").textContent =
@@ -718,9 +650,6 @@ class AdminPanel {
     // Limpiar campos de imagen
     document.getElementById("productoImagenFile").value = "";
     document.getElementById("productoImagen").value = "";
-
-    // NUEVO: Limpiar variable de imagen
-    this.currentProductImage = null;
 
     this.editingProduct = null;
   }

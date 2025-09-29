@@ -677,33 +677,24 @@ class AdminPanel {
       return;
     }
 
-    console.log("🗑️ DEBUG: Eliminando producto", id);
-
     try {
       const response = await fetch(`/api/admin/productos/${id}`, {
         method: "DELETE",
       });
 
-      console.log("📡 Response status:", response.status);
-      console.log("📡 Response ok:", response.ok);
-
       if (response.ok) {
-        const result = await response.text(); // Cambiar a .text() para ver respuesta raw
-        console.log("✅ Respuesta del servidor:", result);
-
         this.showAlert("Producto eliminado correctamente", "success");
         this.loadProductos();
-        this.loadDashboard();
+        this.loadDashboard(); // Actualizar dashboard
       } else {
-        const errorText = await response.text();
-        console.log("❌ Error del servidor:", errorText);
         throw new Error("Error al eliminar producto");
       }
     } catch (error) {
-      console.error("❌ Error eliminando producto:", error);
+      console.error("Error eliminando producto:", error);
       this.showAlert("Error al eliminar el producto", "danger");
     }
   }
+
   resetProductForm() {
     document.getElementById("productoForm").reset();
     document.getElementById("productoModalTitle").textContent =
@@ -718,9 +709,6 @@ class AdminPanel {
     // Limpiar campos de imagen
     document.getElementById("productoImagenFile").value = "";
     document.getElementById("productoImagen").value = "";
-
-    // NUEVO: Limpiar variable de imagen
-    this.currentProductImage = null;
 
     this.editingProduct = null;
   }
