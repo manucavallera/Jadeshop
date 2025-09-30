@@ -136,30 +136,18 @@ router.get("/productos", requireAuth, async (req, res) => {
 router.post("/productos", requireAuth, async (req, res) => {
   try {
     const { comerciante_id } = req;
-    const {
-      nombre,
-      descripcion,
-      descripcion_larga,
-      precio,
-      precio_rebajado,
-      stock,
-      categoria,
-      imagen_url,
-      categoria_id,
-    } = req.body;
+    const { nombre, descripcion, precio, stock, categoria, imagen_url } =
+      req.body;
 
     const result = await pool.query(
-      "INSERT INTO productos (comerciante_id, nombre, descripcion, descripcion_larga, precio, precio_rebajado, stock, categoria, categoria_id, imagen_url, activo) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, true) RETURNING *",
+      "INSERT INTO productos (comerciante_id, nombre, descripcion, precio, stock, categoria, imagen_url, activo) VALUES ($1, $2, $3, $4, $5, $6, $7, true) RETURNING *",
       [
         comerciante_id,
         nombre,
         descripcion,
-        descripcion_larga,
         precio,
-        precio_rebajado,
         stock,
         categoria,
-        categoria_id,
         imagen_url,
       ]
     );
@@ -172,34 +160,21 @@ router.post("/productos", requireAuth, async (req, res) => {
 });
 
 // PUT /api/admin/productos/:id - Actualizar producto
-// PUT /api/admin/productos/:id - Actualizar producto
 router.put("/productos/:id", requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
     const { comerciante_id } = req;
-    const {
-      nombre,
-      descripcion,
-      descripcion_larga,
-      precio,
-      precio_rebajado,
-      stock,
-      categoria,
-      imagen_url,
-      categoria_id,
-    } = req.body;
+    const { nombre, descripcion, precio, stock, categoria, imagen_url } =
+      req.body;
 
     const result = await pool.query(
-      "UPDATE productos SET nombre=$1, descripcion=$2, descripcion_larga=$3, precio=$4, precio_rebajado=$5, stock=$6, categoria=$7, categoria_id=$8, imagen_url=$9, updated_at=NOW() WHERE id=$10 AND comerciante_id=$11 RETURNING *",
+      "UPDATE productos SET nombre=$1, descripcion=$2, precio=$3, stock=$4, categoria=$5, imagen_url=$6, updated_at=NOW() WHERE id=$7 AND comerciante_id=$8 RETURNING *",
       [
         nombre,
         descripcion,
-        descripcion_larga,
         precio,
-        precio_rebajado,
         stock,
         categoria,
-        categoria_id,
         imagen_url,
         id,
         comerciante_id,
@@ -545,13 +520,15 @@ router.post(
   }
 );
 
+/ ===================
 // GESTIÓN DE CATEGORÍAS
+// ===================
 
 // GET /api/admin/categorias - Listar categorías del comerciante
 router.get("/categorias", requireAuth, async (req, res) => {
   try {
     const { comerciante_id } = req;
-
+    
     const result = await pool.query(
       `SELECT c.*, COUNT(p.id) as productos_count 
        FROM categorias c 
@@ -561,7 +538,7 @@ router.get("/categorias", requireAuth, async (req, res) => {
        ORDER BY c.created_at DESC`,
       [comerciante_id]
     );
-
+    
     res.json(result.rows);
   } catch (error) {
     console.error("Error obteniendo categorías:", error);
@@ -574,22 +551,20 @@ router.post("/categorias", requireAuth, async (req, res) => {
   try {
     const { comerciante_id } = req;
     const { nombre, descripcion } = req.body;
-
+    
     if (!nombre) {
       return res.status(400).json({ error: "Nombre es requerido" });
     }
-
+    
     const result = await pool.query(
       "INSERT INTO categorias (nombre, descripcion, comerciante_id) VALUES ($1, $2, $3) RETURNING *",
       [nombre.trim(), descripcion?.trim(), comerciante_id]
     );
-
+    
     res.status(201).json(result.rows[0]);
   } catch (error) {
-    if (error.code === "23505") {
-      return res
-        .status(400)
-        .json({ error: "Ya existe una categoría con ese nombre" });
+    if (error.code === '23505') {
+      return res.status(400).json({ error: "Ya existe una categoría con ese nombre" });
     }
     console.error("Error creando categoría:", error);
     res.status(500).json({ error: "Error interno del servidor" });
@@ -602,16 +577,16 @@ router.put("/categorias/:id", requireAuth, async (req, res) => {
     const { id } = req.params;
     const { comerciante_id } = req;
     const { nombre, descripcion } = req.body;
-
+    
     const result = await pool.query(
       "UPDATE categorias SET nombre=$1, descripcion=$2 WHERE id=$3 AND comerciante_id=$4 RETURNING *",
       [nombre.trim(), descripcion?.trim(), id, comerciante_id]
     );
-
+    
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "Categoría no encontrada" });
     }
-
+    
     res.json(result.rows[0]);
   } catch (error) {
     console.error("Error actualizando categoría:", error);
@@ -624,118 +599,31 @@ router.delete("/categorias/:id", requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
     const { comerciante_id } = req;
-
+    
     const checkProducts = await pool.query(
       "SELECT COUNT(*) FROM productos WHERE categoria_id = $1",
       [id]
     );
-
+    
     if (parseInt(checkProducts.rows[0].count) > 0) {
-      return res.status(400).json({
-        error: "No se puede eliminar, tiene productos asignados",
+      return res.status(400).json({ 
+        error: "No se puede eliminar, tiene productos asignados" 
       });
     }
-
+    
     const result = await pool.query(
       "DELETE FROM categorias WHERE id = $1 AND comerciante_id = $2 RETURNING *",
       [id, comerciante_id]
     );
-
+    
     if (result.rowCount === 0) {
       return res.status(404).json({ error: "Categoría no encontrada" });
     }
-
+    
     res.json({ message: "Categoría eliminada correctamente" });
   } catch (error) {
     console.error("Error eliminando categoría:", error);
     res.status(500).json({ error: "Error interno del servidor" });
-  }
-});
-
-// Endpoint temporal para verificar vinculación
-router.get("/verificar-productos-categorias", requireAuth, async (req, res) => {
-  try {
-    const { comerciante_id } = req;
-
-    const productos = await pool.query(
-      `SELECT id, nombre, categoria, categoria_id 
-       FROM productos 
-       WHERE comerciante_id = $1 
-       ORDER BY id`,
-      [comerciante_id]
-    );
-
-    const categorias = await pool.query(
-      `SELECT id, nombre 
-       FROM categorias 
-       WHERE comerciante_id = $1 
-       ORDER BY id`,
-      [comerciante_id]
-    );
-
-    res.json({
-      productos: productos.rows,
-      categorias: categorias.rows,
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// Endpoint para re-vincular productos con categorías
-router.post("/re-vincular-categorias", requireAuth, async (req, res) => {
-  try {
-    const { comerciante_id } = req;
-
-    const result = await pool.query(`
-      UPDATE productos 
-      SET categoria_id = c.id 
-      FROM categorias c 
-      WHERE productos.categoria = c.nombre 
-      AND productos.comerciante_id = c.comerciante_id 
-      AND productos.categoria_id IS NULL
-      RETURNING productos.id, productos.nombre, productos.categoria_id
-    `);
-
-    res.json({
-      success: true,
-      productos_vinculados: result.rowCount,
-      productos: result.rows,
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-router.get("/migrar-precio-rebajado", requireAuth, async (req, res) => {
-  try {
-    await pool.query(`
-      ALTER TABLE productos 
-      ADD COLUMN IF NOT EXISTS precio_rebajado DECIMAL(10,2) DEFAULT NULL
-    `);
-
-    res.json({
-      success: true,
-      message: "Columna precio_rebajado agregada correctamente",
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-router.get("/migrar-descripciones", requireAuth, async (req, res) => {
-  try {
-    await pool.query(`
-      ALTER TABLE productos 
-      ADD COLUMN IF NOT EXISTS descripcion_larga TEXT DEFAULT NULL
-    `);
-
-    res.json({
-      success: true,
-      message: "Columna descripcion_larga agregada correctamente",
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
   }
 });
 

@@ -452,21 +452,7 @@ class AdminPanel {
                     <td><span class="badge bg-secondary">${
                       producto.categoria
                     }</span></td>
-                    <td>
-  ${
-    producto.precio_rebajado
-      ? `<div>
-         <span style="text-decoration: line-through;" class="text-muted small d-block">$${Number(
-           producto.precio
-         ).toLocaleString()}</span>
-         <span class="text-success fw-bold">$${Number(
-           producto.precio_rebajado
-         ).toLocaleString()}</span>
-         <span class="badge bg-danger ms-1">OFERTA</span>
-       </div>`
-      : `$${Number(producto.precio).toLocaleString()}`
-  }
-</td>
+                    <td>$${Number(producto.precio).toLocaleString()}</td>
                     <td>
                         <span class="badge ${
                           producto.stock > 10
@@ -550,9 +536,6 @@ class AdminPanel {
     const productData = {
       nombre: document.getElementById("productoNombre").value.trim(),
       descripcion: document.getElementById("productoDescripcion").value.trim(),
-      descripcion_larga: document
-        .getElementById("productoDescripcionLarga")
-        .value.trim(),
       precio: parseFloat(document.getElementById("productoPrecio").value),
       precio_rebajado: document.getElementById("productoPrecioRebajado").value
         ? parseFloat(document.getElementById("productoPrecioRebajado").value)
@@ -641,8 +624,6 @@ class AdminPanel {
       document.getElementById("productoNombre").value = producto.nombre;
       document.getElementById("productoDescripcion").value =
         producto.descripcion || "";
-      document.getElementById("productoDescripcionLarga").value =
-        producto.descripcion_larga || "";
       document.getElementById("productoPrecio").value = producto.precio;
       document.getElementById("productoPrecioRebajado").value =
         producto.precio_rebajado || "";
@@ -954,8 +935,6 @@ class AdminPanel {
 
     document.getElementById("productoPrecio").value = "";
     document.getElementById("productoPrecioRebajado").value = "";
-
-    document.getElementById("productoDescripcionLarga").value = "";
 
     // NUEVO: Limpiar variable de imagen
     this.currentProductImage = null;
@@ -1411,3 +1390,65 @@ function loadPedidos() {
 // AGREGAR ESTE CÓDIGO AL FINAL DEL ARCHIVO admin.js
 
 // Inicializar pestañas del modal cuando se abre
+document.addEventListener("DOMContentLoaded", function () {
+  // Inicializar pestañas Bootstrap cuando se muestra el modal
+  const productoModal = document.getElementById("productoModal");
+  if (productoModal) {
+    productoModal.addEventListener("shown.bs.modal", function () {
+      // Activar la primera pestaña por defecto
+      const uploadTab = document.querySelector("#upload-tab");
+      const uploadPane = document.querySelector("#upload-pane");
+      const urlPane = document.querySelector("#url-pane");
+
+      if (uploadTab && uploadPane && urlPane) {
+        // Activar pestaña de upload
+        uploadTab.classList.add("active");
+        uploadPane.classList.add("show", "active");
+
+        // Desactivar pestaña de URL
+        document.querySelector("#url-tab").classList.remove("active");
+        urlPane.classList.remove("show", "active");
+
+        // Limpiar preview al abrir modal
+        const previewContainer = document.getElementById(
+          "imagenPreviewContainer"
+        );
+        if (previewContainer) {
+          previewContainer.style.display = "none";
+        }
+
+        // Limpiar campos
+        document.getElementById("productoImagenFile").value = "";
+        document.getElementById("productoImagen").value = "";
+      }
+    });
+  }
+
+  // Manejar click en pestañas manualmente si Bootstrap no funciona
+  const uploadTabBtn = document.getElementById("upload-tab");
+  const urlTabBtn = document.getElementById("url-tab");
+
+  if (uploadTabBtn) {
+    uploadTabBtn.addEventListener("click", function (e) {
+      e.preventDefault();
+      // Activar pestaña upload
+      uploadTabBtn.classList.add("active");
+      document.getElementById("upload-pane").classList.add("show", "active");
+      // Desactivar pestaña url
+      urlTabBtn.classList.remove("active");
+      document.getElementById("url-pane").classList.remove("show", "active");
+    });
+  }
+
+  if (urlTabBtn) {
+    urlTabBtn.addEventListener("click", function (e) {
+      e.preventDefault();
+      // Activar pestaña url
+      urlTabBtn.classList.add("active");
+      document.getElementById("url-pane").classList.add("show", "active");
+      // Desactivar pestaña upload
+      uploadTabBtn.classList.remove("active");
+      document.getElementById("upload-pane").classList.remove("show", "active");
+    });
+  }
+});

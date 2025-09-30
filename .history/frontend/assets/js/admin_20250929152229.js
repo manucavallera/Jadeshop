@@ -550,9 +550,6 @@ class AdminPanel {
     const productData = {
       nombre: document.getElementById("productoNombre").value.trim(),
       descripcion: document.getElementById("productoDescripcion").value.trim(),
-      descripcion_larga: document
-        .getElementById("productoDescripcionLarga")
-        .value.trim(),
       precio: parseFloat(document.getElementById("productoPrecio").value),
       precio_rebajado: document.getElementById("productoPrecioRebajado").value
         ? parseFloat(document.getElementById("productoPrecioRebajado").value)
@@ -641,8 +638,6 @@ class AdminPanel {
       document.getElementById("productoNombre").value = producto.nombre;
       document.getElementById("productoDescripcion").value =
         producto.descripcion || "";
-      document.getElementById("productoDescripcionLarga").value =
-        producto.descripcion_larga || "";
       document.getElementById("productoPrecio").value = producto.precio;
       document.getElementById("productoPrecioRebajado").value =
         producto.precio_rebajado || "";
@@ -954,8 +949,6 @@ class AdminPanel {
 
     document.getElementById("productoPrecio").value = "";
     document.getElementById("productoPrecioRebajado").value = "";
-
-    document.getElementById("productoDescripcionLarga").value = "";
 
     // NUEVO: Limpiar variable de imagen
     this.currentProductImage = null;

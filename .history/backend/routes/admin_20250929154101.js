@@ -180,7 +180,6 @@ router.put("/productos/:id", requireAuth, async (req, res) => {
     const {
       nombre,
       descripcion,
-      descripcion_larga,
       precio,
       precio_rebajado,
       stock,
@@ -190,11 +189,10 @@ router.put("/productos/:id", requireAuth, async (req, res) => {
     } = req.body;
 
     const result = await pool.query(
-      "UPDATE productos SET nombre=$1, descripcion=$2, descripcion_larga=$3, precio=$4, precio_rebajado=$5, stock=$6, categoria=$7, categoria_id=$8, imagen_url=$9, updated_at=NOW() WHERE id=$10 AND comerciante_id=$11 RETURNING *",
+      "UPDATE productos SET nombre=$1, descripcion=$2, precio=$3, precio_rebajado=$4, stock=$5, categoria=$6, categoria_id=$7, imagen_url=$8, updated_at=NOW() WHERE id=$9 AND comerciante_id=$10 RETURNING *",
       [
         nombre,
         descripcion,
-        descripcion_larga,
         precio,
         precio_rebajado,
         stock,

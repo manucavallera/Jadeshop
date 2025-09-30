@@ -184,11 +184,9 @@ class TiendaDinamica {
         (producto) => `
             <div class="col-lg-3 col-md-4 col-sm-6">
                 <div class="card product-card h-100">
-                  
+                   // Modificar la sección de imagen y título para agregar link:
 <div class="aspect-square bg-light d-flex align-items-center justify-content-center" 
-    onclick="window.location.href='/producto-detalle.html?slug=${
-      this.slug
-    }&id=${producto.id}'"
+     onclick="window.location.href='/producto-detalle.html?id=${producto.id}'" 
      style="cursor: pointer;">
     ${
       producto.imagen_url
@@ -207,9 +205,9 @@ class TiendaDinamica {
     </div>
     
     <h6 class="card-title" 
-        onclick="window.location.href='/producto-detalle.html?slug=${
-          this.slug
-        }&id=${producto.id}'"
+        onclick="window.location.href='/producto-detalle.html?id=${
+          producto.id
+        }'" 
         style="cursor: pointer;">
         ${producto.nombre}
     </h6>

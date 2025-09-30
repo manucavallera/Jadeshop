@@ -955,8 +955,6 @@ class AdminPanel {
     document.getElementById("productoPrecio").value = "";
     document.getElementById("productoPrecioRebajado").value = "";
 
-    document.getElementById("productoDescripcionLarga").value = "";
-
     // NUEVO: Limpiar variable de imagen
     this.currentProductImage = null;
 

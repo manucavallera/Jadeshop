@@ -452,21 +452,7 @@ class AdminPanel {
                     <td><span class="badge bg-secondary">${
                       producto.categoria
                     }</span></td>
-                    <td>
-  ${
-    producto.precio_rebajado
-      ? `<div>
-         <span style="text-decoration: line-through;" class="text-muted small d-block">$${Number(
-           producto.precio
-         ).toLocaleString()}</span>
-         <span class="text-success fw-bold">$${Number(
-           producto.precio_rebajado
-         ).toLocaleString()}</span>
-         <span class="badge bg-danger ms-1">OFERTA</span>
-       </div>`
-      : `$${Number(producto.precio).toLocaleString()}`
-  }
-</td>
+                    <td>$${Number(producto.precio).toLocaleString()}</td>
                     <td>
                         <span class="badge ${
                           producto.stock > 10
@@ -550,18 +536,9 @@ class AdminPanel {
     const productData = {
       nombre: document.getElementById("productoNombre").value.trim(),
       descripcion: document.getElementById("productoDescripcion").value.trim(),
-      descripcion_larga: document
-        .getElementById("productoDescripcionLarga")
-        .value.trim(),
       precio: parseFloat(document.getElementById("productoPrecio").value),
-      precio_rebajado: document.getElementById("productoPrecioRebajado").value
-        ? parseFloat(document.getElementById("productoPrecioRebajado").value)
-        : null,
       stock: parseInt(document.getElementById("productoStock").value),
       categoria: document.getElementById("productoCategoria").value.trim(),
-      categoria_id:
-        document.getElementById("productoCategoria").selectedOptions[0]?.dataset
-          ?.categoriaId || null,
       imagen_url: imagen_url || null,
     };
 
@@ -637,19 +614,15 @@ class AdminPanel {
       console.log("📦 Producto encontrado:", producto);
       console.log("🖼️ Imagen URL del producto:", producto.imagen_url);
 
-      // Llenar formulario con datos existentes (ORDEN CORRECTO)
+      // Llenar formulario con datos existentes
       document.getElementById("productoNombre").value = producto.nombre;
       document.getElementById("productoDescripcion").value =
         producto.descripcion || "";
-      document.getElementById("productoDescripcionLarga").value =
-        producto.descripcion_larga || "";
       document.getElementById("productoPrecio").value = producto.precio;
-      document.getElementById("productoPrecioRebajado").value =
-        producto.precio_rebajado || "";
       document.getElementById("productoStock").value = producto.stock;
       document.getElementById("productoCategoria").value = producto.categoria;
 
-      // CRÍTICO: Guardar imagen en variable de clase
+      // CRÍTICO: Guardar imagen en variable de clase (no en campo del formulario)
       this.currentProductImage = producto.imagen_url || null;
       console.log(
         "💾 Imagen guardada en variable de clase:",
@@ -660,16 +633,20 @@ class AdminPanel {
       document.getElementById("productoImagen").value =
         producto.imagen_url || "";
 
-      // Si hay imagen existente, mostrar preview
+      // Si hay imagen existente, mostrar preview y cambiar a pestaña URL
       if (producto.imagen_url) {
         console.log("🖼️ Configurando preview para imagen existente");
 
+        const preview = document.getElementById("imagenPreview");
         const previewContainer = document.getElementById(
           "imagenPreviewContainer"
         );
 
-        if (previewContainer) {
+        if (preview && previewContainer) {
+          preview.src = producto.imagen_url;
           previewContainer.style.display = "block";
+
+          // Mostrar mensaje informativo
           previewContainer.innerHTML = `
           <div class="text-center mb-3">
             <img src="${producto.imagen_url}" alt="Imagen actual" class="img-thumbnail" style="max-width: 200px;">
@@ -679,6 +656,7 @@ class AdminPanel {
             </div>
           </div>
         `;
+
           console.log("✅ Preview configurado correctamente");
         }
 
@@ -693,6 +671,7 @@ class AdminPanel {
           urlPane.classList.add("show", "active");
           uploadTab.classList.remove("active");
           uploadPane.classList.remove("show", "active");
+
           console.log("✅ Pestaña URL activada automáticamente");
         }
       } else {
@@ -702,7 +681,9 @@ class AdminPanel {
       // Cambiar título del modal
       document.getElementById("productoModalTitle").textContent =
         "Editar Producto";
+
       this.editingProduct = id;
+
       console.log("🏷️ editingProduct establecido a:", this.editingProduct);
 
       // Mostrar modal
@@ -828,7 +809,6 @@ class AdminPanel {
       const option = document.createElement("option");
       option.value = cat.nombre;
       option.textContent = cat.nombre;
-      option.dataset.categoriaId = cat.id; // AGREGAR ESTO
       select.appendChild(option);
     });
 
@@ -951,11 +931,6 @@ class AdminPanel {
     // Limpiar campos de imagen
     document.getElementById("productoImagenFile").value = "";
     document.getElementById("productoImagen").value = "";
-
-    document.getElementById("productoPrecio").value = "";
-    document.getElementById("productoPrecioRebajado").value = "";
-
-    document.getElementById("productoDescripcionLarga").value = "";
 
     // NUEVO: Limpiar variable de imagen
     this.currentProductImage = null;
@@ -1411,3 +1386,65 @@ function loadPedidos() {
 // AGREGAR ESTE CÓDIGO AL FINAL DEL ARCHIVO admin.js
 
 // Inicializar pestañas del modal cuando se abre
+document.addEventListener("DOMContentLoaded", function () {
+  // Inicializar pestañas Bootstrap cuando se muestra el modal
+  const productoModal = document.getElementById("productoModal");
+  if (productoModal) {
+    productoModal.addEventListener("shown.bs.modal", function () {
+      // Activar la primera pestaña por defecto
+      const uploadTab = document.querySelector("#upload-tab");
+      const uploadPane = document.querySelector("#upload-pane");
+      const urlPane = document.querySelector("#url-pane");
+
+      if (uploadTab && uploadPane && urlPane) {
+        // Activar pestaña de upload
+        uploadTab.classList.add("active");
+        uploadPane.classList.add("show", "active");
+
+        // Desactivar pestaña de URL
+        document.querySelector("#url-tab").classList.remove("active");
+        urlPane.classList.remove("show", "active");
+
+        // Limpiar preview al abrir modal
+        const previewContainer = document.getElementById(
+          "imagenPreviewContainer"
+        );
+        if (previewContainer) {
+          previewContainer.style.display = "none";
+        }
+
+        // Limpiar campos
+        document.getElementById("productoImagenFile").value = "";
+        document.getElementById("productoImagen").value = "";
+      }
+    });
+  }
+
+  // Manejar click en pestañas manualmente si Bootstrap no funciona
+  const uploadTabBtn = document.getElementById("upload-tab");
+  const urlTabBtn = document.getElementById("url-tab");
+
+  if (uploadTabBtn) {
+    uploadTabBtn.addEventListener("click", function (e) {
+      e.preventDefault();
+      // Activar pestaña upload
+      uploadTabBtn.classList.add("active");
+      document.getElementById("upload-pane").classList.add("show", "active");
+      // Desactivar pestaña url
+      urlTabBtn.classList.remove("active");
+      document.getElementById("url-pane").classList.remove("show", "active");
+    });
+  }
+
+  if (urlTabBtn) {
+    urlTabBtn.addEventListener("click", function (e) {
+      e.preventDefault();
+      // Activar pestaña url
+      urlTabBtn.classList.add("active");
+      document.getElementById("url-pane").classList.add("show", "active");
+      // Desactivar pestaña upload
+      uploadTabBtn.classList.remove("active");
+      document.getElementById("upload-pane").classList.remove("show", "active");
+    });
+  }
+});

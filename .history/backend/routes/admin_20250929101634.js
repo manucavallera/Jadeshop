@@ -139,9 +139,7 @@ router.post("/productos", requireAuth, async (req, res) => {
     const {
       nombre,
       descripcion,
-      descripcion_larga,
       precio,
-      precio_rebajado,
       stock,
       categoria,
       imagen_url,
@@ -149,14 +147,12 @@ router.post("/productos", requireAuth, async (req, res) => {
     } = req.body;
 
     const result = await pool.query(
-      "INSERT INTO productos (comerciante_id, nombre, descripcion, descripcion_larga, precio, precio_rebajado, stock, categoria, categoria_id, imagen_url, activo) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, true) RETURNING *",
+      "INSERT INTO productos (comerciante_id, nombre, descripcion, precio, stock, categoria, categoria_id, imagen_url, activo) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, true) RETURNING *",
       [
         comerciante_id,
         nombre,
         descripcion,
-        descripcion_larga,
         precio,
-        precio_rebajado,
         stock,
         categoria,
         categoria_id,
@@ -172,34 +168,21 @@ router.post("/productos", requireAuth, async (req, res) => {
 });
 
 // PUT /api/admin/productos/:id - Actualizar producto
-// PUT /api/admin/productos/:id - Actualizar producto
 router.put("/productos/:id", requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
     const { comerciante_id } = req;
-    const {
-      nombre,
-      descripcion,
-      descripcion_larga,
-      precio,
-      precio_rebajado,
-      stock,
-      categoria,
-      imagen_url,
-      categoria_id,
-    } = req.body;
+    const { nombre, descripcion, precio, stock, categoria, imagen_url } =
+      req.body;
 
     const result = await pool.query(
-      "UPDATE productos SET nombre=$1, descripcion=$2, descripcion_larga=$3, precio=$4, precio_rebajado=$5, stock=$6, categoria=$7, categoria_id=$8, imagen_url=$9, updated_at=NOW() WHERE id=$10 AND comerciante_id=$11 RETURNING *",
+      "UPDATE productos SET nombre=$1, descripcion=$2, precio=$3, stock=$4, categoria=$5, imagen_url=$6, updated_at=NOW() WHERE id=$7 AND comerciante_id=$8 RETURNING *",
       [
         nombre,
         descripcion,
-        descripcion_larga,
         precio,
-        precio_rebajado,
         stock,
         categoria,
-        categoria_id,
         imagen_url,
         id,
         comerciante_id,
@@ -701,38 +684,6 @@ router.post("/re-vincular-categorias", requireAuth, async (req, res) => {
       success: true,
       productos_vinculados: result.rowCount,
       productos: result.rows,
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-router.get("/migrar-precio-rebajado", requireAuth, async (req, res) => {
-  try {
-    await pool.query(`
-      ALTER TABLE productos 
-      ADD COLUMN IF NOT EXISTS precio_rebajado DECIMAL(10,2) DEFAULT NULL
-    `);
-
-    res.json({
-      success: true,
-      message: "Columna precio_rebajado agregada correctamente",
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-router.get("/migrar-descripciones", requireAuth, async (req, res) => {
-  try {
-    await pool.query(`
-      ALTER TABLE productos 
-      ADD COLUMN IF NOT EXISTS descripcion_larga TEXT DEFAULT NULL
-    `);
-
-    res.json({
-      success: true,
-      message: "Columna descripcion_larga agregada correctamente",
     });
   } catch (error) {
     res.status(500).json({ error: error.message });

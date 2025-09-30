@@ -207,9 +207,9 @@ class TiendaDinamica {
     </div>
     
     <h6 class="card-title" 
-        onclick="window.location.href='/producto-detalle.html?slug=${
-          this.slug
-        }&id=${producto.id}'"
+        onclick="window.location.href='/producto-detalle.html?id=${
+          producto.id
+        }'" 
         style="cursor: pointer;">
         ${producto.nombre}
     </h6>

@@ -184,35 +184,25 @@ class TiendaDinamica {
         (producto) => `
             <div class="col-lg-3 col-md-4 col-sm-6">
                 <div class="card product-card h-100">
-                  
-<div class="aspect-square bg-light d-flex align-items-center justify-content-center" 
-    onclick="window.location.href='/producto-detalle.html?slug=${
-      this.slug
-    }&id=${producto.id}'"
-     style="cursor: pointer;">
-    ${
-      producto.imagen_url
-        ? `<img src="${producto.imagen_url}" alt="${producto.nombre}" class="card-img-top" style="width: 100%; height: 100%; object-fit: cover;">`
-        : `<i class="fas fa-image text-muted" style="font-size: 3rem;"></i>`
-    }
-</div>
-
-<div class="card-body d-flex flex-column">
-    <div class="mb-2">
-        ${
-          producto.categoria
-            ? `<span class="badge bg-primary">${producto.categoria}</span>`
-            : ""
-        }
-    </div>
-    
-    <h6 class="card-title" 
-        onclick="window.location.href='/producto-detalle.html?slug=${
-          this.slug
-        }&id=${producto.id}'"
-        style="cursor: pointer;">
-        ${producto.nombre}
-    </h6>
+                    <div class="aspect-square bg-light d-flex align-items-center justify-content-center">
+                        ${
+                          producto.imagen_url
+                            ? `<img src="${producto.imagen_url}" alt="${producto.nombre}" class="card-img-top" style="width: 100%; height: 100%; object-fit: cover;">`
+                            : `<i class="fas fa-image text-muted" style="font-size: 3rem;"></i>`
+                        }
+                    </div>
+                    
+                    <div class="card-body d-flex flex-column">
+                        <div class="mb-2">
+                            ${
+                              producto.categoria
+                                ? `<span class="badge bg-primary">${producto.categoria}</span>`
+                                : ""
+                            }
+                        </div>
+                        
+                        <h6 class="card-title">${producto.nombre}</h6>
+                        
                         ${
                           producto.descripcion
                             ? `<p class="card-text text-muted small">${producto.descripcion}</p>`
@@ -367,13 +357,7 @@ class TiendaDinamica {
       this.carrito.push({
         id: producto.id,
         nombre: producto.nombre,
-        precio: producto.precio_rebajado
-          ? parseFloat(producto.precio_rebajado)
-          : parseFloat(producto.precio),
-        precio_original: parseFloat(producto.precio),
-        precio_rebajado: producto.precio_rebajado
-          ? parseFloat(producto.precio_rebajado)
-          : null,
+        precio: parseFloat(producto.precio),
         cantidad: 1,
         imagen_url: producto.imagen_url,
       });
