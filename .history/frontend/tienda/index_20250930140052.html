@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Crea tu tienda gratis - JadeShop</title>
+
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <!-- Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --jade-primary: #00d4aa;
+        --jade-secondary: #1a1a1a;
+        --jade-success: #10b981;
+        --jadebro-primary: #6366f1;
+        --jadebro-secondary: #8b5cf6;
+      }
+
+      * {
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+      }
+
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        font-family: "Space Grotesk", -apple-system, BlinkMacSystemFont,
+          sans-serif;
+      }
+
+      body {
+        background: linear-gradient(
+          135deg,
+          var(--jade-secondary) 0%,
+          #2d3748 100%
+        );
+        min-height: 100vh;
+        padding: 2rem 0;
+      }
+
+      .main-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1rem;
+      }
+
+      .step-header {
+        text-align: center;
+        color: white;
+        margin-bottom: 3rem;
+      }
+
+      .step-indicator {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 2rem;
+      }
+
+      .step {
+        display: flex;
+        align-items: center;
+        color: rgba(255, 255, 255, 0.6);
+      }
+
+      .step.active {
+        color: var(--jade-primary);
+      }
+
+      .step-number {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        font-weight: bold;
+      }
+
+      .step.active .step-number {
+        background: var(--jade-primary);
+        color: white;
+      }
+
+      .plan-card {
+        background: white;
+        border-radius: 1rem;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        border: 3px solid transparent;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        position: relative;
+        height: 100%;
+      }
+
+      .plan-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(0, 212, 170, 0.2);
+      }
+
+      .plan-card.selected {
+        border-color: var(--jade-primary);
+        box-shadow: 0 0 0 1px var(--jade-primary);
+      }
+
+      .plan-card.popular {
+        border-color: var(--jade-primary);
+      }
+
+      .plan-badge {
+        position: absolute;
+        top: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--jade-primary);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        font-weight: bold;
+      }
+
+      .plan-badge.jadebro {
+        background: linear-gradient(
+          135deg,
+          var(--jadebro-primary),
+          var(--jadebro-secondary)
+        );
+      }
+
+      .registration-card {
+        background: white;
+        border-radius: 1rem;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+
+      .header-section {
+        background: linear-gradient(
+          135deg,
+          var(--jade-primary),
+          var(--jade-success)
+        );
+        color: white;
+        padding: 2rem;
+        text-align: center;
+      }
+
+      .form-section {
+        padding: 2rem;
+      }
+
+      .preview-url {
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 0.375rem;
+        padding: 0.375rem 0.75rem;
+        display: flex;
+        align-items: center;
+        margin-top: 0.5rem;
+      }
+
+      .preview-url .base-url {
+        color: #6c757d;
+        font-weight: 500;
+      }
+
+      .preview-url .user-slug {
+        color: var(--jade-success);
+        font-weight: bold;
+        min-width: 100px;
+      }
+
+      .country-select {
+        width: 80px;
+        border-right: 1px solid #dee2e6;
+        border-radius: 0.375rem 0 0 0.375rem;
+      }
+
+      .phone-input {
+        border-radius: 0 0.375rem 0.375rem 0;
+        border-left: 0;
+      }
+
+      .feature-badge {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 1rem;
+        font-size: 0.875rem;
+        margin: 0.25rem;
+        display: inline-block;
+      }
+
+      .btn-create {
+        background: linear-gradient(
+          135deg,
+          var(--jade-primary),
+          var(--jade-success)
+        );
+        border: none;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+        border-radius: 0.5rem;
+        transition: transform 0.2s;
+        color: white;
+      }
+
+      .btn-create:hover {
+        transform: translateY(-2px);
+        background: linear-gradient(135deg, var(--jade-success), #047857);
+        color: white;
+      }
+
+      .btn-continue {
+        background: var(--jade-primary);
+        border: none;
+        padding: 1rem 3rem;
+        font-weight: 600;
+        border-radius: 0.5rem;
+        color: white;
+        font-size: 1.1rem;
+      }
+
+      .btn-continue:hover {
+        background: var(--jade-success);
+        color: white;
+      }
+
+      .jadebro-gradient {
+        background: linear-gradient(
+          135deg,
+          var(--jadebro-primary),
+          var(--jadebro-secondary)
+        );
+        color: white;
+      }
+
+      .hidden {
+        display: none !important;
+      }
+
+      .plan-price {
+        font-size: 2rem;
+        font-weight: bold;
+        color: var(--jade-primary);
+        margin: 1rem 0;
+      }
+
+      .plan-price.jadebro {
+        background: linear-gradient(
+          135deg,
+          var(--jadebro-primary),
+          var(--jadebro-secondary)
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .selected-plan-info {
+        background: #f8f9fa;
+        border-radius: 0.5rem;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border-left: 4px solid var(--jade-primary);
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="main-container">
+      <!-- Step Indicator -->
+      <div class="step-indicator">
+        <div class="step active" id="stepPlan">
+          <div class="step-number">1</div>
+          <span>Elegir Plan</span>
+        </div>
+        <div class="mx-3">→</div>
+        <div class="step" id="stepInfo">
+          <div class="step-number">2</div>
+          <span>Información</span>
+        </div>
+      </div>
+
+      <!-- PASO 1: SELECCIÓN DE PLAN -->
+      <div id="planSelection">
+        <div class="step-header">
+          <h1 class="display-4 fw-bold mb-3">Elige tu plan perfecto</h1>
+          <p class="fs-5 opacity-90">
+            Empieza gratis y evoluciona tu negocio con planes que se adaptan a
+            ti
+          </p>
+        </div>
+
+        <div class="row g-4">
+          <!-- Plan Gratis -->
+          <div class="col-lg-3 col-md-6">
+            <div class="plan-card" data-plan="gratis">
+              <h4 class="fw-bold text-center mb-3">Empezar</h4>
+              <div class="plan-price text-center">GRATIS</div>
+              <p class="text-center text-muted">Para probar</p>
+
+              <ul class="list-unstyled">
+                <li class="mb-2">
+                  <i class="fas fa-check text-success me-2"></i>Hasta 10
+                  productos
+                </li>
+                <li class="mb-2">
+                  <i class="fas fa-check text-success me-2"></i>Carrito de
+                  compras
+                </li>
+                <li class="mb-2">
+                  <i class="fas fa-check text-success me-2"></i>Integración
+                  WhatsApp
+                </li>
+                <li class="mb-2">
+                  <i class="fas fa-check text-success me-2"></i>Control stock
+                  básico
+                </li>
+                <li class="mb-2">
+                  <i class="fas fa-check text-success me-2"></i>Dominio JadeShop
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Plan Pro -->
+          <div class="col-lg-3 col-md-6">
+            <div class="plan-card popular" data-plan="pro">
+              <div class="plan-badge">MÁS POPULAR</div>
+              <h4
+                class="fw-bold text-center mb-3"
+                style="color: var(--jade-primary)"
+              >
+                Comercio Pro
+              </h4>
+              <div class="plan-price text-center">
+                $30.000 <small>ARS/mes</small>
+              </div>
+              <p class="text-center text-muted">USD $20</p>
+
+              <ul class="list-unstyled">
+                <li class="mb-2">
+                  <i class="fas fa-check text-success me-2"></i>Productos
+                  ilimitados
+                </li>
+                <li class="mb-2">
+                  <i class="fas fa-check text-success me-2"></i>Optimizado
+                  TikTok Live
+                </li>
+                <li class="mb-2">
+                  <i class="fas fa-video text-success me-2"></i>Videos TikTok
+                  integrados
+                </li>
+                <li class="mb-2">
+                  <i class="fas fa-boxes text-success me-2"></i>Control stock
+                  avanzado
+                </li>
+                <li class="mb-2">
+                  <i class="fas fa-chart-pie text-success me-2"></i>Panel
+                  control básico
+                </li>
+                <li class="mb-2">
+                  <i class="fas fa-headset text-success me-2"></i>Soporte
+                  prioritario
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Plan JadeBro IA -->
+          <div class="col-lg-3 col-md-6">
+            <div class="plan-card jadebro-gradient" data-plan="jadebro">
+              <div class="plan-badge jadebro">IA POWERED</div>
+              <h4 class="fw-bold text-center mb-3">
+                <i class="fas fa-robot me-2"></i>JadeBro IA
+              </h4>
+              <div class="plan-price text-center text-white">
+                $60.000 <small>ARS/mes</small>
+              </div>
+              <p class="text-center opacity-75">USD $40</p>
+
+              <ul class="list-unstyled">
+                <li class="mb-2">
+                  <i class="fas fa-check me-2"></i>Todo del plan Pro + IA
+                </li>
+                <li class="mb-2">
+                  <i class="fas fa-robot me-2"></i
+                  ><strong>JadeBro IA 24/7</strong>
+                </li>
+                <li class="mb-2">
+                  <i class="fas fa-comments me-2"></i>WhatsApp 24/7
+                </li>
+                <li class="mb-2">
+                  <i class="fas fa-brain me-2"></i>Panel inteligente completo
+                </li>
+                <li class="mb-2">
+                  <i class="fas fa-chart-line me-2"></i>Analytics predictivos
+                </li>
+                <li class="mb-2">
+                  <i class="fas fa-bullhorn me-2"></i>Sugerencias automáticas
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Plan JadeBro IA MAX -->
+          <div class="col-lg-3 col-md-6">
+            <div class="plan-card jadebro-gradient" data-plan="jadebro-max">
+              <div class="plan-badge jadebro">OMNICANAL + TEAM</div>
+              <h4 class="fw-bold text-center mb-3">
+                <i class="fas fa-robot me-2"></i>JadeBro MAX
+              </h4>
+              <div class="plan-price text-center text-white">
+                $140.000 <small>ARS/mes</small>
+              </div>
+              <p class="text-center opacity-75">USD $90</p>
+
+              <ul class="list-unstyled">
+                <li class="mb-2">
+                  <i class="fas fa-check me-2"></i>Todo PRO + IA + OmniCanal
+                </li>
+                <li class="mb-2">
+                  <i class="fas fa-robot me-2"></i
+                  ><strong>JadeBro IA 24/7</strong>
+                </li>
+                <li class="mb-2">
+                  <i class="fas fa-comments me-2"></i>WhatsApp + Instagram +
+                  Facebook
+                </li>
+                <li class="mb-2">
+                  <i class="fas fa-users me-2"></i>Plan TEAM (2+ usuarios)
+                </li>
+                <li class="mb-2">
+                  <i class="fas fa-brain me-2"></i>Panel inteligente completo
+                </li>
+                <li class="mb-2">
+                  <i class="fas fa-cogs me-2"></i>CRM Integrado
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-center mt-4">
+          <button class="btn btn-continue" id="continueToForm" disabled>
+            Continuar con plan seleccionado
+            <i class="fas fa-arrow-right ms-2"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- PASO 2: FORMULARIO DE REGISTRO -->
+      <div id="registrationForm" class="hidden">
+        <div class="registration-card">
+          <!-- Header -->
+          <div class="header-section">
+            <!-- Plan seleccionado -->
+            <div class="selected-plan-info">
+              <div class="d-flex justify-content-between align-items-center">
+                <span id="selectedPlanName" class="fw-bold"></span>
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-light"
+                  id="changePlan"
+                >
+                  Cambiar plan
+                </button>
+              </div>
+              <div id="selectedPlanPrice" class="mt-1"></div>
+            </div>
+
+            <h2 class="mb-3">Completa tu información</h2>
+            <p class="mb-0 opacity-90">Tu tienda estará lista en minutos</p>
+
+            <div class="mt-4">
+              <span class="feature-badge">
+                <i class="fas fa-mobile-alt me-1"></i>
+                Optimizado móvil
+              </span>
+              <span class="feature-badge">
+                <i class="fab fa-whatsapp me-1"></i>
+                Integración WhatsApp
+              </span>
+              <span class="feature-badge">
+                <i class="fas fa-palette me-1"></i>
+                Personalizable
+              </span>
+            </div>
+          </div>
+
+          <!-- Formulario -->
+          <div class="form-section">
+            <form id="storeRegistrationForm">
+              <!-- Campo oculto para el plan -->
+              <input type="hidden" id="selectedPlan" name="plan" />
+
+              <!-- Nombre del comercio -->
+              <div class="mb-3">
+                <label for="nombreComercio" class="form-label fw-semibold">
+                  Nombre del comercio <span class="text-danger">*</span>
+                </label>
+                <input
+                  type="text"
+                  class="form-control form-control-lg"
+                  id="nombreComercio"
+                  placeholder="Nombre de mi comercio"
+                  required
+                />
+              </div>
+
+              <!-- Nombre de usuario (slug) -->
+              <div class="mb-3">
+                <label for="nombreUsuario" class="form-label fw-semibold">
+                  Nombre de usuario <span class="text-danger">*</span>
+                </label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="nombreUsuario"
+                  placeholder="mi-tienda"
+                  required
+                  pattern="[a-z0-9\-]+"
+                  title="Solo letras minúsculas, números y guiones"
+                />
+                <div class="preview-url">
+                  <span class="base-url">jadeshop.live/</span>
+                  <span class="user-slug" id="slugPreview">mi-tienda</span>
+                </div>
+                <small class="form-text text-muted"
+                  >Solo letras minúsculas, números y guiones</small
+                >
+              </div>
+
+              <!-- Rubro del comercio -->
+              <div class="mb-3">
+                <label for="rubroComercio" class="form-label fw-semibold">
+                  Rubro del comercio <span class="text-danger">*</span>
+                </label>
+                <select class="form-select" id="rubroComercio" required>
+                  <option value="">Seleccione una categoría</option>
+                  <option value="Ropa y Accesorios">Ropa y Accesorios</option>
+                  <option value="Electrónicos">Electrónicos</option>
+                  <option value="Hogar y Jardín">Hogar y Jardín</option>
+                  <option value="Deportes y Fitness">Deportes y Fitness</option>
+                  <option value="Belleza y Cuidado Personal">
+                    Belleza y Cuidado Personal
+                  </option>
+                  <option value="Libros y Educación">Libros y Educación</option>
+                  <option value="Juguetes y Bebés">Juguetes y Bebés</option>
+                  <option value="Automotriz">Automotriz</option>
+                  <option value="Alimentos y Bebidas">
+                    Alimentos y Bebidas
+                  </option>
+                  <option value="Arte y Manualidades">
+                    Arte y Manualidades
+                  </option>
+                  <option value="Otro">Otro</option>
+                </select>
+              </div>
+
+              <!-- WhatsApp -->
+              <div class="mb-3">
+                <label for="whatsappComercio" class="form-label fw-semibold">
+                  WhatsApp donde recibirás los pedidos
+                  <span class="text-danger">*</span>
+                </label>
+                <div class="input-group">
+                  <select class="form-select country-select" id="codigoPais">
+                    <option value="+54">🇦🇷 +54</option>
+                    <option value="+1">🇺🇸 +1</option>
+                    <option value="+52">🇲🇽 +52</option>
+                    <option value="+57">🇨🇴 +57</option>
+                    <option value="+51">🇵🇪 +51</option>
+                    <option value="+56">🇨🇱 +56</option>
+                    <option value="+598">🇺🇾 +598</option>
+                    <option value="+591">🇧🇴 +591</option>
+                    <option value="+34">🇪🇸 +34</option>
+                  </select>
+                  <input
+                    type="tel"
+                    class="form-control phone-input"
+                    id="whatsappComercio"
+                    placeholder="1144440000"
+                    required
+                  />
+                </div>
+              </div>
+
+              <!-- País -->
+              <div class="mb-3">
+                <label for="pais" class="form-label fw-semibold">
+                  País <span class="text-danger">*</span>
+                </label>
+                <select class="form-select" id="pais" required>
+                  <option value="">Selecciona un país</option>
+                  <option value="Argentina">🇦🇷 Argentina</option>
+                  <option value="México">🇲🇽 México</option>
+                  <option value="Colombia">🇨🇴 Colombia</option>
+                  <option value="Perú">🇵🇪 Perú</option>
+                  <option value="Chile">🇨🇱 Chile</option>
+                  <option value="Uruguay">🇺🇾 Uruguay</option>
+                  <option value="Bolivia">🇧🇴 Bolivia</option>
+                  <option value="España">🇪🇸 España</option>
+                  <option value="Estados Unidos">🇺🇸 Estados Unidos</option>
+                  <option value="Otro">🌍 Otro</option>
+                </select>
+              </div>
+
+              <!-- Email -->
+              <div class="mb-4">
+                <label for="email" class="form-label fw-semibold">
+                  E-mail <span class="text-danger">*</span>
+                </label>
+                <input
+                  type="email"
+                  class="form-control"
+                  id="email"
+                  placeholder="tu@email.com"
+                  required
+                />
+                <small class="form-text text-muted"
+                  >Te enviaremos las credenciales de acceso</small
+                >
+              </div>
+
+              <!-- Contraseña -->
+              <div class="mb-3">
+                <label for="password" class="form-label fw-semibold">
+                  Contraseña <span class="text-danger">*</span>
+                </label>
+                <input
+                  type="password"
+                  class="form-control"
+                  id="password"
+                  placeholder="Mínimo 6 caracteres"
+                  required
+                  minlength="6"
+                />
+                <small class="form-text text-muted"
+                  >Para acceder a tu panel de administración</small
+                >
+              </div>
+
+              <!-- Confirmar contraseña -->
+              <div class="mb-4">
+                <label for="confirmPassword" class="form-label fw-semibold">
+                  Confirmar contraseña <span class="text-danger">*</span>
+                </label>
+                <input
+                  type="password"
+                  class="form-control"
+                  id="confirmPassword"
+                  placeholder="Repite tu contraseña"
+                  required
+                  minlength="6"
+                />
+              </div>
+
+              <!-- Términos y condiciones -->
+              <div class="mb-4">
+                <div class="form-check">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    id="terminos"
+                    required
+                  />
+                  <label class="form-check-label" for="terminos">
+                    Acepto los
+                    <a href="#" class="text-decoration-none"
+                      >términos y condiciones</a
+                    >
+                    y la
+                    <a href="#" class="text-decoration-none"
+                      >política de privacidad</a
+                    >
+                  </label>
+                </div>
+              </div>
+
+              <!-- Botón submit -->
+              <div class="d-grid">
+                <button type="submit" class="btn btn-create" id="btnCrear">
+                  <span id="btnText">
+                    <i class="fas fa-store me-2"></i>
+                    Crear mi tienda ahora
+                  </span>
+                  <span id="btnSpinner" class="d-none">
+                    <span class="spinner-border spinner-border-sm me-2"></span>
+                    Creando tienda...
+                  </span>
+                </button>
+              </div>
+            </form>
+
+            <!-- Footer -->
+            <div class="text-center mt-4 pt-4 border-top">
+              <p class="text-muted mb-2">¿Ya tienes una tienda?</p>
+              <a href="/admin/" class="btn btn-outline-primary">
+                <i class="fas fa-sign-in-alt me-1"></i>
+                Iniciar sesión
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- JavaScript del registro -->
+    <script>
+      let selectedPlan = null;
+      let checkSlugTimeout = null;
+
+      // Lista de slugs reservados
+      const RESERVED_SLUGS = [
+        "admin",
+        "api",
+        "tienda",
+        "www",
+        "app",
+        "mail",
+        "ftp",
+        "blog",
+        "shop",
+        "store",
+        "help",
+        "support",
+        "login",
+        "register",
+        "signup",
+        "dashboard",
+        "panel",
+        "config",
+        "settings",
+        "home",
+        "index",
+        "assets",
+        "static",
+        "public",
+        "js",
+        "css",
+        "img",
+        "images",
+        "favicon",
+        "robots",
+        "sitemap",
+        "manifest",
+        "sw",
+        "service-worker",
+      ];
+
+      // Función para validar slug
+      function validateSlug(slug) {
+        if (!slug || slug.length < 3) {
+          return {
+            valid: false,
+            message: "El nombre debe tener al menos 3 caracteres.",
+          };
+        }
+
+        if (slug.length > 30) {
+          return {
+            valid: false,
+            message: "El nombre no puede tener más de 30 caracteres.",
+          };
+        }
+
+        if (RESERVED_SLUGS.includes(slug.toLowerCase())) {
+          return {
+            valid: false,
+            message: "Este nombre no está disponible. Prueba con otro.",
+          };
+        }
+
+        return { valid: true, message: "" };
+      }
+
+      // Función para verificar disponibilidad en el servidor
+      async function checkSlugAvailability(slug) {
+        try {
+          const response = await fetch(`/api/check-slug/${slug}`);
+          const data = await response.json();
+          return data.available;
+        } catch (error) {
+          console.error("Error verificando slug:", error);
+          return true; // En caso de error, asumir disponible
+        }
+      }
+
+      // Función para mostrar estado del slug
+      function updateSlugStatus(slug, isValid, message, isChecking = false) {
+        const input = document.getElementById("nombreUsuario");
+        const preview = document.getElementById("slugPreview");
+        let statusMsg = input.parentNode.querySelector(".slug-status");
+
+        // Crear elemento de status si no existe
+        if (!statusMsg) {
+          statusMsg = document.createElement("small");
+          statusMsg.className =
+            "form-text slug-status d-flex align-items-center";
+          input.parentNode.appendChild(statusMsg);
+        }
+
+        // Actualizar preview
+        preview.textContent = slug || "mi-tienda";
+
+        if (isChecking) {
+          input.style.borderColor = "#ffc107";
+          preview.style.color = "#ffc107";
+          statusMsg.innerHTML =
+            '<i class="fas fa-spinner fa-spin me-2"></i>Verificando disponibilidad...';
+          statusMsg.className =
+            "form-text slug-status text-warning d-flex align-items-center";
+          input.setCustomValidity("Verificando...");
+        } else if (!isValid) {
+          input.style.borderColor = "#dc3545";
+          preview.style.color = "#dc3545";
+          statusMsg.innerHTML = `<i class="fas fa-times me-2"></i>${message}`;
+          statusMsg.className =
+            "form-text slug-status text-danger d-flex align-items-center";
+          input.setCustomValidity(message);
+        } else {
+          input.style.borderColor = "#198754";
+          preview.style.color = "#198754";
+          statusMsg.innerHTML =
+            '<i class="fas fa-check me-2"></i>Nombre disponible';
+          statusMsg.className =
+            "form-text slug-status text-success d-flex align-items-center";
+          input.setCustomValidity("");
+        }
+      }
+
+      // Manejo de selección de planes
+      document.querySelectorAll(".plan-card").forEach((card) => {
+        card.addEventListener("click", function () {
+          document
+            .querySelectorAll(".plan-card")
+            .forEach((c) => c.classList.remove("selected"));
+          this.classList.add("selected");
+          selectedPlan = this.dataset.plan;
+          document.getElementById("continueToForm").disabled = false;
+        });
+      });
+
+      // Continuar al formulario
+      document
+        .getElementById("continueToForm")
+        .addEventListener("click", function () {
+          if (!selectedPlan) return;
+
+          // Si el plan es de pago, redirigir a WhatsApp
+          if (selectedPlan !== "gratis") {
+            const planInfo = getPlanInfo(selectedPlan);
+            const whatsappNumber = "5491135850512"; // Tu número de WhatsApp
+            const message = `Hola! Quiero contratar el *${planInfo.name}* (${planInfo.price}). ¿Cómo puedo continuar con el pago?`;
+            const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
+              message
+            )}`;
+
+            window.open(whatsappUrl, "_blank");
+            return;
+          }
+
+          // Si es plan gratis, continuar con el formulario normal
+          document.getElementById("stepPlan").classList.remove("active");
+          document.getElementById("stepInfo").classList.add("active");
+          document.getElementById("planSelection").classList.add("hidden");
+          document
+            .getElementById("registrationForm")
+            .classList.remove("hidden");
+
+          const planInfo = getPlanInfo(selectedPlan);
+          document.getElementById("selectedPlanName").textContent =
+            planInfo.name;
+          document.getElementById("selectedPlanPrice").textContent =
+            planInfo.price;
+          document.getElementById("selectedPlan").value = selectedPlan;
+
+          window.scrollTo(0, 0);
+        });
+      // Cambiar plan
+      document
+        .getElementById("changePlan")
+        .addEventListener("click", function () {
+          document.getElementById("stepInfo").classList.remove("active");
+          document.getElementById("stepPlan").classList.add("active");
+          document.getElementById("registrationForm").classList.add("hidden");
+          document.getElementById("planSelection").classList.remove("hidden");
+          window.scrollTo(0, 0);
+        });
+
+      // Información de planes
+      function getPlanInfo(plan) {
+        const plans = {
+          gratis: { name: "Plan Empezar", price: "GRATIS" },
+          pro: { name: "Plan Comercio Pro", price: "$30.000 ARS/mes" },
+          jadebro: { name: "Plan JadeBro IA", price: "$60.000 ARS/mes" },
+          "jadebro-max": {
+            name: "Plan JadeBro IA MAX",
+            price: "$140.000 ARS/mes",
+          },
+        };
+        return plans[plan] || { name: "Plan", price: "" };
+      }
+
+      // Preview del slug con validación completa
+      document
+        .getElementById("nombreUsuario")
+        .addEventListener("input", function () {
+          const slug = this.value.toLowerCase().replace(/[^a-z0-9\-]/g, "");
+          this.value = slug;
+
+          // Limpiar timeout anterior
+          if (checkSlugTimeout) {
+            clearTimeout(checkSlugTimeout);
+          }
+
+          // Validación inmediata
+          const validation = validateSlug(slug);
+
+          if (!validation.valid) {
+            updateSlugStatus(slug, false, validation.message);
+            return;
+          }
+
+          // Mostrar estado "verificando"
+          updateSlugStatus(slug, false, "", true);
+
+          // Verificar disponibilidad con debounce
+          checkSlugTimeout = setTimeout(async () => {
+            const isAvailable = await checkSlugAvailability(slug);
+
+            if (isAvailable) {
+              updateSlugStatus(slug, true, "Nombre disponible");
+            } else {
+              updateSlugStatus(
+                slug,
+                false,
+                "Este nombre ya está en uso. Prueba con otro."
+              );
+            }
+          }, 800); // Esperar 800ms después de que el usuario deje de escribir
+        });
+
+      // Envío del formulario
+      document
+        .getElementById("storeRegistrationForm")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+
+          // Verificar que el slug sea válido
+          const slugInput = document.getElementById("nombreUsuario");
+          if (slugInput.checkValidity() === false) {
+            alert("Por favor, elige un nombre de usuario válido y disponible.");
+            return;
+          }
+
+          // Verificar contraseñas
+          const password = document.getElementById("password").value;
+          const confirmPassword =
+            document.getElementById("confirmPassword").value;
+
+          if (password !== confirmPassword) {
+            alert("Las contraseñas no coinciden");
+            return;
+          }
+
+          // Mostrar loading
+          document.getElementById("btnText").classList.add("d-none");
+          document.getElementById("btnSpinner").classList.remove("d-none");
+          document.getElementById("btnCrear").disabled = true;
+
+          // Preparar datos
+          const formData = {
+            plan: selectedPlan,
+            nombreComercio: document.getElementById("nombreComercio").value,
+            nombreUsuario: document.getElementById("nombreUsuario").value,
+            rubroComercio: document.getElementById("rubroComercio").value,
+            whatsapp:
+              document.getElementById("codigoPais").value +
+              document.getElementById("whatsappComercio").value,
+            pais: document.getElementById("pais").value,
+            email: document.getElementById("email").value,
+            password: password,
+          };
+
+          // Enviar al backend
+          fetch("/api/register", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(formData),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.success) {
+                alert(
+                  "¡Tienda creada exitosamente! Redirigiendo al panel de administración..."
+                );
+                window.location.href = "/admin/";
+              } else {
+                throw new Error(data.message || "Error al crear la tienda");
+              }
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+              alert("Error al crear la tienda: " + error.message);
+            })
+            .finally(() => {
+              // Restaurar botón
+              document.getElementById("btnText").classList.remove("d-none");
+              document.getElementById("btnSpinner").classList.add("d-none");
+              document.getElementById("btnCrear").disabled = false;
+            });
+        });
+
+      // Detectar parámetro de plan en URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const planFromUrl = urlParams.get("plan");
+
+      if (planFromUrl) {
+        const planCard = document.querySelector(`[data-plan="${planFromUrl}"]`);
+        if (planCard) {
+          planCard.click();
+          setTimeout(() => {
+            document.getElementById("continueToForm").click();
+          }, 500);
+        }
+      }
+    </script>
+  </body>
+</html>
