@@ -842,7 +842,9 @@ class TiendaDinamica {
       </button>
     </div>
   `;
-  }
+
+   
+   
 
   showToast(mensaje, tipo = "info") {
     const colores = {

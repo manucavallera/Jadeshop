@@ -140,33 +140,15 @@ app.get("/api/tiktok-oembed", async (req, res) => {
       return res.status(400).json({ error: "URL requerida" });
     }
 
-    let videoId = null;
-
-    // Intentar extraer ID de URL completa
-    const fullUrlMatch = url.match(/\/video\/(\d+)/);
-    if (fullUrlMatch) {
-      videoId = fullUrlMatch[1];
+    // Extraer video ID de la URL
+    const videoIdMatch = url.match(/\/video\/(\d+)/);
+    if (!videoIdMatch) {
+      return res.status(400).json({ error: "URL inválida" });
     }
 
-    // Si es enlace corto, generar embed sin ID específico
-    if (!videoId && url.includes("vm.tiktok.com")) {
-      const embedHtml = `
-        <blockquote class="tiktok-embed" 
-          cite="${url}" 
-          style="max-width: 605px; min-width: 325px;">
-          <section>
-            <a href="${url}" target="_blank" rel="noopener">Ver video en TikTok</a>
-          </section>
-        </blockquote>
-      `;
-      return res.json({ html: embedHtml });
-    }
+    const videoId = videoIdMatch[1];
 
-    if (!videoId) {
-      return res.status(400).json({ error: "No se pudo extraer ID del video" });
-    }
-
-    // Generar HTML embed con ID
+    // Generar HTML embed directamente (sin llamar a la API oEmbed)
     const embedHtml = `
       <blockquote class="tiktok-embed" 
         cite="${url}" 

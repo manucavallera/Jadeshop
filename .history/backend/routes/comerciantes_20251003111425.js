@@ -104,7 +104,6 @@ router.get("/:slug/productos", async (req, res) => {
 });
 
 // GET /api/comerciantes/:slug/productos/:id - Obtener producto específico
-
 router.get("/:slug/productos/:id", async (req, res) => {
   try {
     const { slug, id } = req.params;
@@ -126,19 +125,10 @@ router.get("/:slug/productos/:id", async (req, res) => {
 
     const comercianteId = tiendaResult.rows[0].id;
 
-    // ✅ NUEVO: Obtener producto con imagen principal de galería
+    // Obtener producto específico
     const productoResult = await pool.query(
-      `SELECT p.*,
-              COALESCE(
-                (SELECT imagen_url 
-                 FROM producto_imagenes 
-                 WHERE producto_id = p.id 
-                 AND es_principal = true 
-                 LIMIT 1),
-                p.imagen_url
-              ) as imagen_url
-       FROM productos p
-       WHERE p.id = $1 AND p.comerciante_id = $2 AND p.activo = true`,
+      `SELECT * FROM productos 
+       WHERE id = $1 AND comerciante_id = $2 AND activo = true`,
       [id, comercianteId]
     );
 
@@ -388,51 +378,6 @@ router.post("/:slug/pedidos", async (req, res) => {
   } catch (error) {
     console.error("Error creando pedido:", error);
     res.status(500).json({ error: "Error interno del servidor" });
-  }
-});
-
-// Agregar ANTES del último module.exports
-router.get("/:slug/productos/:id/imagenes", async (req, res) => {
-  try {
-    const { slug, id } = req.params;
-
-    const tiendaResult = await pool.query(
-      `SELECT c.id FROM comerciantes c 
-       JOIN tiendas t ON c.id = t.comerciante_id 
-       WHERE t.subdominio = $1`,
-      [slug]
-    );
-
-    if (tiendaResult.rows.length === 0) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Tienda no encontrada" });
-    }
-
-    const comercianteId = tiendaResult.rows[0].id;
-
-    const productoCheck = await pool.query(
-      "SELECT id FROM productos WHERE id = $1 AND comerciante_id = $2",
-      [id, comercianteId]
-    );
-
-    if (productoCheck.rows.length === 0) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Producto no encontrado" });
-    }
-
-    const imagenesResult = await pool.query(
-      `SELECT * FROM producto_imagenes 
-       WHERE producto_id = $1 
-       ORDER BY es_principal DESC, orden ASC`,
-      [id]
-    );
-
-    res.json({ success: true, data: imagenesResult.rows });
-  } catch (error) {
-    console.error("Error:", error);
-    res.status(500).json({ success: false, message: "Error interno" });
   }
 });
 

@@ -587,13 +587,38 @@ class AdminPanel {
   }
 
   async saveProduct() {
+    console.log("💾 DEBUG: Iniciando saveProduct()");
+    console.log(
+      "📝 Modo edición:",
+      !!this.editingProduct,
+      "ID:",
+      this.editingProduct
+    );
+    console.log("🖼️ Imagen preservada en memoria:", this.currentProductImage);
+
     const form = document.getElementById("productoForm");
     if (!form.checkValidity()) {
       form.reportValidity();
       return;
     }
 
+    // Usar imagen de variable de clase como fallback
+
+    // NUEVO: Manejar múltiples imágenes
+    if (this.editingProduct) {
+      // Modo edición: procesar cambios en galería
+      await this.processImageChanges(this.editingProduct);
+    }
+
+    // Subir nuevas imágenes si hay archivos seleccionados
+    if (this.filesToUpload.length > 0) {
+      await this.uploadNewImages(this.editingProduct);
+    }
+
+    // AGREGAR ESTA LÍNEA ANTES DE productData:
     const categoriaSelect = document.getElementById("productoCategoria");
+
+    // La imagen_url principal se maneja automáticamente por el backend
 
     const productData = {
       nombre: document.getElementById("productoNombre").value.trim(),
@@ -615,59 +640,64 @@ class AdminPanel {
       tiktok_video_url:
         document.getElementById("productoTiktokUrl").value.trim() || null,
     };
+    console.log("📤 Datos a enviar:", productData);
 
     try {
       const url = this.editingProduct
         ? `/api/admin/productos/${this.editingProduct}`
         : "/api/admin/productos";
+
       const method = this.editingProduct ? "PUT" : "POST";
 
-      // 1. Guardar producto primero
+      console.log("🌐 Request:", method, url);
+
       const response = await fetch(url, {
         method: method,
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(productData),
       });
 
-      if (!response.ok) {
+      console.log("📡 Response status:", response.status);
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log("✅ Producto guardado:", result);
+
+        const modal = bootstrap.Modal.getInstance(
+          document.getElementById("productoModal")
+        );
+        modal.hide();
+
+        this.showAlert(
+          this.editingProduct
+            ? "Producto actualizado correctamente"
+            : "Producto creado correctamente",
+          "success"
+        );
+
+        // Limpiar variable de imagen
+        this.currentProductImage = null;
+
+        // NUEVO: Para gestión de galería de imágenes
+        this.productImages = [];
+        this.filesToUpload = [];
+        this.imagesToDelete = [];
+
+        this.loadProductos();
+        this.loadDashboard();
+      } else {
         const errorData = await response.json();
+        console.log("❌ Error del servidor:", errorData);
         throw new Error(errorData.message || "Error al guardar producto");
       }
-
-      const result = await response.json();
-      const productId = result.producto?.id || this.editingProduct;
-
-      console.log("✅ Producto guardado, ID:", productId);
-      console.log("📸 Archivos pendientes:", this.filesToUpload.length);
-
-      // 2. Subir imágenes DESPUÉS de guardar
-      if (this.filesToUpload.length > 0 && productId) {
-        console.log("📤 Subiendo", this.filesToUpload.length, "imágenes...");
-        await this.uploadNewImages(productId);
-      }
-
-      // 3. Cerrar modal
-      const modal = bootstrap.Modal.getInstance(
-        document.getElementById("productoModal")
-      );
-      modal.hide();
-
-      this.showAlert(
-        this.editingProduct ? "Producto actualizado" : "Producto creado",
-        "success"
-      );
-
-      // 4. Limpiar
-      this.currentProductImage = null;
-      this.productImages = [];
-      this.filesToUpload = [];
-      this.imagesToDelete = [];
-
-      this.loadProductos();
-      this.loadDashboard();
     } catch (error) {
-      console.error("Error:", error);
-      this.showAlert("Error: " + error.message, "danger");
+      console.error("❌ Error guardando producto:", error);
+      this.showAlert(
+        "Error al guardar el producto: " + error.message,
+        "danger"
+      );
     }
   }
 
@@ -1503,34 +1533,18 @@ class AdminPanel {
 
     container.innerHTML = html;
 
-    // ⬇️ AQUÍ VAN LOS LOGS - DESPUÉS DE container.innerHTML = html ⬇️
-    const inputElement = document.getElementById("addMoreImages");
-    console.log("🔍 Buscando input addMoreImages:", inputElement);
-
-    if (inputElement) {
-      console.log("✅ Input encontrado, agregando listener");
-      inputElement.addEventListener("change", (e) => {
-        console.log(
-          "🔥 Evento change disparado! Archivos:",
-          e.target.files.length
-        );
+    // Event listener para agregar más
+    document
+      .getElementById("addMoreImages")
+      ?.addEventListener("change", (e) => {
         this.handleMultipleImageUpload(e);
       });
-    } else {
-      console.error("❌ Input addMoreImages NO encontrado!");
-    }
-    // ⬆️ FIN DE LOS LOGS ⬆️
   }
 
-  async handleMultipleImageUpload(event) {
-    console.log("🎯 handleMultipleImageUpload INICIADO");
-
+  handleMultipleImageUpload(event) {
     const files = Array.from(event.target.files);
-    console.log("📁 files array:", files.length, "archivos");
-
     const totalImages =
       this.productImages.length + this.filesToUpload.length + files.length;
-    console.log("📊 Total imágenes:", totalImages);
 
     if (totalImages > 5) {
       this.showAlert(
@@ -1542,47 +1556,26 @@ class AdminPanel {
       return;
     }
 
-    // Validar tamaños ANTES de procesar
-    for (const file of files) {
+    files.forEach((file) => {
       if (file.size > 5 * 1024 * 1024) {
         this.showAlert(`${file.name} es muy grande (máx 5MB)`, "warning");
-        event.target.value = "";
         return;
       }
-    }
 
-    // Leer TODOS los archivos en paralelo
-    const readPromises = files.map((file) => {
-      return new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          resolve({
-            file: file,
-            preview: e.target.result,
-          });
-        };
-        reader.readAsDataURL(file);
-      });
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        this.filesToUpload.push({
+          file: file,
+          preview: e.target.result,
+        });
+        this.renderImageGallery();
+      };
+      reader.readAsDataURL(file);
     });
-
-    // Esperar a que TODOS se lean
-    const loadedFiles = await Promise.all(readPromises);
-
-    // Agregar todos a la vez
-    this.filesToUpload.push(...loadedFiles);
-    console.log(
-      "📦 filesToUpload actualizado, total:",
-      this.filesToUpload.length
-    );
-
-    // Renderizar UNA SOLA VEZ con todos los archivos
-    this.renderImageGallery();
 
     event.target.value = "";
   }
   async uploadNewImages(productId) {
-    console.log("🚀 uploadNewImages llamado con productId:", productId);
-
     if (!productId) {
       this.showAlert("Primero guarda el producto", "warning");
       return;
@@ -1594,6 +1587,7 @@ class AdminPanel {
 
     const formData = new FormData();
 
+    // Agregar TODAS las imágenes al mismo FormData
     this.filesToUpload.forEach((fileData) => {
       formData.append("imagenes", fileData.file);
     });
@@ -1617,24 +1611,8 @@ class AdminPanel {
         "success"
       );
 
+      // Limpiar array
       this.filesToUpload = [];
-
-      // ✅ NUEVO: Marcar la primera como principal automáticamente
-      if (result.imagenes && result.imagenes.length > 0) {
-        const primeraImagenId = result.imagenes[0].id;
-        console.log("⭐ Marcando imagen", primeraImagenId, "como principal");
-
-        await fetch(
-          `/api/admin/productos/${productId}/imagenes/${primeraImagenId}`,
-          {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ es_principal: true }),
-          }
-        );
-
-        console.log("✅ Imagen principal configurada");
-      }
     } catch (error) {
       console.error("Error:", error);
       this.showAlert("Error subiendo imágenes", "danger");

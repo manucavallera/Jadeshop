@@ -833,15 +833,15 @@ class TiendaDinamica {
 
   showError(message) {
     document.getElementById("initialLoading").innerHTML = `
-    <div class="text-center">
-      <i class="fas fa-exclamation-triangle text-warning mb-3" style="font-size: 4rem;"></i>
-      <h4 class="text-muted mb-3">Error</h4>
-      <p class="text-muted">${message}</p>
-      <button onclick="location.reload()" class="btn btn-primary">
-        <i class="fas fa-redo me-2"></i>Reintentar
-      </button>
-    </div>
-  `;
+            <div class="text-center">
+                <i class="fas fa-exclamation-triangle text-warning mb-3" style="font-size: 4rem;"></i>
+                <h4 class="text-muted mb-3">Error</h4>
+                <p class="text-muted">${message}</p>
+                <button onclick="location.reload()" class="btn btn-primary">
+                    <i class="fas fa-redo me-2"></i>Reintentar
+                </button>
+            </div>
+        `;
   }
 
   showToast(mensaje, tipo = "info") {
@@ -883,37 +883,3 @@ class TiendaDinamica {
 
 // Instancia global
 const tienda = new TiendaDinamica();
-
-// Función global para cargar preview de TikTok
-async function loadTikTokPreview() {
-  const url = document.getElementById("tiktokUrlInput").value;
-  const container = document.getElementById("tiktokPreviewContainer");
-
-  if (!url) return;
-
-  container.innerHTML =
-    '<div class="spinner-border text-primary" role="status"></div>';
-
-  try {
-    const response = await fetch(
-      `/api/tiktok-oembed?url=${encodeURIComponent(url)}`
-    );
-    if (!response.ok) throw new Error("Error cargando video");
-
-    const data = await response.json();
-    container.innerHTML = data.html;
-
-    // Recargar script TikTok
-    const script = document.createElement("script");
-    script.src = "https://www.tiktok.com/embed.js";
-    script.async = true;
-    document.body.appendChild(script);
-  } catch (error) {
-    container.innerHTML = `
-      <div class="alert alert-danger">
-        <i class="fas fa-exclamation-triangle me-2"></i>
-        No se pudo cargar el video. Verifica que el enlace sea correcto.
-      </div>
-    `;
-  }
-}

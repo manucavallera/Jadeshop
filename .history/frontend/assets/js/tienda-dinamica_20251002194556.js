@@ -27,10 +27,8 @@ class TiendaDinamica {
     try {
       await this.loadTiendaData();
       await this.loadProductos();
-
       this.setupEventListeners();
       this.updateCartUI();
-
       this.hideInitialLoading();
     } catch (error) {
       console.error("Error inicializando tienda:", error);
@@ -321,6 +319,108 @@ class TiendaDinamica {
           </div>
         </div>
       `;
+      })
+      .join("");
+  }
+
+  renderFeaturedGallery() {
+    const galleryContainer = document.getElementById("galleryGrid");
+    const gallerySection = document.getElementById("featuredGallery");
+
+    if (!this.productos || this.productos.length === 0) {
+      gallerySection.classList.add("d-none");
+      return;
+    }
+
+    // Tomar los primeros 6 productos con stock
+    const featured = this.productos.filter((p) => p.stock > 0).slice(0, 6);
+
+    if (featured.length === 0) {
+      gallerySection.classList.add("d-none");
+      return;
+    }
+
+    gallerySection.classList.remove("d-none");
+
+    galleryContainer.innerHTML = featured
+      .map((producto) => {
+        const hasTikTok =
+          producto.tiktok_url && producto.tiktok_url.trim() !== "";
+
+        return `
+      <div class="col-6 col-md-4 col-lg-2">
+        <div class="card product-card border-0 shadow-sm h-100" 
+             onclick="window.location.href='/producto-detalle.html?slug=${
+               this.slug
+             }&id=${producto.id}'"
+             style="cursor: pointer;">
+          
+          <div class="position-relative">
+            <!-- Badge de destacado -->
+            <div class="featured-badge">
+              <i class="fas fa-star me-1"></i>Destacado
+            </div>
+            
+            <!-- Badge de TikTok si tiene -->
+            ${
+              hasTikTok
+                ? `
+              <div class="tiktok-badge">
+                <i class="fab fa-tiktok"></i>
+              </div>
+            `
+                : ""
+            }
+            
+            <!-- Imagen -->
+            <img 
+              src="${
+                producto.imagen_url ||
+                "https://via.placeholder.com/200x200?text=Sin+Imagen"
+              }" 
+              alt="${producto.nombre}"
+              class="gallery-image w-100"
+            />
+          </div>
+          
+          <div class="card-body p-2">
+            <!-- Nombre (truncado) -->
+            <h6 class="card-title mb-1 small" style="
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+            ">
+              ${producto.nombre}
+            </h6>
+            
+            <!-- Precio -->
+            <div class="d-flex justify-content-between align-items-center">
+              ${
+                producto.precio_rebajado
+                  ? `<div>
+                     <small class="text-muted" style="text-decoration: line-through; font-size: 0.7rem;">
+                       $${parseFloat(producto.precio).toLocaleString("es-AR")}
+                     </small>
+                     <div class="fw-bold text-success" style="font-size: 0.9rem;">
+                       $${parseFloat(producto.precio_rebajado).toLocaleString(
+                         "es-AR"
+                       )}
+                     </div>
+                   </div>`
+                  : `<span class="fw-bold text-primary" style="font-size: 0.9rem;">
+                     $${parseFloat(producto.precio).toLocaleString("es-AR")}
+                   </span>`
+              }
+              
+              <!-- Stock -->
+              <small class="text-success">
+                <i class="fas fa-check-circle"></i>
+              </small>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
       })
       .join("");
   }
@@ -833,15 +933,15 @@ class TiendaDinamica {
 
   showError(message) {
     document.getElementById("initialLoading").innerHTML = `
-    <div class="text-center">
-      <i class="fas fa-exclamation-triangle text-warning mb-3" style="font-size: 4rem;"></i>
-      <h4 class="text-muted mb-3">Error</h4>
-      <p class="text-muted">${message}</p>
-      <button onclick="location.reload()" class="btn btn-primary">
-        <i class="fas fa-redo me-2"></i>Reintentar
-      </button>
-    </div>
-  `;
+            <div class="text-center">
+                <i class="fas fa-exclamation-triangle text-warning mb-3" style="font-size: 4rem;"></i>
+                <h4 class="text-muted mb-3">Error</h4>
+                <p class="text-muted">${message}</p>
+                <button onclick="location.reload()" class="btn btn-primary">
+                    <i class="fas fa-redo me-2"></i>Reintentar
+                </button>
+            </div>
+        `;
   }
 
   showToast(mensaje, tipo = "info") {
@@ -883,37 +983,3 @@ class TiendaDinamica {
 
 // Instancia global
 const tienda = new TiendaDinamica();
-
-// Función global para cargar preview de TikTok
-async function loadTikTokPreview() {
-  const url = document.getElementById("tiktokUrlInput").value;
-  const container = document.getElementById("tiktokPreviewContainer");
-
-  if (!url) return;
-
-  container.innerHTML =
-    '<div class="spinner-border text-primary" role="status"></div>';
-
-  try {
-    const response = await fetch(
-      `/api/tiktok-oembed?url=${encodeURIComponent(url)}`
-    );
-    if (!response.ok) throw new Error("Error cargando video");
-
-    const data = await response.json();
-    container.innerHTML = data.html;
-
-    // Recargar script TikTok
-    const script = document.createElement("script");
-    script.src = "https://www.tiktok.com/embed.js";
-    script.async = true;
-    document.body.appendChild(script);
-  } catch (error) {
-    container.innerHTML = `
-      <div class="alert alert-danger">
-        <i class="fas fa-exclamation-triangle me-2"></i>
-        No se pudo cargar el video. Verifica que el enlace sea correcto.
-      </div>
-    `;
-  }
-}

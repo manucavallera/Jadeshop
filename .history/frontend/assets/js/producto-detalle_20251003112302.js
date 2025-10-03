@@ -8,17 +8,13 @@ class ProductoDetalle {
     this.init();
   }
 
+  // AGREGAR AQUÍ
   extractTikTokVideoId(url) {
     if (!url) return null;
-
-    // Para URLs completas: tiktok.com/@usuario/video/1234567890
     const match = url.match(/\/video\/(\d+)/);
-    if (match) return match[1];
-
-    // Para enlaces cortos móviles (vm.tiktok.com/ZMhKqp3Jf/)
-    // No podemos extraer el ID, así que devolvemos la URL completa
-    return url;
+    return match ? match[1] : null;
   }
+
   getSlugFromURL() {
     const params = new URLSearchParams(window.location.search);
     return params.get("slug");
@@ -130,11 +126,6 @@ class ProductoDetalle {
       p.descripcion_larga || p.descripcion || "Sin descripción disponible";
     document.getElementById("productDescription").textContent = descripcion;
 
-    if (p.tiktok_video_url) {
-      document.getElementById("tiktokViewerSection").style.display = "block";
-      document.getElementById("tiktokUrlInput").value = p.tiktok_video_url;
-    }
-
     // AGREGAR AQUÍ EL CÓDIGO DE TIKTOK
     // Video TikTok
     if (p.tiktok_video_url) {
@@ -152,6 +143,7 @@ class ProductoDetalle {
           .getElementById("productDescription")
           .parentElement.appendChild(tiktokContainer);
 
+        // Crear el embed después de agregar el contenedor al DOM
         setTimeout(() => {
           tiktokContainer.innerHTML = `
         <h5 class="mb-3">Video del Producto</h5>
@@ -170,7 +162,7 @@ class ProductoDetalle {
         </div>
       `;
 
-          // Cargar script de TikTok
+          // Cargar y ejecutar script de TikTok
           const existingScript = document.querySelector(
             'script[src*="tiktok.com/embed"]'
           );
@@ -181,10 +173,16 @@ class ProductoDetalle {
           const script = document.createElement("script");
           script.src = "https://www.tiktok.com/embed.js";
           script.async = true;
+          script.onload = () => {
+            console.log("Script de TikTok cargado");
+          };
           document.body.appendChild(script);
         }, 100);
+      } else {
+        console.error("No se pudo extraer el ID del video");
       }
     }
+
     // Botón agregar al carrito
     const addBtn = document.getElementById("addToCartBtn");
     if (p.stock > 0) {
@@ -451,36 +449,3 @@ class ProductoDetalle {
 
 // Inicializar
 const productoDetalle = new ProductoDetalle();
-
-// Función global para cargar preview de TikTok
-async function loadTikTokPreview() {
-  const url = document.getElementById("tiktokUrlInput").value;
-  const container = document.getElementById("tiktokPreviewContainer");
-
-  if (!url) return;
-
-  container.innerHTML =
-    '<div class="spinner-border text-primary" role="status"></div>';
-
-  try {
-    const response = await fetch(
-      `/api/tiktok-oembed?url=${encodeURIComponent(url)}`
-    );
-    if (!response.ok) throw new Error("Error cargando video");
-
-    const data = await response.json();
-    container.innerHTML = data.html;
-
-    const script = document.createElement("script");
-    script.src = "https://www.tiktok.com/embed.js";
-    script.async = true;
-    document.body.appendChild(script);
-  } catch (error) {
-    container.innerHTML = `
-      <div class="alert alert-danger">
-        <i class="fas fa-exclamation-triangle me-2"></i>
-        Error cargando video. Verifica el enlace.
-      </div>
-    `;
-  }
-}

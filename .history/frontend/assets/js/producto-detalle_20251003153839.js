@@ -451,36 +451,3 @@ class ProductoDetalle {
 
 // Inicializar
 const productoDetalle = new ProductoDetalle();
-
-// Función global para cargar preview de TikTok
-async function loadTikTokPreview() {
-  const url = document.getElementById("tiktokUrlInput").value;
-  const container = document.getElementById("tiktokPreviewContainer");
-
-  if (!url) return;
-
-  container.innerHTML =
-    '<div class="spinner-border text-primary" role="status"></div>';
-
-  try {
-    const response = await fetch(
-      `/api/tiktok-oembed?url=${encodeURIComponent(url)}`
-    );
-    if (!response.ok) throw new Error("Error cargando video");
-
-    const data = await response.json();
-    container.innerHTML = data.html;
-
-    const script = document.createElement("script");
-    script.src = "https://www.tiktok.com/embed.js";
-    script.async = true;
-    document.body.appendChild(script);
-  } catch (error) {
-    container.innerHTML = `
-      <div class="alert alert-danger">
-        <i class="fas fa-exclamation-triangle me-2"></i>
-        Error cargando video. Verifica el enlace.
-      </div>
-    `;
-  }
-}

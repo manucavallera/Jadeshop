@@ -842,6 +842,40 @@ class TiendaDinamica {
       </button>
     </div>
   `;
+
+    // Función global para cargar preview
+    async function loadTikTokPreview() {
+      const url = document.getElementById("tiktokUrlInput").value;
+      const container = document.getElementById("tiktokPreviewContainer");
+
+      if (!url) return;
+
+      container.innerHTML =
+        '<div class="spinner-border text-primary" role="status"></div>';
+
+      try {
+        const response = await fetch(
+          `/api/tiktok-oembed?url=${encodeURIComponent(url)}`
+        );
+        if (!response.ok) throw new Error("Error cargando video");
+
+        const data = await response.json();
+        container.innerHTML = data.html;
+
+        // Recargar script TikTok
+        const script = document.createElement("script");
+        script.src = "https://www.tiktok.com/embed.js";
+        script.async = true;
+        document.body.appendChild(script);
+      } catch (error) {
+        container.innerHTML = `
+      <div class="alert alert-danger">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        No se pudo cargar el video. Verifica que el enlace sea correcto.
+      </div>
+    `;
+      }
+    }
   }
 
   showToast(mensaje, tipo = "info") {

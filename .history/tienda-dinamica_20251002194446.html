@@ -503,6 +503,46 @@
           display: none;
         }
       }
+
+      #featuredGallery .product-card {
+        height: 100%;
+        transition: all 0.3s ease;
+      }
+
+      #featuredGallery .product-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      }
+
+      #featuredGallery .gallery-image {
+        height: 200px;
+        object-fit: cover;
+        border-radius: 8px 8px 0 0;
+      }
+
+      #featuredGallery .featured-badge {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background: linear-gradient(135deg, #ffd700, #ff8c00);
+        color: white;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        z-index: 5;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      }
+
+      @media (max-width: 768px) {
+        #featuredGallery .gallery-image {
+          height: 150px;
+        }
+
+        #featuredGallery h3 {
+          font-size: 1.1rem;
+        }
+      }
     </style>
   </head>
   <body class="bg-light">
@@ -514,7 +554,7 @@
     >
       <div class="text-center">
         <div
-          class="spinner-b#feaorder text-primary mb-3"
+          class="spinner-border text-primary mb-3"
           style="width: 3rem; height: 3rem"
         ></div>
         <div>Cargando tienda...</div>
@@ -561,6 +601,29 @@
           </div>
         </div>
       </header>
+
+      <!-- Galería de Productos Destacados -->
+      <section id="featuredGallery" class="bg-white py-4 border-bottom d-none">
+        <div class="container">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <h3 class="h5 mb-1 fw-bold">Productos Destacados</h3>
+              <p class="text-muted small mb-0">Los mejores de nuestra tienda</p>
+            </div>
+            <button
+              id="viewAllProducts"
+              class="btn btn-outline-primary btn-sm"
+              onclick="document.getElementById('searchInput').scrollIntoView({ behavior: 'smooth' })"
+            >
+              Ver todos <i class="fas fa-arrow-down ms-1"></i>
+            </button>
+          </div>
+
+          <div id="galleryGrid" class="row g-3">
+            <!-- Los 6 productos destacados se cargan aquí -->
+          </div>
+        </div>
+      </section>
 
       <!-- Búsqueda y filtros -->
       <div class="bg-white border-bottom py-3">

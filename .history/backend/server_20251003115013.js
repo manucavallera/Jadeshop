@@ -22,8 +22,6 @@ app.use(
           "'unsafe-inline'",
           "https://cdn.jsdelivr.net",
           "https://cdnjs.cloudflare.com",
-          "https://www.tiktok.com", // ← AGREGAR ESTA LÍNEA
-          "https://sf16-website-login.neutral.ttwstatic.com", // ← AGREGAR
         ],
         scriptSrcAttr: ["'unsafe-inline'"],
         styleSrc: [
@@ -32,20 +30,12 @@ app.use(
           "https://cdn.jsdelivr.net",
           "https://cdnjs.cloudflare.com",
           "https://fonts.googleapis.com",
-          "https://sf16-website-login.neutral.ttwstatic.com",
         ],
         imgSrc: ["'self'", "data:", "https:", "http:"],
         fontSrc: [
           "'self'",
           "https://cdnjs.cloudflare.com",
           "https://fonts.gstatic.com",
-        ],
-        frameSrc: ["https://www.tiktok.com"],
-        connectSrc: [
-          // ← AGREGAR ESTA DIRECTIVA COMPLETA
-          "'self'",
-          "https://www.tiktok.com",
-          "https://sf16-website-login.neutral.ttwstatic.com",
         ],
       },
     },
@@ -140,47 +130,21 @@ app.get("/api/tiktok-oembed", async (req, res) => {
       return res.status(400).json({ error: "URL requerida" });
     }
 
-    let videoId = null;
+    const fetch = (await import("node-fetch")).default;
+    const oembedUrl = `https://www.tiktok.com/oembed?url=${encodeURIComponent(
+      url
+    )}`;
 
-    // Intentar extraer ID de URL completa
-    const fullUrlMatch = url.match(/\/video\/(\d+)/);
-    if (fullUrlMatch) {
-      videoId = fullUrlMatch[1];
+    const response = await fetch(oembedUrl);
+
+    if (!response.ok) {
+      throw new Error("Video no encontrado");
     }
 
-    // Si es enlace corto, generar embed sin ID específico
-    if (!videoId && url.includes("vm.tiktok.com")) {
-      const embedHtml = `
-        <blockquote class="tiktok-embed" 
-          cite="${url}" 
-          style="max-width: 605px; min-width: 325px;">
-          <section>
-            <a href="${url}" target="_blank" rel="noopener">Ver video en TikTok</a>
-          </section>
-        </blockquote>
-      `;
-      return res.json({ html: embedHtml });
-    }
-
-    if (!videoId) {
-      return res.status(400).json({ error: "No se pudo extraer ID del video" });
-    }
-
-    // Generar HTML embed con ID
-    const embedHtml = `
-      <blockquote class="tiktok-embed" 
-        cite="${url}" 
-        data-video-id="${videoId}" 
-        style="max-width: 605px; min-width: 325px;">
-        <section>
-          <a href="${url}" target="_blank" rel="noopener">Ver video en TikTok</a>
-        </section>
-      </blockquote>
-    `;
-
-    res.json({ html: embedHtml });
+    const data = await response.json();
+    res.json(data);
   } catch (error) {
-    console.error("❌ Error TikTok Embed:", error);
+    console.error("Error TikTok oEmbed:", error);
     res.status(500).json({ error: error.message });
   }
 });

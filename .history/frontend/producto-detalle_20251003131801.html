@@ -43,71 +43,6 @@
         font-size: 1.1rem;
         font-weight: 600;
       }
-
-      /* Responsive móvil */
-      @media (max-width: 768px) {
-        /* Carrusel más compacto */
-        .product-image {
-          height: 300px;
-        }
-
-        /* Miniaturas más pequeñas */
-        #thumbnailsContainer .col-3 img {
-          height: 60px !important;
-        }
-
-        /* Precio compacto */
-        .price-section {
-          padding: 15px;
-        }
-
-        .price-section .h2 {
-          font-size: 1.5rem;
-        }
-
-        /* Botón agregar al carrito */
-        .btn-add-cart {
-          padding: 12px;
-          font-size: 1rem;
-        }
-
-        /* Visor TikTok responsive */
-        #tiktokViewerSection .input-group {
-          flex-direction: column;
-        }
-
-        #tiktokViewerSection .input-group input {
-          border-radius: 0.375rem !important;
-          margin-bottom: 10px;
-        }
-
-        #tiktokViewerSection .input-group button {
-          border-radius: 0.375rem !important;
-          width: 100%;
-        }
-
-        /* Preview container más pequeño */
-        #tiktokPreviewContainer {
-          min-height: 200px !important;
-        }
-
-        /* Navbar responsive */
-        .navbar .container {
-          flex-wrap: wrap;
-        }
-
-        #storeName {
-          font-size: 1.2rem;
-          width: 100%;
-          text-align: center;
-          margin-top: 10px;
-        }
-
-        /* Títulos más pequeños */
-        #productName {
-          font-size: 1.5rem;
-        }
-      }
     </style>
   </head>
   <body class="bg-light">
@@ -207,40 +142,6 @@
             <div class="mb-4">
               <h5>Descripción</h5>
               <p id="productDescription" class="text-muted"></p>
-            </div>
-
-            <!-- ✅ VISOR TIKTOK - AGREGAR AQUÍ -->
-            <div class="mb-4" id="tiktokViewerSection" style="display: none">
-              <h5 class="mb-3">
-                <i class="fab fa-tiktok me-2"></i>Video del Producto
-              </h5>
-              <div class="card">
-                <div class="card-body">
-                  <div class="input-group mb-3">
-                    <input
-                      type="text"
-                      class="form-control"
-                      id="tiktokUrlInput"
-                      readonly
-                      placeholder="URL del video"
-                    />
-                    <button
-                      class="btn btn-primary"
-                      type="button"
-                      onclick="loadTikTokPreview()"
-                    >
-                      <i class="fas fa-play-circle me-1"></i>Cargar Video
-                    </button>
-                  </div>
-                  <div
-                    id="tiktokPreviewContainer"
-                    class="text-center"
-                    style="min-height: 300px"
-                  >
-                    <!-- El video se cargará aquí -->
-                  </div>
-                </div>
-              </div>
             </div>
 
             <!-- Video TikTok -->

@@ -122,28 +122,9 @@ router.get("/productos", requireAuth, async (req, res) => {
     const { comerciante_id } = req;
 
     const result = await pool.query(
-      `SELECT p.*, c.nombre as categoria 
-       FROM productos p
-       LEFT JOIN categorias c ON p.categoria_id = c.id
-       WHERE p.comerciante_id = $1 
-       ORDER BY p.created_at DESC`,
+      "SELECT * FROM productos WHERE comerciante_id = $1 ORDER BY created_at DESC",
       [comerciante_id]
     );
-
-    // Sincronizar imagen_url con la imagen principal de la galería
-    for (let producto of result.rows) {
-      if (!producto.imagen_url) {
-        const imagenPrincipal = await pool.query(
-          "SELECT imagen_url FROM producto_imagenes WHERE producto_id = $1 AND es_principal = true LIMIT 1",
-          [producto.id]
-        );
-
-        if (imagenPrincipal.rows.length > 0) {
-          producto.imagen_url = imagenPrincipal.rows[0].imagen_url;
-        }
-      }
-    }
-
     res.json(result.rows);
   } catch (error) {
     console.error("Error obteniendo productos:", error);
@@ -1084,5 +1065,7 @@ router.put(
     }
   }
 );
+
+module.exports = router;
 
 module.exports = router;

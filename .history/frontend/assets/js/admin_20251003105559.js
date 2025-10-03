@@ -1581,8 +1581,6 @@ class AdminPanel {
     event.target.value = "";
   }
   async uploadNewImages(productId) {
-    console.log("🚀 uploadNewImages llamado con productId:", productId);
-
     if (!productId) {
       this.showAlert("Primero guarda el producto", "warning");
       return;
@@ -1594,6 +1592,7 @@ class AdminPanel {
 
     const formData = new FormData();
 
+    // Agregar TODAS las imágenes al mismo FormData
     this.filesToUpload.forEach((fileData) => {
       formData.append("imagenes", fileData.file);
     });
@@ -1617,24 +1616,8 @@ class AdminPanel {
         "success"
       );
 
+      // Limpiar array
       this.filesToUpload = [];
-
-      // ✅ NUEVO: Marcar la primera como principal automáticamente
-      if (result.imagenes && result.imagenes.length > 0) {
-        const primeraImagenId = result.imagenes[0].id;
-        console.log("⭐ Marcando imagen", primeraImagenId, "como principal");
-
-        await fetch(
-          `/api/admin/productos/${productId}/imagenes/${primeraImagenId}`,
-          {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ es_principal: true }),
-          }
-        );
-
-        console.log("✅ Imagen principal configurada");
-      }
     } catch (error) {
       console.error("Error:", error);
       this.showAlert("Error subiendo imágenes", "danger");

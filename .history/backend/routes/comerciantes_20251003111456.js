@@ -391,49 +391,4 @@ router.post("/:slug/pedidos", async (req, res) => {
   }
 });
 
-// Agregar ANTES del último module.exports
-router.get("/:slug/productos/:id/imagenes", async (req, res) => {
-  try {
-    const { slug, id } = req.params;
-
-    const tiendaResult = await pool.query(
-      `SELECT c.id FROM comerciantes c 
-       JOIN tiendas t ON c.id = t.comerciante_id 
-       WHERE t.subdominio = $1`,
-      [slug]
-    );
-
-    if (tiendaResult.rows.length === 0) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Tienda no encontrada" });
-    }
-
-    const comercianteId = tiendaResult.rows[0].id;
-
-    const productoCheck = await pool.query(
-      "SELECT id FROM productos WHERE id = $1 AND comerciante_id = $2",
-      [id, comercianteId]
-    );
-
-    if (productoCheck.rows.length === 0) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Producto no encontrado" });
-    }
-
-    const imagenesResult = await pool.query(
-      `SELECT * FROM producto_imagenes 
-       WHERE producto_id = $1 
-       ORDER BY es_principal DESC, orden ASC`,
-      [id]
-    );
-
-    res.json({ success: true, data: imagenesResult.rows });
-  } catch (error) {
-    console.error("Error:", error);
-    res.status(500).json({ success: false, message: "Error interno" });
-  }
-});
-
 module.exports = router;

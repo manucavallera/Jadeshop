@@ -8,17 +8,13 @@ class ProductoDetalle {
     this.init();
   }
 
+  // AGREGAR AQUÍ
   extractTikTokVideoId(url) {
     if (!url) return null;
-
-    // Para URLs completas: tiktok.com/@usuario/video/1234567890
     const match = url.match(/\/video\/(\d+)/);
-    if (match) return match[1];
-
-    // Para enlaces cortos móviles (vm.tiktok.com/ZMhKqp3Jf/)
-    // No podemos extraer el ID, así que devolvemos la URL completa
-    return url;
+    return match ? match[1] : null;
   }
+
   getSlugFromURL() {
     const params = new URLSearchParams(window.location.search);
     return params.get("slug");
@@ -85,7 +81,6 @@ class ProductoDetalle {
       console.log("====================");
 
       this.renderProducto();
-      await this.loadImageGallery(); // ← AGREGAR ESTA LÍNEA
     } catch (error) {
       console.error("Error cargando producto:", error);
       throw error;
@@ -130,11 +125,6 @@ class ProductoDetalle {
       p.descripcion_larga || p.descripcion || "Sin descripción disponible";
     document.getElementById("productDescription").textContent = descripcion;
 
-    if (p.tiktok_video_url) {
-      document.getElementById("tiktokViewerSection").style.display = "block";
-      document.getElementById("tiktokUrlInput").value = p.tiktok_video_url;
-    }
-
     // AGREGAR AQUÍ EL CÓDIGO DE TIKTOK
     // Video TikTok
     if (p.tiktok_video_url) {
@@ -152,6 +142,7 @@ class ProductoDetalle {
           .getElementById("productDescription")
           .parentElement.appendChild(tiktokContainer);
 
+        // Crear el embed después de agregar el contenedor al DOM
         setTimeout(() => {
           tiktokContainer.innerHTML = `
         <h5 class="mb-3">Video del Producto</h5>
@@ -170,7 +161,7 @@ class ProductoDetalle {
         </div>
       `;
 
-          // Cargar script de TikTok
+          // Cargar y ejecutar script de TikTok
           const existingScript = document.querySelector(
             'script[src*="tiktok.com/embed"]'
           );
@@ -181,10 +172,16 @@ class ProductoDetalle {
           const script = document.createElement("script");
           script.src = "https://www.tiktok.com/embed.js";
           script.async = true;
+          script.onload = () => {
+            console.log("Script de TikTok cargado");
+          };
           document.body.appendChild(script);
         }, 100);
+      } else {
+        console.error("No se pudo extraer el ID del video");
       }
     }
+
     // Botón agregar al carrito
     const addBtn = document.getElementById("addToCartBtn");
     if (p.stock > 0) {
@@ -370,117 +367,79 @@ class ProductoDetalle {
       toastElement.remove();
     });
   }
+}
 
-  async loadImageGallery() {
-    try {
-      const response = await fetch(
-        `/api/comerciantes/${this.slug}/productos/${this.productoId}/imagenes`
-      );
+async loadImageGallery() {
+  try {
+    const response = await fetch(
+      `/api/comerciantes/${this.slug}/productos/${this.productoId}/imagenes`
+    );
+    
+    if (!response.ok) {
+      console.log("No hay galería, usando imagen única");
+      return;
+    }
 
-      if (!response.ok) {
-        console.log("No hay galería, usando imagen única");
-        return;
-      }
+    const result = await response.json();
+    const imagenes = result.data;
 
-      const result = await response.json();
-      const imagenes = result.data;
+    if (!imagenes || imagenes.length === 0) {
+      console.log("Galería vacía");
+      return;
+    }
 
-      if (!imagenes || imagenes.length === 0) {
-        console.log("Galería vacía");
-        return;
-      }
+    console.log(`✅ Galería cargada: ${imagenes.length} imágenes`);
 
-      console.log(`✅ Galería cargada: ${imagenes.length} imágenes`);
-
-      // Renderizar carrusel
-      const carouselInner = document.getElementById("carouselImages");
-      carouselInner.innerHTML = imagenes
-        .map(
-          (img, index) => `
-        <div class="carousel-item ${index === 0 ? "active" : ""}">
+    // Renderizar carrusel
+    const carouselInner = document.getElementById("carouselImages");
+    carouselInner.innerHTML = imagenes
+      .map((img, index) => `
+        <div class="carousel-item ${index === 0 ? 'active' : ''}">
           <img src="${img.imagen_url}" 
                class="product-image" 
                alt="${this.producto.nombre} - Imagen ${index + 1}">
         </div>
-      `
-        )
-        .join("");
+      `)
+      .join("");
 
-      // Indicadores
-      if (imagenes.length > 1) {
-        const indicators = document.getElementById("carouselIndicators");
-        indicators.innerHTML = imagenes
-          .map(
-            (img, index) => `
+    // Indicadores
+    if (imagenes.length > 1) {
+      const indicators = document.getElementById("carouselIndicators");
+      indicators.innerHTML = imagenes
+        .map((img, index) => `
           <button type="button" 
                   data-bs-target="#productImageCarousel" 
                   data-bs-slide-to="${index}" 
-                  ${index === 0 ? 'class="active" aria-current="true"' : ""}
+                  ${index === 0 ? 'class="active" aria-current="true"' : ''}
                   aria-label="Imagen ${index + 1}">
           </button>
-        `
-          )
-          .join("");
-      }
+        `)
+        .join("");
+    }
 
-      // Miniaturas
-      const thumbnails = document.getElementById("thumbnailsContainer");
-      thumbnails.innerHTML = imagenes
-        .map(
-          (img, index) => `
+    // Miniaturas
+    const thumbnails = document.getElementById("thumbnailsContainer");
+    thumbnails.innerHTML = imagenes
+      .map((img, index) => `
         <div class="col-3">
           <img src="${img.imagen_url}" 
                class="img-thumbnail" 
                style="cursor: pointer; height: 80px; width: 100%; object-fit: cover;"
                onclick="bootstrap.Carousel.getInstance(document.getElementById('productImageCarousel')).to(${index})">
         </div>
-      `
-        )
-        .join("");
+      `)
+      .join("");
 
-      // Mostrar controles si hay más de 1 imagen
-      if (imagenes.length > 1) {
-        document.getElementById("carouselPrev").style.display = "block";
-        document.getElementById("carouselNext").style.display = "block";
-      }
-    } catch (error) {
-      console.error("Error cargando galería:", error);
+    // Mostrar controles si hay más de 1 imagen
+    if (imagenes.length > 1) {
+      document.getElementById("carouselPrev").style.display = "block";
+      document.getElementById("carouselNext").style.display = "block";
     }
+
+  } catch (error) {
+    console.error("Error cargando galería:", error);
   }
 }
 
 // Inicializar
 const productoDetalle = new ProductoDetalle();
-
-// Función global para cargar preview de TikTok
-async function loadTikTokPreview() {
-  const url = document.getElementById("tiktokUrlInput").value;
-  const container = document.getElementById("tiktokPreviewContainer");
-
-  if (!url) return;
-
-  container.innerHTML =
-    '<div class="spinner-border text-primary" role="status"></div>';
-
-  try {
-    const response = await fetch(
-      `/api/tiktok-oembed?url=${encodeURIComponent(url)}`
-    );
-    if (!response.ok) throw new Error("Error cargando video");
-
-    const data = await response.json();
-    container.innerHTML = data.html;
-
-    const script = document.createElement("script");
-    script.src = "https://www.tiktok.com/embed.js";
-    script.async = true;
-    document.body.appendChild(script);
-  } catch (error) {
-    container.innerHTML = `
-      <div class="alert alert-danger">
-        <i class="fas fa-exclamation-triangle me-2"></i>
-        Error cargando video. Verifica el enlace.
-      </div>
-    `;
-  }
-}

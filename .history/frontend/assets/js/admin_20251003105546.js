@@ -1522,15 +1522,18 @@ class AdminPanel {
     // ⬆️ FIN DE LOS LOGS ⬆️
   }
 
-  async handleMultipleImageUpload(event) {
+  handleMultipleImageUpload(event) {
     console.log("🎯 handleMultipleImageUpload INICIADO");
-
+    console.log("📁 event.target:", event.target);
+    console.log("📁 event.target.files:", event.target.files);
     const files = Array.from(event.target.files);
-    console.log("📁 files array:", files.length, "archivos");
-
+    console.log("📁 files array:", files);
     const totalImages =
       this.productImages.length + this.filesToUpload.length + files.length;
     console.log("📊 Total imágenes:", totalImages);
+    console.log("   - productImages:", this.productImages.length);
+    console.log("   - filesToUpload:", this.filesToUpload.length);
+    console.log("   - nuevos files:", files.length);
 
     if (totalImages > 5) {
       this.showAlert(
@@ -1542,47 +1545,30 @@ class AdminPanel {
       return;
     }
 
-    // Validar tamaños ANTES de procesar
-    for (const file of files) {
+    files.forEach((file) => {
       if (file.size > 5 * 1024 * 1024) {
         this.showAlert(`${file.name} es muy grande (máx 5MB)`, "warning");
-        event.target.value = "";
         return;
       }
-    }
 
-    // Leer TODOS los archivos en paralelo
-    const readPromises = files.map((file) => {
-      return new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          resolve({
-            file: file,
-            preview: e.target.result,
-          });
-        };
-        reader.readAsDataURL(file);
-      });
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        this.filesToUpload.push({
+          file: file,
+          preview: e.target.result,
+        });
+        console.log(
+          "📦 filesToUpload actualizado, total:",
+          this.filesToUpload.length
+        );
+        this.renderImageGallery();
+      };
+      reader.readAsDataURL(file);
     });
-
-    // Esperar a que TODOS se lean
-    const loadedFiles = await Promise.all(readPromises);
-
-    // Agregar todos a la vez
-    this.filesToUpload.push(...loadedFiles);
-    console.log(
-      "📦 filesToUpload actualizado, total:",
-      this.filesToUpload.length
-    );
-
-    // Renderizar UNA SOLA VEZ con todos los archivos
-    this.renderImageGallery();
 
     event.target.value = "";
   }
   async uploadNewImages(productId) {
-    console.log("🚀 uploadNewImages llamado con productId:", productId);
-
     if (!productId) {
       this.showAlert("Primero guarda el producto", "warning");
       return;
@@ -1594,6 +1580,7 @@ class AdminPanel {
 
     const formData = new FormData();
 
+    // Agregar TODAS las imágenes al mismo FormData
     this.filesToUpload.forEach((fileData) => {
       formData.append("imagenes", fileData.file);
     });
@@ -1617,24 +1604,8 @@ class AdminPanel {
         "success"
       );
 
+      // Limpiar array
       this.filesToUpload = [];
-
-      // ✅ NUEVO: Marcar la primera como principal automáticamente
-      if (result.imagenes && result.imagenes.length > 0) {
-        const primeraImagenId = result.imagenes[0].id;
-        console.log("⭐ Marcando imagen", primeraImagenId, "como principal");
-
-        await fetch(
-          `/api/admin/productos/${productId}/imagenes/${primeraImagenId}`,
-          {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ es_principal: true }),
-          }
-        );
-
-        console.log("✅ Imagen principal configurada");
-      }
     } catch (error) {
       console.error("Error:", error);
       this.showAlert("Error subiendo imágenes", "danger");
