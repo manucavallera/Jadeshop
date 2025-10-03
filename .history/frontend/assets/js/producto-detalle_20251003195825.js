@@ -137,7 +137,54 @@ class ProductoDetalle {
 
     // AGREGAR AQUÍ EL CÓDIGO DE TIKTOK
     // Video TikTok
+    if (p.tiktok_video_url) {
+      const videoId = this.extractTikTokVideoId(p.tiktok_video_url);
 
+      console.log("TikTok URL:", p.tiktok_video_url);
+      console.log("Video ID extraído:", videoId);
+
+      if (videoId) {
+        const tiktokContainer = document.createElement("div");
+        tiktokContainer.className = "mt-4 mb-4";
+        tiktokContainer.id = "tiktok-container";
+
+        document
+          .getElementById("productDescription")
+          .parentElement.appendChild(tiktokContainer);
+
+        setTimeout(() => {
+          tiktokContainer.innerHTML = `
+        <h5 class="mb-3">Video del Producto</h5>
+        <div class="d-flex justify-content-center">
+          <blockquote 
+            class="tiktok-embed" 
+            cite="${p.tiktok_video_url}" 
+            data-video-id="${videoId}" 
+            style="max-width: 605px; min-width: 325px;">
+            <section>
+              <a href="${p.tiktok_video_url}" target="_blank" rel="noopener">
+                Ver video en TikTok
+              </a>
+            </section>
+          </blockquote>
+        </div>
+      `;
+
+          // Cargar script de TikTok
+          const existingScript = document.querySelector(
+            'script[src*="tiktok.com/embed"]'
+          );
+          if (existingScript) {
+            existingScript.remove();
+          }
+
+          const script = document.createElement("script");
+          script.src = "https://www.tiktok.com/embed.js";
+          script.async = true;
+          document.body.appendChild(script);
+        }, 100);
+      }
+    }
     // Botón agregar al carrito
     const addBtn = document.getElementById("addToCartBtn");
     if (p.stock > 0) {
