@@ -166,7 +166,6 @@ router.post("/productos", requireAuth, async (req, res) => {
       imagen_url,
       categoria_id,
       tiktok_video_url,
-      mostrar_stock,
     } = req.body;
 
     // AGREGAR ESTA VALIDACIÓN
@@ -232,7 +231,6 @@ router.put("/productos/:id", requireAuth, async (req, res) => {
       categoria_id,
       imagen_url,
       tiktok_video_url,
-      mostrar_stock,
     } = req.body;
 
     const result = await pool.query(

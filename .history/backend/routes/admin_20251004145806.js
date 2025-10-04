@@ -166,7 +166,6 @@ router.post("/productos", requireAuth, async (req, res) => {
       imagen_url,
       categoria_id,
       tiktok_video_url,
-      mostrar_stock,
     } = req.body;
 
     // AGREGAR ESTA VALIDACIÓN

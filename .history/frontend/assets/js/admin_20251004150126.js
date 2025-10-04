@@ -701,8 +701,6 @@ class AdminPanel {
         producto.precio_rebajado || "";
       document.getElementById("productoStock").value = producto.stock;
       document.getElementById("productoCategoria").value = producto.categoria;
-      document.getElementById("productoMostrarStock").checked =
-        producto.mostrar_stock !== false; // ← AGREGAR ESTA LÍNEA
 
       // Cambiar título
       document.getElementById("productoModalTitle").textContent =
@@ -965,7 +963,6 @@ class AdminPanel {
 
     document.getElementById("productoDescripcionLarga").value = "";
     document.getElementById("productoTiktokUrl").value = "";
-    document.getElementById("productoMostrarStock").checked = true; // ← AGREGAR ESTA LÍNEA
 
     // NUEVO: Limpiar variable de imagen
     this.currentProductImage = null;
@@ -976,7 +973,6 @@ class AdminPanel {
     this.clearGalleryUI();
 
     this.editingProduct = null;
-    this.currentProductImage = null;
   }
   // ===================
   // PEDIDOS

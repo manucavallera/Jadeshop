@@ -166,7 +166,6 @@ router.post("/productos", requireAuth, async (req, res) => {
       imagen_url,
       categoria_id,
       tiktok_video_url,
-      mostrar_stock,
     } = req.body;
 
     // AGREGAR ESTA VALIDACIÓN
@@ -232,11 +231,10 @@ router.put("/productos/:id", requireAuth, async (req, res) => {
       categoria_id,
       imagen_url,
       tiktok_video_url,
-      mostrar_stock,
     } = req.body;
 
     const result = await pool.query(
-      "UPDATE productos SET nombre=$1, descripcion=$2, descripcion_larga=$3, precio=$4, precio_rebajado=$5, stock=$6, categoria=$7, categoria_id=$8, imagen_url=$9, tiktok_video_url=$10, mostrar_stock=$11, updated_at=NOW() WHERE id=$12 AND comerciante_id=$13 RETURNING *",
+      "UPDATE productos SET nombre=$1, descripcion=$2, descripcion_larga=$3, precio=$4, precio_rebajado=$5, stock=$6, categoria=$7, categoria_id=$8, imagen_url=$9, tiktok_video_url=$10, updated_at=NOW() WHERE id=$11 AND comerciante_id=$12 RETURNING *",
       [
         nombre,
         descripcion,
@@ -247,10 +245,9 @@ router.put("/productos/:id", requireAuth, async (req, res) => {
         categoria,
         categoria_id,
         imagen_url,
-        tiktok_video_url, // $10
-        mostrar_stock !== undefined ? mostrar_stock : true, // $11
-        id, // $12
-        comerciante_id, // $13
+        tiktok_video_url, // $10 ✅
+        id, // $11 ✅
+        comerciante_id, // $12 ✅
       ]
     );
 

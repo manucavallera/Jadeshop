@@ -976,7 +976,6 @@ class AdminPanel {
     this.clearGalleryUI();
 
     this.editingProduct = null;
-    this.currentProductImage = null;
   }
   // ===================
   // PEDIDOS
