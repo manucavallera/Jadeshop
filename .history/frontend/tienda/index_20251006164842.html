@@ -1409,48 +1409,6 @@
           }, 500);
         }
       }
-
-      window.addEventListener("DOMContentLoaded", () => {
-        const urlParams = new URLSearchParams(window.location.search);
-        const paymentVerified = urlParams.get("payment_verified");
-        const plan = urlParams.get("plan");
-        const preapprovalId = urlParams.get("preapproval_id");
-
-        if (paymentVerified === "true" && plan && plan !== "gratis") {
-          selectedPlan = plan;
-
-          if (preapprovalId) {
-            const form = document.getElementById("storeRegistrationForm");
-            const subInput = document.createElement("input");
-            subInput.type = "hidden";
-            subInput.name = "subscription_id";
-            subInput.value = preapprovalId;
-            form.appendChild(subInput);
-          }
-
-          document.getElementById("stepPlan").classList.add("d-none");
-          document.getElementById("stepInfo").classList.add("active");
-          document.getElementById("planSelection").classList.add("hidden");
-          document
-            .getElementById("registrationForm")
-            .classList.remove("hidden");
-
-          const planInfo = getPlanInfo(plan);
-          document.getElementById("selectedPlanName").textContent =
-            planInfo.name;
-          document.getElementById("selectedPlanPrice").textContent =
-            planInfo.price;
-          document.getElementById("selectedPlan").value = plan;
-
-          const alert = document.createElement("div");
-          alert.className = "alert alert-success mb-3";
-          alert.innerHTML =
-            '<i class="fas fa-check-circle me-2"></i>Pago aprobado. Completa tu registro.';
-          document.querySelector(".form-section").prepend(alert);
-
-          window.scrollTo(0, 0);
-        }
-      });
     </script>
   </body>
 </html>
