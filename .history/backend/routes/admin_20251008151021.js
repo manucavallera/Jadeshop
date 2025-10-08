@@ -494,6 +494,7 @@ router.get("/tienda-config", requireAuth, async (req, res) => {
 });
 
 // PUT /api/admin/tienda-config - Actualizar configuración
+// PUT /api/admin/tienda-config - Actualizar configuración
 router.put("/tienda-config", requireAuth, async (req, res) => {
   try {
     const { comerciante_id } = req;

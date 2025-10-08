@@ -494,6 +494,7 @@ router.get("/tienda-config", requireAuth, async (req, res) => {
 });
 
 // PUT /api/admin/tienda-config - Actualizar configuración
+// PUT /api/admin/tienda-config - Actualizar configuración
 router.put("/tienda-config", requireAuth, async (req, res) => {
   try {
     const { comerciante_id } = req;
@@ -512,7 +513,7 @@ router.put("/tienda-config", requireAuth, async (req, res) => {
       });
     }
 
-    // Actualizar comerciantes
+    // Actualizar comerciante (no tienda)
     const result = await pool.query(
       "UPDATE comerciantes SET nombre = $1, whatsapp = $2 WHERE id = $3 RETURNING nombre, slug, whatsapp",
       [nombre, whatsappClean, comerciante_id]
@@ -521,12 +522,6 @@ router.put("/tienda-config", requireAuth, async (req, res) => {
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "Comerciante no encontrado" });
     }
-
-    // Actualizar tiendas también
-    await pool.query(
-      "UPDATE tiendas SET nombre = $1 WHERE comerciante_id = $2",
-      [nombre, comerciante_id]
-    );
 
     req.session.comerciante_nombre = nombre;
 
