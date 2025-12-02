@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Panel Admin - Live Commerce</title>
+
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+      :root {
+        --primary-color: #3b82f6;
+        --secondary-color: #10b981;
+        --accent-color: #8b5cf6;
+        --sidebar-width: 250px;
+      }
+
+      /* Login Styles */
+      .login-container {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .login-card {
+        background: white;
+        border-radius: 1rem;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+        width: 100%;
+        max-width: 400px;
+      }
+
+      .login-header {
+        text-align: center;
+        margin-bottom: 2rem;
+      }
+
+      .login-header h1 {
+        color: var(--primary-color);
+        font-size: 1.8rem;
+        margin-bottom: 0.5rem;
+      }
+
+      /* Admin Panel Styles */
+      .sidebar {
+        width: var(--sidebar-width);
+        height: 100vh;
+        position: fixed;
+        top: 0;
+        left: 0;
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--accent-color)
+        );
+        color: white;
+        z-index: 1000;
+        transition: transform 0.3s ease;
+      }
+
+      .sidebar-nav {
+        list-style: none;
+        padding: 0;
+        margin-top: 2rem;
+      }
+
+      .sidebar-nav li {
+        margin: 0;
+      }
+
+      .sidebar-nav a {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 1.5rem;
+        color: rgba(255, 255, 255, 0.8);
+        text-decoration: none;
+        transition: all 0.3s ease;
+      }
+
+      .sidebar-nav a:hover,
+      .sidebar-nav a.active {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        padding-left: 2rem;
+      }
+
+      .sidebar-nav i {
+        width: 20px;
+        margin-right: 0.75rem;
+      }
+
+      .main-content {
+        margin-left: var(--sidebar-width);
+        padding: 1.5rem;
+        min-height: 100vh;
+        background-color: #f8f9fa;
+      }
+
+      .stat-card {
+        background: white;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        border-left: 4px solid var(--primary-color);
+        transition: transform 0.2s ease;
+      }
+
+      .stat-card:hover {
+        transform: translateY(-2px);
+      }
+
+      .stat-card.secondary {
+        border-left-color: var(--secondary-color);
+      }
+
+      .stat-card.accent {
+        border-left-color: var(--accent-color);
+      }
+
+      .stat-card.warning {
+        border-left-color: #f59e0b;
+      }
+
+      .stat-number {
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+      }
+
+      .chart-container {
+        background: white;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        height: 400px;
+      }
+
+      @media (max-width: 768px) {
+        .sidebar {
+          transform: translateX(-100%);
+        }
+
+        .sidebar.show {
+          transform: translateX(0);
+        }
+
+        .main-content {
+          margin-left: 0;
+        }
+      }
+
+      .d-none {
+        display: none !important;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- LOGIN CONTAINER -->
+    <div id="loginContainer" class="login-container">
+      <div class="login-card">
+        <div class="login-header">
+          <i
+            class="fas fa-shopping-bag text-primary"
+            style="font-size: 3rem"
+          ></i>
+          <h1>Live Commerce</h1>
+          <p class="text-muted">Panel de Administración</p>
+        </div>
+
+        <form id="loginForm">
+          <div class="mb-3">
+            <label for="loginEmail" class="form-label">Email</label>
+            <input
+              type="email"
+              class="form-control"
+              id="loginEmail"
+              placeholder="tu@email.com"
+              required
+            />
+          </div>
+
+          <div class="mb-3">
+            <label for="loginPassword" class="form-label">Contraseña</label>
+            <input
+              type="password"
+              class="form-control"
+              id="loginPassword"
+              placeholder="Tu contraseña"
+              required
+            />
+          </div>
+
+          <div class="d-grid mb-3">
+            <button type="submit" class="btn btn-primary btn-lg" id="loginBtn">
+              <span id="loginBtnText">
+                <i class="fas fa-sign-in-alt me-2"></i>
+                Iniciar Sesión
+              </span>
+              <span id="loginBtnSpinner" class="d-none">
+                <span class="spinner-border spinner-border-sm me-2"></span>
+                Iniciando...
+              </span>
+            </button>
+          </div>
+        </form>
+
+        <div class="text-center">
+          <p class="text-muted mb-2">¿No tienes cuenta?</p>
+          <a href="../tienda/" class="btn btn-outline-primary">
+            <i class="fas fa-plus me-1"></i>
+            Crear mi tienda
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADMIN PANEL CONTAINER -->
+    <div id="adminContainer" class="d-none">
+      <!-- Sidebar -->
+      <div class="sidebar" id="sidebar">
+        <div class="p-3">
+          <h4 class="mb-0">
+            <i class="fas fa-shopping-bag me-2"></i>
+            Live Commerce
+          </h4>
+          <small class="text-light opacity-75" id="userInfo"
+            >Panel de Administración</small
+          >
+        </div>
+
+        <ul class="sidebar-nav">
+          <li>
+            <a href="#" class="nav-link active" data-section="dashboard">
+              <i class="fas fa-chart-pie"></i>
+              Dashboard
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-link" data-section="productos">
+              <i class="fas fa-box"></i>
+              Productos
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-link" data-section="pedidos">
+              <i class="fas fa-shopping-cart"></i>
+              Pedidos
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-link" data-section="estadisticas">
+              <i class="fas fa-chart-bar"></i>
+              Estadísticas
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-link" data-section="configuracion">
+              <i class="fas fa-cog"></i>
+              Configuración
+            </a>
+          </li>
+          <li class="mt-4">
+            <a href="#" id="verTiendaLink" class="nav-link">
+              <i class="fas fa-globe"></i>
+              Ver Tienda
+            </a>
+          </li>
+          <li>
+            <a href="/tienda/" class="nav-link">
+              <i class="fas fa-shopping-bag"></i>
+              Crear Nueva Tienda
+            </a>
+          </li>
+          <li class="mt-3">
+            <a href="#" id="logoutBtn" class="nav-link text-warning">
+              <i class="fas fa-sign-out-alt"></i>
+              Cerrar Sesión
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Main Content -->
+      <div class="main-content">
+        <!-- Mobile Menu Button -->
+        <button class="btn btn-primary d-md-none mb-3" id="toggleSidebar">
+          <i class="fas fa-bars"></i>
+        </button>
+
+        <!-- Dashboard Section -->
+        <div id="dashboard-section" class="content-section">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Dashboard</h2>
+            <button class="btn btn-outline-primary" onclick="loadDashboard()">
+              <i class="fas fa-sync-alt me-1"></i>
+              Actualizar
+            </button>
+          </div>
+
+          <!-- Stats Cards -->
+          <div class="row mb-4" id="statsCards">
+            <div class="col-lg-3 col-md-6 mb-3">
+              <div class="stat-card">
+                <div class="stat-number text-primary" id="totalPedidos">-</div>
+                <div class="text-muted">Total Pedidos</div>
+              </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+              <div class="stat-card secondary">
+                <div class="stat-number text-success" id="totalVentas">-</div>
+                <div class="text-muted">Total Ventas</div>
+              </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+              <div class="stat-card warning">
+                <div class="stat-number text-warning" id="pedidosPendientes">
+                  -
+                </div>
+                <div class="text-muted">Pedidos Pendientes</div>
+              </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+              <div class="stat-card accent">
+                <div class="stat-number text-info" id="totalProductos">-</div>
+                <div class="text-muted">Total Productos</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Charts -->
+          <div class="row">
+            <div class="col-lg-8 mb-4">
+              <div class="chart-container">
+                <h5 class="mb-3">Ventas por Día (Últimos 7 días)</h5>
+                <canvas id="ventasChart"></canvas>
+              </div>
+            </div>
+            <div class="col-lg-4 mb-4">
+              <div class="chart-container">
+                <h5 class="mb-3">Productos Más Vendidos</h5>
+                <canvas id="productosChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Productos Section -->
+        <div id="productos-section" class="content-section d-none">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Gestión de Productos</h2>
+            <button
+              class="btn btn-primary"
+              data-bs-toggle="modal"
+              data-bs-target="#productoModal"
+            >
+              <i class="fas fa-plus me-1"></i>
+              Nuevo Producto
+            </button>
+          </div>
+
+          <div class="bg-white rounded p-3 shadow-sm">
+            <div class="table-responsive">
+              <table class="table table-hover" id="productosTable">
+                <thead class="table-light">
+                  <tr>
+                    <th>ID</th>
+                    <th>Imagen</th>
+                    <th>Nombre</th>
+                    <th>Categoría</th>
+                    <th>Precio</th>
+                    <th>Stock</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="productosTableBody">
+                  <tr>
+                    <td colspan="7" class="text-center py-4">
+                      <div
+                        class="spinner-border text-primary"
+                        role="status"
+                      ></div>
+                      <div class="mt-2">Cargando productos...</div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pedidos Section -->
+        <div id="pedidos-section" class="content-section d-none">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Gestión de Pedidos</h2>
+            <button class="btn btn-outline-primary" onclick="loadPedidos()">
+              <i class="fas fa-sync-alt me-1"></i>
+              Actualizar
+            </button>
+          </div>
+
+          <div class="bg-white rounded p-3 shadow-sm">
+            <div class="table-responsive">
+              <table class="table table-hover" id="pedidosTable">
+                <thead class="table-light">
+                  <tr>
+                    <th>ID</th>
+                    <th>Cliente</th>
+                    <th>Email</th>
+                    <th>Total</th>
+                    <th>Estado</th>
+                    <th>Fecha</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="pedidosTableBody">
+                  <tr>
+                    <td colspan="7" class="text-center py-4">
+                      <div
+                        class="spinner-border text-primary"
+                        role="status"
+                      ></div>
+                      <div class="mt-2">Cargando pedidos...</div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Estadísticas Section -->
+        <div id="estadisticas-section" class="content-section d-none">
+          <h2 class="mb-4">Estadísticas Detalladas</h2>
+
+          <div class="row">
+            <div class="col-12">
+              <div class="chart-container">
+                <h5 class="mb-3">Próximamente: Estadísticas Avanzadas</h5>
+                <p class="text-muted">
+                  Aquí irán gráficos más detallados, reportes de ventas por
+                  categoría, análisis de tendencias, etc.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Nueva sección después de estadisticas-section: -->
+<div id="configuracion-section" class="content-section d-none">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Configuración de la Tienda</h2>
+  </div>
+
+  <div class="row justify-content-center">
+    <div class="col-lg-6">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">
+            <i class="fas fa-store me-2"></i>
+            Datos de la Tienda
+          </h5>
+        </div>
+        <div class="card-body">
+          <form id="tiendaConfigForm">
+            <div class="mb-3">
+              <label for="tiendaNombreConfig" class="form-label">
+                <i class="fas fa-tag me-1"></i>
+                Nombre de la Tienda
+              </label>
+              <input type="text" class="form-control form-control-lg" 
+                     id="tiendaNombreConfig" required>
+              <small class="form-text text-muted">
+                Este nombre aparece en el header de tu tienda
+              </small>
+            </div>
+
+            <div class="mb-4">
+              <label for="whatsappConfig" class="form-label">
+                <i class="fab fa-whatsapp me-1"></i>
+                Número de WhatsApp
+              </label>
+              <div class="input-group input-group-lg">
+                <span class="input-group-text">+</span>
+                <input type="tel" class="form-control" id="whatsappConfig" 
+                       placeholder="5491144440000" required>
+              </div>
+              <small class="form-text text-muted">
+                Número con código de país (sin el +). Ejemplo: 5491144440000
+              </small>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label text-muted">URL de tu tienda:</label>
+              <div class="alert alert-info">
+                <i class="fas fa-link me-2"></i>
+                <span id="tiendaUrlPreview">localhost:3000/tu-slug</span>
+              </div>
+            </div>
+
+            <div class="d-grid">
+              <button type="submit" class="btn btn-primary btn-lg" id="guardarConfigBtn">
+                <span id="guardarBtnText">
+                  <i class="fas fa-save me-2"></i>
+                  Guardar Cambios
+                </span>
+                <span id="guardarBtnSpinner" class="d-none">
+                  <span class="spinner-border spinner-border-sm me-2"></span>
+                  Guardando...
+                </span>
+              </button>
+            </div>
+      </div>
+    </div>
+
+    <!-- Modal Producto -->
+    <div class="modal fade" id="productoModal" tabindex="-1">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="productoModalTitle">Nuevo Producto</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="productoForm">
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Nombre del Producto</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="productoNombre"
+                    required
+                  />
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Categoría</label>
+                  <select class="form-select" id="productoCategoria" required>
+                    <option value="">Seleccionar categoría</option>
+                    <option value="Electrónicos">Electrónicos</option>
+                    <option value="Ropa">Ropa</option>
+                    <option value="Hogar">Hogar</option>
+                    <option value="Deportes">Deportes</option>
+                  </select>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Precio</label>
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="productoPrecio"
+                    step="0.01"
+                    required
+                  />
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Stock</label>
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="productoStock"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Descripción</label>
+                <textarea
+                  class="form-control"
+                  id="productoDescripcion"
+                  rows="3"
+                ></textarea>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">URL de Imagen</label>
+                <input
+                  type="url"
+                  class="form-control"
+                  id="productoImagen"
+                  placeholder="https://ejemplo.com/imagen.jpg"
+                />
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cancelar
+            </button>
+            <button type="button" class="btn btn-primary" id="guardarProducto">
+              Guardar Producto
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Admin JavaScript -->
+    <script src="../assets/js/admin.js"></script>
+  </body>
+</html>

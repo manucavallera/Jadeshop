@@ -1,0 +1,1361 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Panel Admin - Jade Shop</title>
+
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+      :root {
+        --primary-color: #3b82f6;
+        --secondary-color: #10b981;
+        --accent-color: #8b5cf6;
+        --sidebar-width: 250px;
+      }
+
+      /* Login Styles */
+      .login-container {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .login-card {
+        background: white;
+        border-radius: 1rem;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+        width: 100%;
+        max-width: 400px;
+      }
+
+      .login-header {
+        text-align: center;
+        margin-bottom: 2rem;
+      }
+
+      .login-header h1 {
+        color: var(--primary-color);
+        font-size: 1.8rem;
+        margin-bottom: 0.5rem;
+      }
+
+      /* Admin Panel Styles */
+      .sidebar {
+        width: var(--sidebar-width);
+        height: 100vh;
+        position: fixed;
+        top: 0;
+        left: 0;
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--accent-color)
+        );
+        color: white;
+        z-index: 1000;
+        transition: transform 0.3s ease;
+      }
+
+      .sidebar-nav {
+        list-style: none;
+        padding: 0;
+        margin-top: 2rem;
+      }
+
+      .sidebar-nav li {
+        margin: 0;
+      }
+
+      .sidebar-nav a {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 1.5rem;
+        color: rgba(255, 255, 255, 0.8);
+        text-decoration: none;
+        transition: all 0.3s ease;
+      }
+
+      .sidebar-nav a:hover,
+      .sidebar-nav a.active {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        padding-left: 2rem;
+      }
+
+      .sidebar-nav i {
+        width: 20px;
+        margin-right: 0.75rem;
+      }
+
+      .main-content {
+        margin-left: var(--sidebar-width);
+        padding: 1.5rem;
+        min-height: 100vh;
+        background-color: #f8f9fa;
+      }
+
+      .stat-card {
+        background: white;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        border-left: 4px solid var(--primary-color);
+        transition: transform 0.2s ease;
+      }
+
+      .stat-card:hover {
+        transform: translateY(-2px);
+      }
+
+      .stat-card.secondary {
+        border-left-color: var(--secondary-color);
+      }
+
+      .stat-card.accent {
+        border-left-color: var(--accent-color);
+      }
+
+      .stat-card.warning {
+        border-left-color: #f59e0b;
+      }
+
+      .stat-number {
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+      }
+
+      .chart-container {
+        background: white;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        height: 400px;
+      }
+
+      .d-none {
+        display: none !important;
+      }
+      /* ========================================
+   RESPONSIVE MEJORADO - ADMIN PANEL
+   ======================================== */
+
+      /* ===== MÓVIL (hasta 768px) ===== */
+      @media (max-width: 768px) {
+        /* ========== SIDEBAR MÓVIL ========== */
+        .sidebar {
+          transform: translateX(-100%);
+          width: 280px;
+          box-shadow: 2px 0 15px rgba(0, 0, 0, 0.3);
+          overflow-y: auto;
+        }
+
+        .sidebar.show {
+          transform: translateX(0);
+        }
+
+        .main-content {
+          margin-left: 0;
+          padding: 1rem;
+        }
+
+        /* Botón hamburguesa */
+        #toggleSidebar {
+          width: 48px;
+          height: 48px;
+          font-size: 20px;
+          position: fixed;
+          top: 15px;
+          left: 15px;
+          z-index: 1002;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+          border-radius: 8px;
+          transition: left 0.3s ease;
+        }
+
+        /* Mover botón cuando sidebar está abierto */
+        .sidebar.show ~ .main-content #toggleSidebar {
+          left: 290px;
+        }
+
+        /* Overlay oscuro */
+        .sidebar-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.5);
+          z-index: 999;
+          opacity: 0;
+          visibility: hidden;
+          transition: opacity 0.3s ease;
+        }
+
+        .sidebar-overlay.show {
+          opacity: 1;
+          visibility: visible;
+        }
+
+        /* ========== TABLA PRODUCTOS - SCROLL HORIZONTAL ========== */
+
+        /* Contenedor principal sin overflow */
+        #productos-section .bg-white.rounded {
+          overflow: visible;
+          padding: 0.5rem;
+        }
+
+        /* Wrapper con scroll */
+        #productos-section .table-responsive {
+          overflow-x: auto !important;
+          -webkit-overflow-scrolling: touch;
+          margin: 0 -0.5rem;
+          padding: 0.5rem;
+          display: block !important;
+        }
+
+        /* TABLA: Ancho fijo para forzar scroll */
+        #productosTable {
+          width: 750px !important; /* Ancho FIJO para forzar scroll */
+          min-width: 750px !important;
+          max-width: none !important;
+          font-size: 12px;
+          table-layout: fixed; /* Layout fijo */
+          margin-bottom: 0;
+        }
+
+        /* MOSTRAR TODAS LAS COLUMNAS */
+        #productosTable th,
+        #productosTable td {
+          display: table-cell !important; /* Forzar mostrar */
+          padding: 0.6rem 0.4rem;
+          vertical-align: middle;
+          white-space: nowrap;
+        }
+
+        /* OCULTAR SOLO ID */
+        #productosTable th:nth-child(1),
+        #productosTable td:nth-child(1) {
+          display: none !important;
+        }
+
+        /* ANCHOS FIJOS POR COLUMNA */
+
+        /* Imagen */
+        #productosTable th:nth-child(2),
+        #productosTable td:nth-child(2) {
+          width: 60px !important;
+          min-width: 60px !important;
+          text-align: center;
+        }
+
+        /* Nombre */
+        #productosTable th:nth-child(3),
+        #productosTable td:nth-child(3) {
+          width: 140px !important;
+          min-width: 140px !important;
+          white-space: normal;
+          word-wrap: break-word;
+        }
+
+        /* Categoría */
+        #productosTable th:nth-child(4),
+        #productosTable td:nth-child(4) {
+          width: 90px !important;
+          min-width: 90px !important;
+        }
+
+        /* PRECIO - DESTACADO */
+        #productosTable th:nth-child(5),
+        #productosTable td:nth-child(5) {
+          width: 95px !important;
+          min-width: 95px !important;
+          font-weight: 700 !important;
+          color: #059669 !important;
+          font-size: 13px !important;
+        }
+
+        /* STOCK - DESTACADO */
+        #productosTable th:nth-child(6),
+        #productosTable td:nth-child(6) {
+          width: 70px !important;
+          min-width: 70px !important;
+          text-align: center !important;
+          font-weight: 700 !important;
+          font-size: 13px !important;
+        }
+
+        /* Acciones - STICKY a la derecha */
+        #productosTable th:nth-child(7),
+        #productosTable td:nth-child(7) {
+          width: 120px !important;
+          min-width: 120px !important;
+          position: sticky !important;
+          right: 0 !important;
+          background: white !important;
+          box-shadow: -3px 0 10px rgba(0, 0, 0, 0.1) !important;
+          z-index: 10 !important;
+        }
+
+        /* Headers sticky top */
+        #productosTable thead th {
+          position: sticky !important;
+          top: 0 !important;
+          background: #f8f9fa !important;
+          z-index: 5 !important;
+          border-bottom: 2px solid #dee2e6 !important;
+        }
+
+        /* Header de acciones con mayor z-index */
+        #productosTable thead th:nth-child(7) {
+          z-index: 15 !important;
+        }
+
+        /* Imágenes compactas */
+        #productosTable img {
+          width: 45px !important;
+          height: 45px !important;
+          object-fit: cover;
+          border-radius: 6px;
+          display: block;
+          margin: 0 auto;
+        }
+
+        /* Badges */
+        #productosTable .badge {
+          font-size: 10px;
+          padding: 3px 6px;
+          white-space: nowrap;
+        }
+
+        /* Botones de acción verticales */
+        #productosTable .btn-sm {
+          padding: 6px 10px;
+          font-size: 11px;
+          display: block;
+          width: 100%;
+          margin-bottom: 4px;
+          white-space: nowrap;
+        }
+
+        #productosTable .btn-sm:last-child {
+          margin-bottom: 0;
+        }
+
+        /* Scrollbar visible */
+        #productos-section .table-responsive::-webkit-scrollbar {
+          height: 10px;
+        }
+
+        #productos-section .table-responsive::-webkit-scrollbar-track {
+          background: #f1f5f9;
+          border-radius: 5px;
+        }
+
+        #productos-section .table-responsive::-webkit-scrollbar-thumb {
+          background: #3b82f6;
+          border-radius: 5px;
+        }
+
+        #productos-section .table-responsive::-webkit-scrollbar-thumb:hover {
+          background: #2563eb;
+        }
+
+        /* Indicador de scroll */
+        #productos-section .table-responsive::before {
+          content: "👉 Desliza horizontalmente para ver Precio y Stock";
+          display: block;
+          text-align: center;
+          font-size: 11px;
+          color: #3b82f6;
+          padding: 0.5rem;
+          background: #eff6ff;
+          border-radius: 4px;
+          margin-bottom: 0.5rem;
+          font-weight: 500;
+        }
+
+        /* Header de productos responsive */
+        #productos-section .d-flex.justify-content-between {
+          flex-direction: column;
+          align-items: stretch !important;
+          gap: 1rem;
+        }
+
+        #productos-section h2 {
+          font-size: 1.4rem;
+        }
+
+        #productos-section .btn-group {
+          display: flex;
+          flex-direction: column;
+          width: 100%;
+          gap: 0.5rem;
+        }
+
+        #productos-section .btn-group .btn {
+          width: 100%;
+          padding: 0.75rem;
+        }
+        /* ========== PEDIDOS SECTION RESPONSIVE ========== */
+
+        /* Header de pedidos responsive */
+        #pedidos-section .d-flex.justify-content-between {
+          flex-direction: column;
+          align-items: stretch !important;
+          gap: 1rem;
+        }
+
+        #pedidos-section h2 {
+          font-size: 1.4rem;
+        }
+
+        /* Contenedor de tabla */
+        #pedidos-section .bg-white.rounded {
+          padding: 0.75rem;
+          overflow: visible;
+        }
+
+        #pedidos-section .table-responsive {
+          overflow-x: auto !important;
+          -webkit-overflow-scrolling: touch;
+          margin: 0 -0.75rem;
+          padding: 0 0.75rem 1rem;
+        }
+
+        /* TABLA PEDIDOS - Ancho fijo para scroll */
+        #pedidosTable {
+          min-width: 800px;
+          width: 800px;
+          table-layout: fixed;
+          font-size: 12px;
+        }
+
+        /* Ocultar ID en móvil */
+        #pedidosTable th:nth-child(1),
+        #pedidosTable td:nth-child(1) {
+          display: none;
+        }
+
+        /* ANCHOS POR COLUMNA */
+
+        /* Cliente - 120px */
+        #pedidosTable th:nth-child(2),
+        #pedidosTable td:nth-child(2) {
+          width: 120px;
+          min-width: 120px;
+          font-weight: 600;
+        }
+
+        /* Email - 150px */
+        #pedidosTable th:nth-child(3),
+        #pedidosTable td:nth-child(3) {
+          width: 150px;
+          min-width: 150px;
+          font-size: 11px;
+          word-break: break-word;
+        }
+
+        /* Total - 90px */
+        #pedidosTable th:nth-child(4),
+        #pedidosTable td:nth-child(4) {
+          width: 90px;
+          min-width: 90px;
+          font-weight: 700;
+          color: #059669;
+          font-size: 13px;
+        }
+
+        /* Estado - 140px (select más ancho) */
+        #pedidosTable th:nth-child(5),
+        #pedidosTable td:nth-child(5) {
+          width: 140px;
+          min-width: 140px;
+        }
+
+        /* Fecha - 100px */
+        #pedidosTable th:nth-child(6),
+        #pedidosTable td:nth-child(6) {
+          width: 100px;
+          min-width: 100px;
+          font-size: 11px;
+        }
+
+        /* Acciones - Sticky derecha */
+        #pedidosTable th:nth-child(7),
+        #pedidosTable td:nth-child(7) {
+          width: 80px;
+          min-width: 80px;
+          position: sticky;
+          right: 0;
+          background: white;
+          box-shadow: -2px 0 8px rgba(0, 0, 0, 0.08);
+          z-index: 10;
+          text-align: center;
+        }
+
+        /* Headers sticky */
+        #pedidosTable thead th {
+          position: sticky;
+          top: 0;
+          background: #f8f9fa;
+          z-index: 5;
+          padding: 0.75rem 0.5rem;
+        }
+
+        #pedidosTable thead th:nth-child(7) {
+          z-index: 15;
+        }
+
+        /* Celdas */
+        #pedidosTable td {
+          padding: 0.75rem 0.5rem;
+          vertical-align: middle;
+        }
+
+        /* Select de estado más compacto */
+        #pedidosTable .form-select-sm {
+          font-size: 11px;
+          padding: 0.4rem 0.6rem;
+          min-height: auto;
+        }
+
+        /* Botones de acción */
+        #pedidosTable .btn-sm {
+          padding: 6px 10px;
+          font-size: 11px;
+        }
+
+        /* Scrollbar visible */
+        #pedidos-section .table-responsive::-webkit-scrollbar {
+          height: 8px;
+        }
+
+        #pedidos-section .table-responsive::-webkit-scrollbar-track {
+          background: #e5e7eb;
+          border-radius: 4px;
+        }
+
+        #pedidos-section .table-responsive::-webkit-scrollbar-thumb {
+          background: #3b82f6;
+          border-radius: 4px;
+        }
+
+        #pedidos-section .table-responsive::-webkit-scrollbar-thumb:hover {
+          background: #2563eb;
+        }
+
+        /* Firefox */
+        #pedidos-section .table-responsive {
+          scrollbar-width: thin;
+          scrollbar-color: #3b82f6 #e5e7eb;
+        }
+
+        /* Hint visual */
+        #pedidos-section .table-responsive::after {
+          content: "← Desliza para ver más →";
+          display: block;
+          text-align: center;
+          font-size: 11px;
+          color: #6b7280;
+          padding: 0.5rem 0 0;
+          margin-top: 0.5rem;
+          border-top: 1px solid #e5e7eb;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- LOGIN CONTAINER -->
+    <div id="loginContainer" class="login-container">
+      <div class="login-card">
+        <div class="login-header">
+          <i
+            class="fas fa-shopping-bag text-primary"
+            style="font-size: 3rem"
+          ></i>
+          <h1>Live Commerce</h1>
+          <p class="text-muted">Panel de Administración</p>
+        </div>
+
+        <form id="loginForm">
+          <div class="mb-3">
+            <label for="loginEmail" class="form-label">Email</label>
+            <input
+              type="email"
+              class="form-control"
+              id="loginEmail"
+              placeholder="tu@email.com"
+              required
+            />
+          </div>
+
+          <div class="mb-3">
+            <label for="loginPassword" class="form-label">Contraseña</label>
+            <input
+              type="password"
+              class="form-control"
+              id="loginPassword"
+              placeholder="Tu contraseña"
+              required
+            />
+          </div>
+
+          <div class="d-grid mb-3">
+            <button type="submit" class="btn btn-primary btn-lg" id="loginBtn">
+              <span id="loginBtnText">
+                <i class="fas fa-sign-in-alt me-2"></i>
+                Iniciar Sesión
+              </span>
+              <span id="loginBtnSpinner" class="d-none">
+                <span class="spinner-border spinner-border-sm me-2"></span>
+                Iniciando...
+              </span>
+            </button>
+          </div>
+        </form>
+
+        <div class="text-center">
+          <p class="text-muted mb-2">¿No tienes cuenta?</p>
+          <a href="../tienda/" class="btn btn-outline-primary">
+            <i class="fas fa-plus me-1"></i>
+            Crear mi tienda
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADMIN PANEL CONTAINER -->
+    <div id="adminContainer" class="d-none">
+      <!-- Sidebar -->
+      <div class="sidebar" id="sidebar">
+        <div class="p-3">
+          <h4 class="mb-0">
+            <i class="fas fa-shopping-bag me-2"></i>
+            Live Commerce
+          </h4>
+          <small class="text-light opacity-75" id="userInfo"
+            >Panel de Administración</small
+          >
+        </div>
+
+        <ul class="sidebar-nav">
+          <li>
+            <a href="#" class="nav-link active" data-section="dashboard">
+              <i class="fas fa-chart-pie"></i>
+              Dashboard
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-link" data-section="productos">
+              <i class="fas fa-box"></i>
+              Productos
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-link" data-section="pedidos">
+              <i class="fas fa-shopping-cart"></i>
+              Pedidos
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-link" data-section="estadisticas">
+              <i class="fas fa-chart-bar"></i>
+              Estadísticas
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-link" data-section="configuracion">
+              <i class="fas fa-cog"></i>
+              Configuración
+            </a>
+          </li>
+          <li class="mt-4">
+            <a href="#" id="verTiendaLink" class="nav-link">
+              <i class="fas fa-globe"></i>
+              Ver Tienda
+            </a>
+          </li>
+          <li>
+            <a href="/tienda/" class="nav-link">
+              <i class="fas fa-shopping-bag"></i>
+              Crear Nueva Tienda
+            </a>
+          </li>
+          <li class="mt-3">
+            <a href="#" id="logoutBtn" class="nav-link text-warning">
+              <i class="fas fa-sign-out-alt"></i>
+              Cerrar Sesión
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- AGREGAR ESTO: -->
+      <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+      <!-- Main Content -->
+      <div class="main-content">
+        <!-- Mobile Menu Button -->
+        <button class="btn btn-primary d-md-none mb-3" id="toggleSidebar">
+          <i class="fas fa-bars"></i>
+        </button>
+
+        <!-- Dashboard Section -->
+        <div id="dashboard-section" class="content-section">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Dashboard</h2>
+            <button class="btn btn-outline-primary" onclick="loadDashboard()">
+              <i class="fas fa-sync-alt me-1"></i>
+              Actualizar
+            </button>
+          </div>
+
+          <!-- Stats Cards -->
+          <div class="row mb-4" id="statsCards">
+            <div class="col-lg-3 col-md-6 mb-3">
+              <div class="stat-card">
+                <div class="stat-number text-primary" id="totalPedidos">-</div>
+                <div class="text-muted">Total Pedidos</div>
+              </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+              <div class="stat-card secondary">
+                <div class="stat-number text-success" id="totalVentas">-</div>
+                <div class="text-muted">Total Ventas</div>
+              </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+              <div class="stat-card warning">
+                <div class="stat-number text-warning" id="pedidosPendientes">
+                  -
+                </div>
+                <div class="text-muted">Pedidos Pendientes</div>
+              </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+              <div class="stat-card accent">
+                <div class="stat-number text-info" id="totalProductos">-</div>
+                <div class="text-muted">Total Productos</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Charts -->
+          <div class="row">
+            <div class="col-lg-8 mb-4">
+              <div class="chart-container">
+                <h5 class="mb-3">Ventas por Día (Últimos 7 días)</h5>
+                <canvas id="ventasChart"></canvas>
+              </div>
+            </div>
+            <div class="col-lg-4 mb-4">
+              <div class="chart-container">
+                <h5 class="mb-3">Productos Más Vendidos</h5>
+                <canvas id="productosChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Productos Section -->
+        <div id="productos-section" class="content-section d-none">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Gestión de Productos</h2>
+            <div class="btn-group">
+              <button
+                class="btn btn-outline-secondary"
+                data-bs-toggle="modal"
+                data-bs-target="#categoriasModal"
+              >
+                <i class="fas fa-tags me-1"></i>
+                Gestionar Categorías
+              </button>
+              <button
+                class="btn btn-primary"
+                data-bs-toggle="modal"
+                data-bs-target="#productoModal"
+              >
+                <i class="fas fa-plus me-1"></i>
+                Nuevo Producto
+              </button>
+            </div>
+          </div>
+
+          <div class="bg-white rounded p-3 shadow-sm">
+            <div class="table-responsive">
+              <table class="table table-hover" id="productosTable">
+                <thead class="table-light">
+                  <tr>
+                    <th>ID</th>
+                    <th>Imagen</th>
+                    <th>Nombre</th>
+                    <th>Categoría</th>
+                    <th>Precio</th>
+                    <th>Stock</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="productosTableBody">
+                  <tr>
+                    <td colspan="7" class="text-center py-4">
+                      <div
+                        class="spinner-border text-primary"
+                        role="status"
+                      ></div>
+                      <div class="mt-2">Cargando productos...</div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pedidos Section -->
+        <div id="pedidos-section" class="content-section d-none">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Gestión de Pedidos</h2>
+            <button class="btn btn-outline-primary" onclick="loadPedidos()">
+              <i class="fas fa-sync-alt me-1"></i>
+              Actualizar
+            </button>
+          </div>
+
+          <div class="bg-white rounded p-3 shadow-sm">
+            <div class="table-responsive">
+              <table class="table table-hover" id="pedidosTable">
+                <thead class="table-light">
+                  <tr>
+                    <th>ID</th>
+                    <th>Cliente</th>
+                    <th>Email</th>
+                    <th>Total</th>
+                    <th>Estado</th>
+                    <th>Fecha</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="pedidosTableBody">
+                  <tr>
+                    <td colspan="7" class="text-center py-4">
+                      <div
+                        class="spinner-border text-primary"
+                        role="status"
+                      ></div>
+                      <div class="mt-2">Cargando pedidos...</div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Estadísticas Section -->
+        <div id="estadisticas-section" class="content-section d-none">
+          <h2 class="mb-4">Estadísticas Detalladas</h2>
+
+          <div class="row">
+            <div class="col-12">
+              <div class="chart-container">
+                <h5 class="mb-3">Próximamente: Estadísticas Avanzadas</h5>
+                <p class="text-muted">
+                  Aquí irán gráficos más detallados, reportes de ventas por
+                  categoría, análisis de tendencias, etc.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Configuración Section -->
+        <div id="configuracion-section" class="content-section d-none">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Configuración de la Tienda</h2>
+          </div>
+
+          <div class="row justify-content-center">
+            <div class="col-lg-6">
+              <div class="card">
+                <div class="card-header">
+                  <h5 class="mb-0">
+                    <i class="fas fa-store me-2"></i>
+                    Datos de la Tienda
+                  </h5>
+                </div>
+                <div class="card-body">
+                  <form id="tiendaConfigForm">
+                    <div class="mb-3">
+                      <label for="tiendaNombreConfig" class="form-label">
+                        <i class="fas fa-tag me-1"></i>
+                        Nombre de la Tienda
+                      </label>
+                      <input
+                        type="text"
+                        class="form-control form-control-lg"
+                        id="tiendaNombreConfig"
+                        required
+                      />
+                      <small class="form-text text-muted">
+                        Este nombre aparece en el header de tu tienda
+                      </small>
+                    </div>
+
+                    <div class="mb-4">
+                      <label for="whatsappConfig" class="form-label">
+                        <i class="fab fa-whatsapp me-1"></i>
+                        Número de WhatsApp
+                      </label>
+                      <div class="input-group input-group-lg">
+                        <span class="input-group-text">+</span>
+                        <input
+                          type="tel"
+                          class="form-control"
+                          id="whatsappConfig"
+                          placeholder="5491144440000"
+                          required
+                        />
+                      </div>
+                      <small class="form-text text-muted">
+                        Número con código de país (sin el +). Ejemplo:
+                        5491144440000
+                      </small>
+                    </div>
+
+                    <div class="mb-3">
+                      <label class="form-label text-muted"
+                        >URL de tu tienda:</label
+                      >
+                      <div class="alert alert-info">
+                        <i class="fas fa-link me-2"></i>
+                        <span id="tiendaUrlPreview"
+                          >localhost:3000/tu-slug</span
+                        >
+                      </div>
+                    </div>
+
+                    <div class="d-grid">
+                      <button
+                        type="submit"
+                        class="btn btn-primary btn-lg"
+                        id="guardarConfigBtn"
+                      >
+                        <span id="guardarBtnText">
+                          <i class="fas fa-save me-2"></i>
+                          Guardar Cambios
+                        </span>
+                        <span id="guardarBtnSpinner" class="d-none">
+                          <span
+                            class="spinner-border spinner-border-sm me-2"
+                          ></span>
+                          Guardando...
+                        </span>
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Producto -->
+    <div class="modal fade" id="productoModal" tabindex="-1">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="productoModalTitle">Nuevo Producto</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="productoForm">
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Nombre del Producto</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="productoNombre"
+                    required
+                  />
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Categoría</label>
+                  <select class="form-select" id="productoCategoria" required>
+                    <option value="">Cargando categorías...</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label"
+                    >Precio <span class="text-danger">*</span></label
+                  >
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="productoPrecio"
+                    step="0.01"
+                    required
+                  />
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">
+                    Precio Rebajado (opcional)
+                    <span class="badge bg-danger">OFERTA</span>
+                  </label>
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="productoPrecioRebajado"
+                    step="0.01"
+                    placeholder="Dejar vacío si no hay oferta"
+                  />
+                  <small class="text-muted"
+                    >Si completas este campo, se mostrará como oferta</small
+                  >
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label"
+                    >Stock <span class="text-danger">*</span></label
+                  >
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="productoStock"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label"
+                  >Descripción Corta (para catálogo)</label
+                >
+                <textarea
+                  class="form-control"
+                  id="productoDescripcion"
+                  rows="2"
+                  placeholder="Descripción breve que aparece en el catálogo de productos"
+                  maxlength="150"
+                ></textarea>
+                <small class="text-muted"
+                  >Máximo 150 caracteres. Aparece en las tarjetas del
+                  catálogo.</small
+                >
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label"
+                  >Descripción Larga (para página de detalle)</label
+                >
+                <textarea
+                  class="form-control"
+                  id="productoDescripcionLarga"
+                  rows="5"
+                  placeholder="Descripción completa con todos los detalles del producto"
+                ></textarea>
+                <small class="text-muted"
+                  >Descripción detallada que aparecerá en la página del
+                  producto.</small
+                >
+              </div>
+              <div class="mb-3">
+                <label class="form-label">
+                  <i class="fab fa-tiktok me-1"></i>
+                  URL de Video TikTok (opcional)
+                </label>
+                <input
+                  type="url"
+                  class="form-control"
+                  id="productoTiktokUrl"
+                  placeholder="https://www.tiktok.com/@usuario/video/1234567890"
+                />
+                <small class="text-muted">
+                  Pega el link completo del video de TikTok que quieres mostrar
+                  en la página del producto
+                </small>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Imagen del Producto</label>
+                <ul
+                  class="nav nav-tabs nav-fill mb-3"
+                  id="imagenTabs"
+                  role="tablist"
+                >
+                  <li class="nav-item" role="presentation">
+                    <button
+                      class="nav-link active"
+                      id="upload-tab"
+                      data-bs-toggle="tab"
+                      data-bs-target="#upload-pane"
+                      type="button"
+                      role="tab"
+                    >
+                      <i class="fas fa-upload me-1"></i> Subir Archivo
+                    </button>
+                  </li>
+                  <li class="nav-item" role="presentation">
+                    <button
+                      class="nav-link"
+                      id="url-tab"
+                      data-bs-toggle="tab"
+                      data-bs-target="#url-pane"
+                      type="button"
+                      role="tab"
+                    >
+                      <i class="fas fa-link me-1"></i> URL de Imagen
+                    </button>
+                  </li>
+                </ul>
+                <div class="tab-content" id="imagenTabsContent">
+                  <div
+                    class="tab-pane fade show active"
+                    id="upload-pane"
+                    role="tabpanel"
+                  >
+                    <input
+                      type="file"
+                      class="form-control"
+                      id="productoImagenFile"
+                      accept="image/*"
+                    />
+                    <small class="form-text text-muted"
+                      >Formatos soportados: JPG, PNG, GIF. Máximo 5MB.</small
+                    >
+                    <div
+                      id="imagenPreviewContainer"
+                      class="mt-3"
+                      style="display: none"
+                    >
+                      <label class="form-label">Vista previa:</label>
+                      <div class="border rounded p-2 text-center">
+                        <img
+                          id="imagenPreview"
+                          src=""
+                          alt="Preview"
+                          style="
+                            max-width: 200px;
+                            max-height: 200px;
+                            object-fit: contain;
+                          "
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="tab-pane fade" id="url-pane" role="tabpanel">
+                    <input
+                      type="url"
+                      class="form-control"
+                      id="productoImagen"
+                      placeholder="https://ejemplo.com/imagen.jpg"
+                    />
+                    <small class="form-text text-muted"
+                      >URL directa a una imagen en internet</small
+                    >
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cancelar
+            </button>
+            <button type="button" class="btn btn-primary" id="guardarProducto">
+              Guardar Producto
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL CATEGORÍAS - Agregar antes del cierre de </body> -->
+    <div class="modal fade" id="categoriasModal" tabindex="-1">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Gestionar Categorías</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <!-- Formulario nueva categoría -->
+            <div class="card mb-3">
+              <div class="card-header bg-primary text-white">
+                <h6 class="mb-0">
+                  <i class="fas fa-plus-circle me-2"></i>
+                  Agregar Nueva Categoría
+                </h6>
+              </div>
+              <div class="card-body">
+                <form id="nuevaCategoriaForm">
+                  <div class="row">
+                    <div class="col-md-8 mb-3">
+                      <label class="form-label">Nombre de la Categoría *</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="nombreCategoria"
+                        placeholder="Ej: Ropa, Electrónicos, Hogar..."
+                        required
+                      />
+                    </div>
+                    <div class="col-md-4 mb-3">
+                      <label class="form-label">&nbsp;</label>
+                      <button type="submit" class="btn btn-success w-100">
+                        <i class="fas fa-plus me-1"></i>
+                        Agregar
+                      </button>
+                    </div>
+                  </div>
+                  <div class="mb-0">
+                    <label class="form-label">Descripción (opcional)</label>
+                    <textarea
+                      class="form-control"
+                      id="descripcionCategoria"
+                      placeholder="Descripción de la categoría..."
+                      rows="2"
+                    ></textarea>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <!-- Lista de categorías existentes -->
+            <div class="card">
+              <div class="card-header">
+                <h6 class="mb-0">
+                  <i class="fas fa-list me-2"></i>
+                  Categorías Existentes
+                </h6>
+              </div>
+              <div class="card-body">
+                <div class="table-responsive">
+                  <table class="table table-sm table-hover">
+                    <thead>
+                      <tr>
+                        <th>Nombre</th>
+                        <th>Descripción</th>
+                        <th class="text-center">Productos</th>
+                        <th class="text-center">Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody id="categoriasTableBody">
+                      <tr>
+                        <td colspan="4" class="text-center py-3">
+                          <div
+                            class="spinner-border spinner-border-sm text-primary me-2"
+                          ></div>
+                          Cargando categorías...
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL EDITAR CATEGORÍA -->
+    <!-- MODAL EDITAR CATEGORÍA -->
+    <div class="modal fade" id="editarCategoriaModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Editar Categoría</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="editarCategoriaForm">
+              <input type="hidden" id="editCategoriaId" />
+              <div class="mb-3">
+                <label class="form-label">Nombre *</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="editNombreCategoria"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Descripción</label>
+                <textarea
+                  class="form-control"
+                  id="editDescripcionCategoria"
+                  rows="3"
+                ></textarea>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              id="guardarCategoriaEditBtn"
+            >
+              <i class="fas fa-save me-1"></i>
+              Guardar Cambios
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Admin JavaScript -->
+    <script src="../assets/js/admin.js"></script>
+  </body>
+</html>

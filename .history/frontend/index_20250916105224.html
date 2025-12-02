@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Live Commerce - Tu Tienda Online</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Configuración personalizada de Tailwind -->
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: "#3B82F6",
+              secondary: "#10B981",
+              accent: "#8B5CF6",
+            },
+          },
+        },
+      };
+    </script>
+
+    <!-- Font Awesome para iconos -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+  <body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-lg">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center py-6">
+          <div class="flex items-center">
+            <i class="fas fa-shopping-bag text-primary text-3xl mr-3"></i>
+            <h1 class="text-2xl font-bold text-gray-900">Live Commerce</h1>
+          </div>
+
+          <nav class="hidden md:flex space-x-8">
+            <a
+              href="#"
+              class="text-gray-600 hover:text-primary transition duration-300"
+              >Inicio</a
+            >
+            <a
+              href="tienda/"
+              class="text-gray-600 hover:text-primary transition duration-300"
+              >Tienda</a
+            >
+            <a
+              href="#"
+              class="text-gray-600 hover:text-primary transition duration-300"
+              >Contacto</a
+            >
+          </nav>
+
+          <div class="flex items-center space-x-4">
+            <button
+              class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition duration-300"
+            >
+              <i class="fab fa-whatsapp mr-2"></i>WhatsApp
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section
+      class="bg-gradient-to-r from-primary to-secondary text-white py-20"
+    >
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h2 class="text-4xl md:text-6xl font-bold mb-6">
+          Tu Tienda Online
+          <span class="block text-yellow-300">Con WhatsApp</span>
+        </h2>
+        <p class="text-xl md:text-2xl mb-8 text-blue-100">
+          Vende fácil, cobra rápido, entrega simple
+        </p>
+
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a
+            href="tienda/"
+            class="bg-white text-primary px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition duration-300 inline-flex items-center justify-center"
+          >
+            <i class="fas fa-shopping-cart mr-2"></i>
+            Ver Tienda
+          </a>
+          <a
+            href="admin/"
+            class="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white hover:text-primary transition duration-300 inline-flex items-center justify-center"
+          >
+            <i class="fas fa-cog mr-2"></i>
+            Panel Admin
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-20">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+          <h3 class="text-3xl font-bold text-gray-900 mb-4">
+            ¿Por qué elegir Live Commerce?
+          </h3>
+          <p class="text-xl text-gray-600">Simple, automático y efectivo</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <!-- Feature 1 -->
+          <div
+            class="text-center p-6 bg-white rounded-lg shadow-lg hover:shadow-xl transition duration-300"
+          >
+            <div
+              class="bg-primary text-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
+            >
+              <i class="fab fa-whatsapp text-2xl"></i>
+            </div>
+            <h4 class="text-xl font-semibold text-gray-900 mb-2">
+              Integración WhatsApp
+            </h4>
+            <p class="text-gray-600">
+              Los pedidos llegan automáticamente a tu WhatsApp. Sin
+              complicaciones.
+            </p>
+          </div>
+
+          <!-- Feature 2 -->
+          <div
+            class="text-center p-6 bg-white rounded-lg shadow-lg hover:shadow-xl transition duration-300"
+          >
+            <div
+              class="bg-secondary text-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
+            >
+              <i class="fas fa-bolt text-2xl"></i>
+            </div>
+            <h4 class="text-xl font-semibold text-gray-900 mb-2">
+              Súper Rápido
+            </h4>
+            <p class="text-gray-600">
+              Cliente ve, cliente compra, tú vendes. Todo en segundos.
+            </p>
+          </div>
+
+          <!-- Feature 3 -->
+          <div
+            class="text-center p-6 bg-white rounded-lg shadow-lg hover:shadow-xl transition duration-300"
+          >
+            <div
+              class="bg-accent text-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
+            >
+              <i class="fas fa-chart-line text-2xl"></i>
+            </div>
+            <h4 class="text-xl font-semibold text-gray-900 mb-2">
+              Control Total
+            </h4>
+            <p class="text-gray-600">
+              Panel completo para gestionar productos, pedidos y clientes.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="bg-gray-900 text-white py-20">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h3 class="text-3xl font-bold mb-4">¿Listo para vender más?</h3>
+        <p class="text-xl text-gray-300 mb-8">
+          Tu tienda online lista en minutos
+        </p>
+
+        <a
+          href="tienda/"
+          class="bg-primary text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-blue-600 transition duration-300 inline-flex items-center"
+        >
+          <i class="fas fa-rocket mr-2"></i>
+          Empezar Ahora
+        </a>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="flex flex-col md:flex-row justify-between items-center">
+          <div class="flex items-center mb-4 md:mb-0">
+            <i class="fas fa-shopping-bag text-primary text-2xl mr-2"></i>
+            <span class="text-xl font-bold text-gray-900">Live Commerce</span>
+          </div>
+
+          <div class="flex space-x-6">
+            <a
+              href="#"
+              class="text-gray-600 hover:text-primary transition duration-300"
+            >
+              <i class="fab fa-whatsapp text-2xl"></i>
+            </a>
+            <a
+              href="#"
+              class="text-gray-600 hover:text-primary transition duration-300"
+            >
+              <i class="fab fa-instagram text-2xl"></i>
+            </a>
+            <a
+              href="#"
+              class="text-gray-600 hover:text-primary transition duration-300"
+            >
+              <i class="fab fa-tiktok text-2xl"></i>
+            </a>
+          </div>
+        </div>
+
+        <div class="mt-8 pt-8 border-t text-center text-gray-600">
+          <p>&copy; 2024 Live Commerce. Hecho con ❤️ para emprendedores.</p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="assets/js/app.js"></script>
+  </body>
+</html>

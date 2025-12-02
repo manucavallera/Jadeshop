@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title id="pageTitle">Producto - Cargando...</title>
+
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <style>
+      :root {
+        --primary-color: #3b82f6;
+        --secondary-color: #10b981;
+      }
+
+      .product-image {
+        width: 100%;
+        height: 500px;
+        object-fit: contain;
+        background: #f8f9fa;
+        border-radius: 8px;
+      }
+
+      .price-section {
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        margin-bottom: 20px;
+      }
+
+      .btn-add-cart {
+        padding: 15px;
+        font-size: 1.1rem;
+        font-weight: 600;
+      }
+
+      /* Responsive móvil */
+      @media (max-width: 768px) {
+        /* Carrusel más compacto */
+        .product-image {
+          height: 300px;
+        }
+
+        /* Miniaturas más pequeñas */
+        #thumbnailsContainer .col-3 img {
+          height: 60px !important;
+        }
+
+        /* Precio compacto */
+        .price-section {
+          padding: 15px;
+        }
+
+        .price-section .h2 {
+          font-size: 1.5rem;
+        }
+
+        /* Botón agregar al carrito */
+        .btn-add-cart {
+          padding: 12px;
+          font-size: 1rem;
+        }
+
+        /* Visor TikTok responsive */
+        #tiktokViewerSection .input-group {
+          flex-direction: column;
+        }
+
+        #tiktokViewerSection .input-group input {
+          border-radius: 0.375rem !important;
+          margin-bottom: 10px;
+        }
+
+        #tiktokViewerSection .input-group button {
+          border-radius: 0.375rem !important;
+          width: 100%;
+        }
+
+        /* Preview container más pequeño */
+        #tiktokPreviewContainer {
+          min-height: 200px !important;
+        }
+
+        /* Navbar responsive */
+        .navbar .container {
+          flex-wrap: wrap;
+        }
+
+        #storeName {
+          font-size: 1.2rem;
+          width: 100%;
+          text-align: center;
+          margin-top: 10px;
+        }
+
+        /* Títulos más pequeños */
+        #productName {
+          font-size: 1.5rem;
+        }
+      }
+    </style>
+  </head>
+  <body class="bg-light">
+    <!-- Loading inicial -->
+    <div
+      id="initialLoading"
+      class="d-flex justify-content-center align-items-center"
+      style="height: 100vh"
+    >
+      <div class="text-center">
+        <div
+          class="spinner-border text-primary mb-3"
+          style="width: 3rem; height: 3rem"
+        ></div>
+        <div>Cargando producto...</div>
+      </div>
+    </div>
+
+    <!-- Contenido principal -->
+    <div id="mainContent" class="d-none">
+      <!-- Navbar simple -->
+      <nav class="navbar navbar-light bg-white border-bottom">
+        <div class="container">
+          <a href="#" id="backToStore" class="btn btn-outline-primary">
+            <i class="fas fa-arrow-left me-2"></i>Volver a la tienda
+          </a>
+          <span id="storeName" class="navbar-brand mb-0 h1"></span>
+        </div>
+      </nav>
+
+      <!-- Producto -->
+      <div class="container my-5">
+        <div class="row">
+          <!-- Imagen -->
+          <div class="col-md-6 mb-4">
+            <!-- Carrusel de imágenes -->
+            <div
+              id="productImageCarousel"
+              class="carousel slide mb-3"
+              data-bs-ride="carousel"
+            >
+              <div class="carousel-inner rounded" id="carouselImages">
+                <!-- Imagen única si no hay galería -->
+                <div class="carousel-item active">
+                  <img id="productImage" src="" alt="" class="product-image" />
+                </div>
+              </div>
+
+              <!-- Controles -->
+              <button
+                class="carousel-control-prev"
+                type="button"
+                data-bs-target="#productImageCarousel"
+                data-bs-slide="prev"
+                id="carouselPrev"
+                style="display: none"
+              >
+                <span
+                  class="carousel-control-prev-icon bg-dark rounded-circle p-3"
+                ></span>
+              </button>
+              <button
+                class="carousel-control-next"
+                type="button"
+                data-bs-target="#productImageCarousel"
+                data-bs-slide="next"
+                id="carouselNext"
+                style="display: none"
+              >
+                <span
+                  class="carousel-control-next-icon bg-dark rounded-circle p-3"
+                ></span>
+              </button>
+
+              <!-- Indicadores -->
+              <div class="carousel-indicators" id="carouselIndicators"></div>
+            </div>
+
+            <!-- Miniaturas -->
+            <div class="row g-2" id="thumbnailsContainer"></div>
+          </div>
+
+          <!-- Información -->
+          <div class="col-md-6">
+            <div id="categoryBadge"></div>
+            <h1 id="productName" class="mb-3"></h1>
+
+            <!-- Precio -->
+            <div class="price-section">
+              <div id="priceContainer"></div>
+            </div>
+
+            <!-- Stock -->
+            <div id="stockInfo" class="mb-4"></div>
+
+            <!-- Descripción larga -->
+            <div class="mb-4">
+              <h5>Descripción</h5>
+              <p id="productDescription" class="text-muted"></p>
+            </div>
+
+            <!-- ✅ VISOR TIKTOK - AGREGAR AQUÍ -->
+            <div class="mb-4" id="tiktokViewerSection" style="display: none">
+              <h5 class="mb-3">
+                <i class="fab fa-tiktok me-2"></i>Video del Producto
+              </h5>
+              <div class="card">
+                <div class="card-body">
+                  <div class="input-group mb-3">
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="tiktokUrlInput"
+                      readonly
+                      placeholder="URL del video"
+                    />
+                    <button
+                      class="btn btn-primary"
+                      type="button"
+                      onclick="loadTikTokPreview()"
+                    >
+                      <i class="fas fa-play-circle me-1"></i>Cargar Video
+                    </button>
+                  </div>
+                  <div
+                    id="tiktokPreviewContainer"
+                    class="text-center"
+                    style="min-height: 300px"
+                  >
+                    <!-- El video se cargará aquí -->
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Video TikTok -->
+            <div id="tiktokVideoContainer" class="mb-4" style="display: none">
+              <h5>Video del Producto</h5>
+              <div id="tiktokEmbed"></div>
+            </div>
+
+            <!-- Botón agregar al carrito -->
+            <button
+              id="addToCartBtn"
+              class="btn btn-primary w-100 btn-add-cart"
+            >
+              <i class="fas fa-cart-plus me-2"></i>Agregar al Carrito
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- JavaScript -->
+    <script src="assets/js/producto-detalle.js"></script>
+  </body>
+</html>

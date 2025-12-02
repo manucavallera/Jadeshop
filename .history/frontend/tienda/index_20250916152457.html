@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tienda - Live Commerce</title>
+
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- Font Awesome para iconos -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <!-- Estilos personalizados -->
+    <style>
+      :root {
+        --primary-color: #0d6efd;
+        --secondary-color: #198754;
+      }
+
+      .product-card {
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+
+      .product-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .cart-sidebar {
+        position: fixed;
+        top: 0;
+        right: -400px;
+        width: 400px;
+        height: 100vh;
+        background: white;
+        box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+        transition: right 0.3s ease;
+        z-index: 1050;
+      }
+
+      .cart-sidebar.show {
+        right: 0;
+      }
+
+      .cart-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1040;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease;
+      }
+
+      .cart-overlay.show {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .aspect-square {
+        aspect-ratio: 1;
+      }
+
+      @media (max-width: 768px) {
+        .cart-sidebar {
+          width: 100%;
+          right: -100%;
+        }
+      }
+    </style>
+  </head>
+  <body class="bg-light">
+    <!-- Header -->
+    <nav
+      class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top"
+    >
+      <div class="container">
+        <a class="navbar-brand" href="../">
+          <i class="fas fa-shopping-bag text-primary me-2"></i>
+          <strong>Live Commerce</strong>
+        </a>
+
+        <!-- Búsqueda -->
+        <div class="d-none d-md-flex flex-grow-1 mx-4">
+          <div class="input-group">
+            <span class="input-group-text">
+              <i class="fas fa-search text-muted"></i>
+            </span>
+            <input
+              type="text"
+              id="searchInput"
+              class="form-control"
+              placeholder="Buscar productos..."
+            />
+          </div>
+        </div>
+
+        <!-- Carrito -->
+        <button id="cartButton" class="btn btn-primary position-relative">
+          <i class="fas fa-shopping-cart me-1"></i>
+          Carrito
+          <span
+            id="cartCount"
+            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none"
+          >
+            0
+          </span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Filtros -->
+    <div class="bg-white border-bottom py-3">
+      <div class="container">
+        <div class="d-flex flex-wrap gap-2 align-items-center">
+          <span class="text-muted fw-medium me-3">Filtrar por:</span>
+
+          <button
+            class="btn btn-primary btn-sm filter-btn active"
+            data-categoria="todos"
+          >
+            Todos
+          </button>
+          <button
+            class="btn btn-outline-primary btn-sm filter-btn"
+            data-categoria="Electrónicos"
+          >
+            Electrónicos
+          </button>
+          <button
+            class="btn btn-outline-primary btn-sm filter-btn"
+            data-categoria="Ropa"
+          >
+            Ropa
+          </button>
+          <button
+            class="btn btn-outline-primary btn-sm filter-btn"
+            data-categoria="Hogar"
+          >
+            Hogar
+          </button>
+          <button
+            class="btn btn-outline-primary btn-sm filter-btn"
+            data-categoria="Deportes"
+          >
+            Deportes
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div
+      id="loading"
+      class="d-flex justify-content-center align-items-center py-5"
+    >
+      <div class="spinner-border text-primary me-3" role="status"></div>
+      <span class="text-muted">Cargando productos...</span>
+    </div>
+
+    <!-- Productos -->
+    <div class="container my-4">
+      <!-- Contador de productos -->
+      <div class="mb-3">
+        <p id="productCount" class="text-muted mb-0">
+          Mostrando <span id="currentCount">0</span> productos
+        </p>
+      </div>
+
+      <!-- Grid de productos -->
+      <div id="productGrid" class="row g-4 d-none">
+        <!-- Los productos se cargan aquí dinámicamente -->
+      </div>
+
+      <!-- Mensaje cuando no hay productos -->
+      <div id="noProducts" class="text-center py-5 d-none">
+        <i class="fas fa-search text-muted" style="font-size: 4rem"></i>
+        <h4 class="text-muted mt-3 mb-2">No se encontraron productos</h4>
+        <p class="text-muted">
+          Intenta con otros términos de búsqueda o filtros
+        </p>
+      </div>
+    </div>
+
+    <!-- Cart Overlay -->
+    <div id="cartOverlay" class="cart-overlay"></div>
+
+    <!-- Cart Sidebar -->
+    <div id="cartSidebar" class="cart-sidebar">
+      <div class="d-flex flex-column h-100">
+        <!-- Header del carrito -->
+        <div
+          class="d-flex align-items-center justify-content-between p-3 border-bottom"
+        >
+          <h5 class="mb-0">Mi Carrito</h5>
+          <button id="closeCartBtn" class="btn-close"></button>
+        </div>
+
+        <!-- Items del carrito -->
+        <div id="cartItems" class="flex-grow-1 overflow-auto p-3">
+          <!-- Items se cargan aquí dinámicamente -->
+        </div>
+
+        <!-- Footer del carrito -->
+        <div class="border-top p-3 bg-light">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="h5 mb-0">Total:</span>
+            <span id="cartTotal" class="h5 mb-0 text-primary fw-bold"
+              >$0.00</span
+            >
+          </div>
+
+          <button id="confirmOrderBtn" class="btn btn-success w-100 py-2">
+            <i class="fab fa-whatsapp me-2"></i>
+            Confirmar Pedido
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- JavaScript personalizado -->
+    <script src="../assets/js/tienda-bootstrap.js"></script>
+  </body>
+</html>

@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title id="pageTitle">Cargando...</title>
+
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <style>
+      :root {
+        --primary-color: #3b82f6;
+        --secondary-color: #10b981;
+      }
+
+      .product-card {
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+
+      .product-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .cart-sidebar {
+        position: fixed;
+        top: 0;
+        right: -400px;
+        width: 400px;
+        height: 100vh;
+        background: white;
+        box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+        transition: right 0.3s ease;
+        z-index: 1050;
+      }
+
+      .cart-sidebar.show {
+        right: 0;
+      }
+
+      .cart-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1040;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease;
+      }
+
+      .cart-overlay.show {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .aspect-square {
+        aspect-ratio: 1;
+      }
+
+      .tienda-header {
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--secondary-color)
+        );
+      }
+
+      /* Botón flotante del carrito */
+      .floating-cart-btn {
+        position: fixed;
+        bottom: 90px; /* ✅ Más espacio entre botones */
+        right: 20px;
+        z-index: 1000;
+        border-radius: 50px;
+        padding: 12px 16px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        border: none;
+        transition: all 0.3s ease;
+        display: none;
+      }
+
+      .floating-cart-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+      }
+
+      .floating-cart-btn .cart-badge {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        background: #dc3545;
+        color: white;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        font-size: 12px;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid white;
+      }
+
+      /* Barra sticky WhatsApp mobile */
+      .whatsapp-order-mobile {
+        position: sticky;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: white;
+        border-top: 1px solid #ddd;
+        padding: 12px 16px;
+        z-index: 100;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      /* Botón admin flotante */
+      .admin-floating-btn {
+        position: fixed;
+        bottom: 80px;
+        right: 20px;
+        z-index: 999;
+        opacity: 0.7;
+        transition: opacity 0.3s ease;
+      }
+
+      .admin-floating-btn:hover {
+        opacity: 1;
+      }
+
+      .admin-floating-btn .btn {
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        transition: all 0.3s ease;
+        border: none;
+      }
+
+      .admin-floating-btn .btn:hover {
+        transform: scale(1.1);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3) !important;
+      }
+
+      /* Animación botón flotante */
+      .floating-cart-btn.animate {
+        animation: cartBounce 0.6s ease;
+      }
+
+      @keyframes cartBounce {
+        0%,
+        20%,
+        50%,
+        80%,
+        100% {
+          transform: translateY(0) scale(1);
+        }
+        40% {
+          transform: translateY(-8px) scale(1.1);
+        }
+        60% {
+          transform: translateY(-4px) scale(1.05);
+        }
+      }
+
+      /* Header del carrito sticky */
+      .cart-sidebar .border-top.bg-light {
+        position: sticky;
+        bottom: 0;
+        z-index: 10;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      /* Botón eliminar con feedback visual */
+      .btn-outline-danger {
+        transition: all 0.2s ease;
+      }
+
+      .btn-outline-danger:active {
+        transform: scale(0.95);
+        background: #dc3545 !important;
+        color: white !important;
+      }
+
+      /* Scroll suave en carrito */
+      #cartItems {
+        scroll-behavior: smooth;
+      }
+
+      /* ===== RESPONSIVE MÓVIL ===== */
+      @media (max-width: 768px) {
+        /* Carrito pantalla completa */
+        .cart-sidebar {
+          width: 100%;
+          right: -100%;
+        }
+
+        /* Mostrar botón flotante */
+        .floating-cart-btn {
+          display: block;
+        }
+
+        /* Ocultar botón header */
+        .header-cart-btn {
+          display: none;
+        }
+
+        /* Ajustar admin button */
+        .admin-floating-btn {
+          bottom: 160px; /* ✅ Ajustar para que quede arriba del carrito */
+          right: 15px;
+        }
+
+        .admin-floating-btn .btn {
+          width: 44px;
+          height: 44px;
+          font-size: 16px;
+        }
+
+        /* Opacidad cuando carrito abierto */
+        .cart-sidebar.show ~ .admin-floating-btn {
+          opacity: 0.2;
+        }
+
+        .cart-sidebar.show ~ .floating-cart-btn {
+          opacity: 0.3;
+        }
+
+        /* Filtros scroll horizontal */
+        #categoryFilters {
+          overflow-x: auto;
+          white-space: nowrap;
+          -webkit-overflow-scrolling: touch;
+          padding-bottom: 8px;
+        }
+
+        #categoryFilters .filter-btn {
+          flex-shrink: 0;
+        }
+
+        #categoryFilters::-webkit-scrollbar {
+          height: 4px;
+        }
+
+        #categoryFilters::-webkit-scrollbar-thumb {
+          background: #ddd;
+          border-radius: 4px;
+        }
+
+        /* Botones +/- más grandes */
+        .btn-group-sm .btn {
+          padding: 8px 14px;
+          font-size: 16px;
+          min-width: 44px;
+          min-height: 44px;
+        }
+
+        /* Cards carrito compactas */
+        #cartItems .card {
+          margin-bottom: 12px;
+        }
+
+        #cartItems .card-body {
+          padding: 12px !important;
+        }
+
+        #cartItems h6 {
+          font-size: 14px;
+          line-height: 1.3;
+        }
+
+        #cartItems .text-primary {
+          font-size: 16px;
+        }
+
+        #cartItems .bg-light.rounded {
+          width: 60px !important;
+          height: 60px !important;
+        }
+
+        /* Botón WhatsApp prominente */
+        #whatsappOrderBtn {
+          padding: 14px !important;
+          font-size: 16px;
+          font-weight: 600;
+        }
+      }
+
+      /* ===== RESPONSIVE DESKTOP ===== */
+      @media (min-width: 769px) {
+        .header-cart-btn {
+          display: inline-block;
+        }
+
+        .floating-cart-btn {
+          display: none !important;
+        }
+
+        .admin-floating-btn {
+          bottom: 20px;
+          right: 20px;
+        }
+
+        .admin-floating-btn .btn {
+          width: 56px;
+          height: 56px;
+          font-size: 20px;
+        }
+
+        .cart-sidebar.show ~ .admin-floating-btn {
+          right: 420px;
+        }
+      }
+    </style>
+  </head>
+  <body class="bg-light">
+    <!-- Loading inicial -->
+    <div
+      id="initialLoading"
+      class="d-flex justify-content-center align-items-center"
+      style="height: 100vh"
+    >
+      <div class="text-center">
+        <div
+          class="spinner-border text-primary mb-3"
+          style="width: 3rem; height: 3rem"
+        ></div>
+        <div>Cargando tienda...</div>
+      </div>
+    </div>
+
+    <!-- Contenido principal (oculto inicialmente) -->
+    <div id="mainContent" class="d-none">
+      <!-- Header de la tienda -->
+      <header class="tienda-header text-white py-4">
+        <div class="container">
+          <div class="row align-items-center">
+            <div class="col-md-8">
+              <div class="d-flex align-items-center">
+                <img
+                  id="tiendaLogo"
+                  src=""
+                  alt="Logo"
+                  class="rounded-circle me-3 d-none"
+                  style="width: 60px; height: 60px; object-fit: cover"
+                />
+                <div>
+                  <h1 id="tiendaNombre" class="h3 mb-1">Cargando...</h1>
+                  <p id="tiendaDescripcion" class="mb-0 opacity-75">
+                    Cargando...
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+              <button
+                id="cartButton"
+                class="btn btn-light position-relative me-2 header-cart-btn"
+              >
+                <i class="fas fa-shopping-cart me-1"></i>
+                Carrito
+                <span
+                  id="cartCount"
+                  class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none"
+                  >0</span
+                >
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Búsqueda y filtros -->
+      <div class="bg-white border-bottom py-3">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="input-group">
+                <span class="input-group-text">
+                  <i class="fas fa-search text-muted"></i>
+                </span>
+                <input
+                  type="text"
+                  id="searchInput"
+                  class="form-control"
+                  placeholder="Buscar productos..."
+                />
+              </div>
+            </div>
+            <div class="col-md-6 mt-2 mt-md-0">
+              <div class="d-flex flex-wrap gap-2" id="categoryFilters">
+                <button
+                  class="btn btn-primary btn-sm filter-btn active"
+                  data-categoria="todos"
+                >
+                  Todos
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading productos -->
+      <div
+        id="loading"
+        class="d-flex justify-content-center align-items-center py-5"
+      >
+        <div class="spinner-border text-primary me-3"></div>
+        <span class="text-muted">Cargando productos...</span>
+      </div>
+
+      <!-- Productos -->
+      <div class="container my-4">
+        <div class="mb-3">
+          <p id="productCount" class="text-muted mb-0">
+            Mostrando <span id="currentCount">0</span> productos
+          </p>
+        </div>
+
+        <div id="productGrid" class="row g-4 d-none">
+          <!-- Los productos se cargan aquí dinámicamente -->
+        </div>
+
+        <div id="noProducts" class="text-center py-5 d-none">
+          <i class="fas fa-search text-muted" style="font-size: 4rem"></i>
+          <h4 class="text-muted mt-3 mb-2">No se encontraron productos</h4>
+          <p class="text-muted">Intenta con otros términos de búsqueda</p>
+        </div>
+      </div>
+
+      <!-- Footer con redes sociales -->
+      <footer class="bg-white border-top py-4 mt-5">
+        <div class="container">
+          <div class="row align-items-center">
+            <div class="col-md-6">
+              <h5 id="footerNombre">Tienda</h5>
+              <p class="text-muted mb-0">Síguenos en nuestras redes</p>
+            </div>
+            <div class="col-md-6 text-md-end mt-3 mt-md-0">
+              <div id="socialLinks">
+                <!-- Links se agregan dinámicamente -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <!-- Cart Overlay -->
+    <div id="cartOverlay" class="cart-overlay"></div>
+
+    <!-- Cart Sidebar -->
+    <div id="cartSidebar" class="cart-sidebar">
+      <div class="d-flex flex-column h-100">
+        <div
+          class="d-flex align-items-center justify-content-between p-3 border-bottom"
+        >
+          <h5 class="mb-0">Mi Carrito</h5>
+          <button id="closeCartBtn" class="btn-close"></button>
+        </div>
+
+        <div id="cartItems" class="flex-grow-1 overflow-auto p-3">
+          <!-- Items se cargan aquí dinámicamente -->
+        </div>
+
+        <div class="border-top p-3 bg-light">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="h5 mb-0">Total:</span>
+            <span id="cartTotal" class="h5 mb-0 text-primary fw-bold"
+              >$0.00</span
+            >
+          </div>
+
+          <button id="whatsappOrderBtn" class="btn btn-success w-100 py-2">
+            <i class="fab fa-whatsapp me-2"></i>
+            Iniciar Compra por WhatsApp
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- NUEVO: Botón flotante del carrito para mobile -->
+    <button id="floatingCartBtn" class="floating-cart-btn btn btn-primary">
+      <i class="fas fa-shopping-cart me-2"></i>
+      <span>Carrito</span>
+      <span id="floatingCartBadge" class="cart-badge d-none">0</span>
+    </button>
+
+    <!-- NUEVO: Botón sticky "Hacer Pedido" para mobile -->
+    <div id="mobileOrderBar" class="whatsapp-order-mobile d-block d-md-none">
+      <button
+        id="mobileWhatsappBtn"
+        class="btn btn-success w-100 py-2"
+        disabled
+      >
+        <i class="fab fa-whatsapp me-2"></i>
+        <span id="mobileOrderText">Agrega productos al carrito</span>
+      </button>
+    </div>
+
+    <!-- Botón flotante para panel admin -->
+    <div class="admin-floating-btn">
+      <a
+        href="/admin/"
+        class="btn btn-primary rounded-circle shadow"
+        title="Panel de Administración"
+        data-bs-toggle="tooltip"
+      >
+        <i class="fas fa-cog"></i>
+      </a>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- JavaScript para activar tooltip -->
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Activar tooltips de Bootstrap para el botón admin
+        const adminBtn = document.querySelector('[data-bs-toggle="tooltip"]');
+        if (adminBtn) {
+          new bootstrap.Tooltip(adminBtn);
+        }
+
+        // Configurar botones del carrito
+        setupCartButtons();
+
+        // Configurar botón móvil de WhatsApp
+        setupMobileWhatsAppButton();
+      });
+
+      function setupCartButtons() {
+        const cartButton = document.getElementById("cartButton");
+        const floatingCartBtn = document.getElementById("floatingCartBtn");
+
+        // Ambos botones abren el carrito
+        if (cartButton) {
+          cartButton.addEventListener("click", toggleCart);
+        }
+
+        if (floatingCartBtn) {
+          floatingCartBtn.addEventListener("click", toggleCart);
+        }
+      }
+
+      function setupMobileWhatsAppButton() {
+        const mobileBtn = document.getElementById("mobileWhatsappBtn");
+        const whatsappBtn = document.getElementById("whatsappOrderBtn");
+
+        if (mobileBtn && whatsappBtn) {
+          mobileBtn.addEventListener("click", function () {
+            // Mismo comportamiento que el botón del carrito
+            whatsappBtn.click();
+          });
+        }
+      }
+
+      function toggleCart() {
+        const cartSidebar = document.getElementById("cartSidebar");
+        const cartOverlay = document.getElementById("cartOverlay");
+
+        cartSidebar.classList.toggle("show");
+        cartOverlay.classList.toggle("show");
+      }
+
+      // Función para actualizar contadores del carrito
+      function updateCartUI(itemCount, total) {
+        // Actualizar contadores
+        const cartCount = document.getElementById("cartCount");
+        const floatingBadge = document.getElementById("floatingCartBadge");
+
+        if (itemCount > 0) {
+          cartCount.textContent = itemCount;
+          cartCount.classList.remove("d-none");
+
+          floatingBadge.textContent = itemCount;
+          floatingBadge.classList.remove("d-none");
+
+          // Animar botón flotante
+          const floatingBtn = document.getElementById("floatingCartBtn");
+          floatingBtn.classList.add("animate");
+          setTimeout(() => floatingBtn.classList.remove("animate"), 600);
+        } else {
+          cartCount.classList.add("d-none");
+          floatingBadge.classList.add("d-none");
+        }
+
+        // Actualizar botón móvil de WhatsApp
+        const mobileBtn = document.getElementById("mobileWhatsappBtn");
+        const mobileText = document.getElementById("mobileOrderText");
+
+        if (itemCount > 0) {
+          mobileBtn.disabled = false;
+          mobileBtn.classList.remove("btn-secondary");
+          mobileBtn.classList.add("btn-success");
+          mobileText.innerHTML = `<i class="fab fa-whatsapp me-2"></i>Iniciar Compra - $${total.toLocaleString()}`;
+        } else {
+          mobileBtn.disabled = true;
+          mobileBtn.classList.remove("btn-success");
+          mobileBtn.classList.add("btn-secondary");
+          mobileText.textContent = "Agrega productos al carrito";
+        }
+      }
+
+      // Cerrar carrito
+      document
+        .getElementById("closeCartBtn")
+        ?.addEventListener("click", function () {
+          const cartSidebar = document.getElementById("cartSidebar");
+          const cartOverlay = document.getElementById("cartOverlay");
+
+          cartSidebar.classList.remove("show");
+          cartOverlay.classList.remove("show");
+        });
+
+      // Cerrar carrito al hacer click en overlay
+      document
+        .getElementById("cartOverlay")
+        ?.addEventListener("click", function () {
+          const cartSidebar = document.getElementById("cartSidebar");
+          const cartOverlay = document.getElementById("cartOverlay");
+
+          cartSidebar.classList.remove("show");
+          cartOverlay.classList.remove("show");
+        });
+    </script>
+
+    <!-- JavaScript de la tienda dinámica -->
+    <script src="assets/js/tienda-dinamica.js"></script>
+  </body>
+</html>

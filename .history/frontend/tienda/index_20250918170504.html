@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Crea tu tienda gratis - Live Commerce</title>
+
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+
+    <style>
+      body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 2rem 0;
+      }
+
+      .registration-card {
+        background: white;
+        border-radius: 1rem;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        max-width: 600px;
+        margin: 0 auto;
+      }
+
+      .header-section {
+        background: linear-gradient(135deg, #3b82f6, #10b981);
+        color: white;
+        padding: 2rem;
+        border-radius: 1rem 1rem 0 0;
+        text-align: center;
+      }
+
+      .form-section {
+        padding: 2rem;
+      }
+
+      .preview-url {
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 0.375rem;
+        padding: 0.375rem 0.75rem;
+        display: flex;
+        align-items: center;
+        margin-top: 0.5rem;
+      }
+
+      .preview-url .base-url {
+        color: #6c757d;
+        font-weight: 500;
+      }
+
+      .preview-url .user-slug {
+        color: #198754;
+        font-weight: bold;
+        min-width: 100px;
+      }
+
+      .country-select {
+        width: 80px;
+        border-right: 1px solid #dee2e6;
+        border-radius: 0.375rem 0 0 0.375rem;
+      }
+
+      .phone-input {
+        border-radius: 0 0.375rem 0.375rem 0;
+        border-left: 0;
+      }
+
+      .feature-badge {
+        background: #e7f3ff;
+        color: #0066cc;
+        padding: 0.25rem 0.75rem;
+        border-radius: 1rem;
+        font-size: 0.875rem;
+        margin: 0.25rem;
+        display: inline-block;
+      }
+
+      .btn-create {
+        background: linear-gradient(135deg, #10b981, #059669);
+        border: none;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+        border-radius: 0.5rem;
+        transition: transform 0.2s;
+      }
+
+      .btn-create:hover {
+        transform: translateY(-2px);
+        background: linear-gradient(135deg, #059669, #047857);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="registration-card">
+        <!-- Header -->
+        <div class="header-section">
+          <h1 class="h2 mb-3">Crea tu tienda gratis</h1>
+          <p class="mb-0 opacity-90">
+            Empieza a vender en minutos con tu tienda online personalizada
+          </p>
+
+          <div class="mt-4">
+            <span class="feature-badge">
+              <i class="fas fa-mobile-alt me-1"></i>
+              Optimizado para móvil
+            </span>
+            <span class="feature-badge">
+              <i class="fab fa-whatsapp me-1"></i>
+              Integración WhatsApp
+            </span>
+            <span class="feature-badge">
+              <i class="fas fa-palette me-1"></i>
+              Personalizable
+            </span>
+          </div>
+        </div>
+
+        <!-- Formulario -->
+        <div class="form-section">
+          <form id="registrationForm">
+            <!-- Nombre del comercio -->
+            <div class="mb-3">
+              <label for="nombreComercio" class="form-label fw-semibold">
+                Nombre del comercio <span class="text-danger">*</span>
+              </label>
+              <input
+                type="text"
+                class="form-control form-control-lg"
+                id="nombreComercio"
+                placeholder="Nombre de mi comercio"
+                required
+              />
+            </div>
+
+            <!-- Nombre de usuario (slug) -->
+            <div class="mb-3">
+              <label for="nombreUsuario" class="form-label fw-semibold">
+                Nombre de usuario <span class="text-danger">*</span>
+              </label>
+              <input
+                type="text"
+                class="form-control"
+                id="nombreUsuario"
+                placeholder="mi-tienda"
+                required
+                pattern="[a-z0-9-]+"
+                title="Solo letras minúsculas, números y guiones"
+              />
+              <div class="preview-url">
+                <span class="base-url">livecommerce.com/</span>
+                <span class="user-slug" id="slugPreview">mi-tienda</span>
+              </div>
+              <small class="form-text text-muted"
+                >Solo letras minúsculas, números y guiones</small
+              >
+            </div>
+
+            <!-- Rubro del comercio -->
+            <div class="mb-3">
+              <label for="rubroComercio" class="form-label fw-semibold">
+                Rubro del comercio <span class="text-danger">*</span>
+              </label>
+              <select class="form-select" id="rubroComercio" required>
+                <option value="">Seleccione una categoría</option>
+                <option value="Ropa y Accesorios">Ropa y Accesorios</option>
+                <option value="Electrónicos">Electrónicos</option>
+                <option value="Hogar y Jardín">Hogar y Jardín</option>
+                <option value="Deportes y Fitness">Deportes y Fitness</option>
+                <option value="Belleza y Cuidado Personal">
+                  Belleza y Cuidado Personal
+                </option>
+                <option value="Libros y Educación">Libros y Educación</option>
+                <option value="Juguetes y Bebés">Juguetes y Bebés</option>
+                <option value="Automotriz">Automotriz</option>
+                <option value="Alimentos y Bebidas">Alimentos y Bebidas</option>
+                <option value="Arte y Manualidades">Arte y Manualidades</option>
+                <option value="Otro">Otro</option>
+              </select>
+            </div>
+
+            <!-- WhatsApp -->
+            <div class="mb-3">
+              <label for="whatsappComercio" class="form-label fw-semibold">
+                WhatsApp donde recibirás los pedidos
+                <span class="text-danger">*</span>
+              </label>
+              <div class="input-group">
+                <select class="form-select country-select" id="codigoPais">
+                  <option value="+54">🇦🇷 +54</option>
+                  <option value="+1">🇺🇸 +1</option>
+                  <option value="+52">🇲🇽 +52</option>
+                  <option value="+57">🇨🇴 +57</option>
+                  <option value="+51">🇵🇪 +51</option>
+                  <option value="+56">🇨🇱 +56</option>
+                  <option value="+598">🇺🇾 +598</option>
+                  <option value="+591">🇧🇴 +591</option>
+                  <option value="+34">🇪🇸 +34</option>
+                </select>
+                <input
+                  type="tel"
+                  class="form-control phone-input"
+                  id="whatsappComercio"
+                  placeholder="1144440000"
+                  required
+                />
+              </div>
+            </div>
+
+            <!-- Teléfono personal -->
+            <div class="mb-3">
+              <label for="telefonoPersonal" class="form-label fw-semibold">
+                Teléfono personal <span class="text-danger">*</span>
+              </label>
+              <div class="input-group">
+                <select
+                  class="form-select country-select"
+                  id="codigoPaisPersonal"
+                >
+                  <option value="+54">🇦🇷 +54</option>
+                  <option value="+1">🇺🇸 +1</option>
+                  <option value="+52">🇲🇽 +52</option>
+                  <option value="+57">🇨🇴 +57</option>
+                  <option value="+51">🇵🇪 +51</option>
+                  <option value="+56">🇨🇱 +56</option>
+                  <option value="+598">🇺🇾 +598</option>
+                  <option value="+591">🇧🇴 +591</option>
+                  <option value="+34">🇪🇸 +34</option>
+                </select>
+                <input
+                  type="tel"
+                  class="form-control phone-input"
+                  id="telefonoPersonal"
+                  placeholder="1144440000"
+                  required
+                />
+              </div>
+              <small class="form-text text-muted"
+                >Este teléfono puede ser igual que el del comercio</small
+              >
+            </div>
+
+            <!-- País -->
+            <div class="mb-3">
+              <label for="pais" class="form-label fw-semibold">
+                País <span class="text-danger">*</span>
+              </label>
+              <select class="form-select" id="pais" required>
+                <option value="">Selecciona un país</option>
+                <option value="Argentina">🇦🇷 Argentina</option>
+                <option value="México">🇲🇽 México</option>
+                <option value="Colombia">🇨🇴 Colombia</option>
+                <option value="Perú">🇵🇪 Perú</option>
+                <option value="Chile">🇨🇱 Chile</option>
+                <option value="Uruguay">🇺🇾 Uruguay</option>
+                <option value="Bolivia">🇧🇴 Bolivia</option>
+                <option value="España">🇪🇸 España</option>
+                <option value="Estados Unidos">🇺🇸 Estados Unidos</option>
+                <option value="Otro">🌍 Otro</option>
+              </select>
+            </div>
+
+            <!-- Email -->
+            <div class="mb-4">
+              <label for="email" class="form-label fw-semibold">
+                E-mail <span class="text-danger">*</span>
+              </label>
+              <input
+                type="email"
+                class="form-control"
+                id="email"
+                placeholder="tu@email.com"
+                required
+              />
+              <small class="form-text text-muted"
+                >Te enviaremos las credenciales de acceso</small
+              >
+            </div>
+
+            <!-- Términos y condiciones -->
+            <div class="mb-4">
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="terminos"
+                  required
+                />
+                <label class="form-check-label" for="terminos">
+                  Acepto los
+                  <a href="#" class="text-decoration-none"
+                    >términos y condiciones</a
+                  >
+                  y la
+                  <a href="#" class="text-decoration-none"
+                    >política de privacidad</a
+                  >
+                </label>
+              </div>
+            </div>
+
+            <!-- Botón submit -->
+            <div class="d-grid">
+              <button
+                type="submit"
+                class="btn btn-success btn-create"
+                id="btnCrear"
+              >
+                <span id="btnText">
+                  <i class="fas fa-store me-2"></i>
+                  Crear mi tienda gratis
+                </span>
+                <span id="btnSpinner" class="d-none">
+                  <span class="spinner-border spinner-border-sm me-2"></span>
+                  Creando tienda...
+                </span>
+              </button>
+            </div>
+          </form>
+
+          <!-- Footer -->
+          <div class="text-center mt-4 pt-4 border-top">
+            <p class="text-muted mb-2">¿Ya tienes una tienda?</p>
+            <a href="/admin/" class="btn btn-outline-primary">
+              <i class="fas fa-sign-in-alt me-1"></i>
+              Iniciar sesión
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- JavaScript del registro -->
+    <script src="../assets/js/registro-comerciante.js"></script>
+  </body>
+</html>
