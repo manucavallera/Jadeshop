@@ -655,20 +655,20 @@ ${
       0,
     )}*\n\n`;
 
-    // Datos del cliente
-    if (this.clienteData) {
-      mensaje += `👤 *DATOS DEL CLIENTE:*\n`;
-      mensaje += `---------------------------------------\n`;
-      mensaje += `📛 Nombre: ${this.clienteData.nombre}\n`;
-      mensaje += `📱 Teléfono: ${this.clienteData.telefono}\n`;
-      if (this.clienteData.email) {
-        mensaje += `📧 Email: ${this.clienteData.email}\n`;
-      }
-      if (this.clienteData.direccion) {
-        mensaje += `📍 Dirección: ${this.clienteData.direccion}\n`;
-      }
-      mensaje += `\n`;
-    }
+    mensaje += `📝 *PARA CONFIRMAR TU PEDIDO, RESPONDE CON:*\n`;
+    mensaje += `---------------------------------------\n`;
+    mensaje += `👤 Nombre completo:\n`;
+    mensaje += `📱 Teléfono:\n`;
+    mensaje += `📍 Dirección de entrega:\n`;
+    mensaje += `💳 Forma de pago preferida:\n`;
+    mensaje += `🚚 Tipo de entrega:\n\n`;
+
+    mensaje += `💬 *EJEMPLO DE RESPUESTA:*\n`;
+    mensaje += `---------------------------------------\n`;
+    mensaje += `Nombre: Juan Pérez\n`;
+    mensaje += `Teléfono: 11-1234-5678\n`;
+    mensaje += `Dirección: Av. Corrientes 1234, CABA\n`;
+    mensaje += `Pago: Transferencia bancaria\n`;
     mensaje += `Entrega: Envío a domicilio\n\n`;
 
     mensaje += `⚠️ *IMPORTANTE:*\n`;
@@ -718,163 +718,54 @@ ${
     }
   }
 
-  // Iniciar compra - muestra formulario de datos del cliente
+  // MODIFICA la función iniciarCompraWhatsApp() para incluir el guardado:
   async iniciarCompraWhatsApp() {
     if (this.carrito.length === 0) {
       this.showToast("Tu carrito está vacío", "warning");
       return;
     }
 
-    const whatsapp = this.tiendaData.whatsapp;
+    const whatsapp = this.tiendaData.whatsapp; // PRIMERO definir whatsapp
 
     if (!whatsapp) {
       this.showToast("WhatsApp no configurado para esta tienda", "error");
       return;
     }
 
-    this.mostrarFormularioCliente();
-  }
-
-  mostrarFormularioCliente() {
-    const prevModal = document.getElementById("clienteModal");
-    if (prevModal) prevModal.remove();
-
-    const total = this.carrito.reduce(
-      (sum, item) => sum + item.precio * item.cantidad,
-      0,
-    );
-
-    const modalHTML = `
-      <div class="modal fade" tabindex="-1" id="clienteModal">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header bg-success text-white">
-              <h5 class="modal-title">
-                <i class="fab fa-whatsapp me-2"></i>Finalizar Pedido
-              </h5>
-              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body p-4">
-              <p class="text-muted mb-3">Completá tus datos para confirmar el pedido</p>
-              
-              <div class="mb-3">
-                <label class="form-label fw-bold">
-                  <i class="fas fa-user me-1"></i> Nombre completo *
-                </label>
-                <input type="text" id="clienteNombre" class="form-control" placeholder="Ej: Juan Pérez" required>
-              </div>
-              
-              <div class="mb-3">
-                <label class="form-label fw-bold">
-                  <i class="fas fa-phone me-1"></i> Teléfono / WhatsApp *
-                </label>
-                <input type="tel" id="clienteTelefono" class="form-control" placeholder="Ej: 1123456789" required>
-              </div>
-              
-              <div class="mb-3">
-                <label class="form-label fw-bold">
-                  <i class="fas fa-envelope me-1"></i> Email (opcional)
-                </label>
-                <input type="email" id="clienteEmail" class="form-control" placeholder="Ej: juan@email.com">
-              </div>
-              
-              <div class="mb-3">
-                <label class="form-label fw-bold">
-                  <i class="fas fa-map-marker-alt me-1"></i> Dirección de entrega (opcional)
-                </label>
-                <input type="text" id="clienteDireccion" class="form-control" placeholder="Ej: Av. Corrientes 1234, CABA">
-              </div>
-
-              <div class="alert alert-light border mt-3 mb-0">
-                <div class="d-flex justify-content-between align-items-center">
-                  <span class="fw-bold">Total a pagar:</span>
-                  <span class="h5 mb-0 text-success fw-bold">$${total.toLocaleString("es-AR", { minimumFractionDigits: 2 })}</span>
-                </div>
-              </div>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-              <button type="button" id="confirmarPedidoBtn" class="btn btn-success">
-                <i class="fab fa-whatsapp me-2"></i>Confirmar y Enviar
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
-
-    document.body.insertAdjacentHTML("beforeend", modalHTML);
-    const modal = new bootstrap.Modal(document.getElementById("clienteModal"));
-    modal.show();
-
-    document
-      .getElementById("confirmarPedidoBtn")
-      .addEventListener("click", () => {
-        this.procesarPedidoConDatos(modal);
-      });
-
-    document
-      .getElementById("clienteModal")
-      .addEventListener("hidden.bs.modal", function () {
-        this.remove();
-      });
-  }
-
-  async procesarPedidoConDatos(modal) {
-    const nombre = document.getElementById("clienteNombre").value.trim();
-    const telefono = document.getElementById("clienteTelefono").value.trim();
-    const email = document.getElementById("clienteEmail").value.trim();
-    const direccion = document.getElementById("clienteDireccion").value.trim();
-
-    if (!nombre) {
-      this.showToast("Ingresá tu nombre", "warning");
-      document.getElementById("clienteNombre").focus();
-      return;
-    }
-
-    if (!telefono) {
-      this.showToast("Ingresá tu teléfono", "warning");
-      document.getElementById("clienteTelefono").focus();
-      return;
-    }
-
-    this.clienteData = { nombre, telefono, email, direccion };
-
-    const btn = document.getElementById("confirmarPedidoBtn");
-    btn.disabled = true;
-    btn.innerHTML =
-      '<span class="spinner-border spinner-border-sm me-2"></span>Procesando...';
-
+    // Crear pedido en la base de datos
     try {
       const resultado = await this.crearPedidoEnBD();
       this.showToast(`Pedido ${resultado.codigo_pedido} creado`, "success");
-
-      modal.hide();
-
-      const mensaje = this.generarMensajeWhatsApp();
-      const whatsappClean = this.tiendaData.whatsapp.replace(/[^\d]/g, "");
-      const url = `https://wa.me/${whatsappClean}?text=${encodeURIComponent(mensaje)}`;
-      window.open(url, "_blank");
-
-      this.carrito = [];
-      this.saveCarrito();
-      this.updateCartUI();
-      this.closeCart();
-      this.showConfirmacion();
     } catch (error) {
       console.error("Error creando pedido:", error);
-      btn.disabled = false;
-      btn.innerHTML = '<i class="fab fa-whatsapp me-2"></i>Confirmar y Enviar';
-
       if (error.message.includes("Stock insuficiente")) {
         this.showToast(error.message, "error");
-        modal.hide();
+        // Recargar productos para actualizar stock en la UI
         await this.loadProductos();
         this.updateCartUI();
       } else {
-        this.showToast("Error creando el pedido. Intentá de nuevo.", "error");
+        this.showToast("Error creando el pedido", "error");
       }
+      return;
     }
+
+    const mensaje = this.generarMensajeWhatsApp();
+
+    const whatsappClean = whatsapp.replace(/[^\d]/g, ""); // DESPUÉS limpiar
+
+    const url = `https://wa.me/${whatsappClean}?text=${encodeURIComponent(
+      mensaje,
+    )}`;
+
+    window.open(url, "_blank");
+
+    // Limpiar carrito después de enviar
+    this.carrito = [];
+    this.saveCarrito();
+    this.updateCartUI();
+    this.closeCart();
+
+    this.showConfirmacion();
   }
 
   async crearPedidoEnBD() {
@@ -890,13 +781,9 @@ ${
         precio_unitario: item.precio,
       })),
       total: total,
-      cliente_nombre: this.clienteData
-        ? this.clienteData.nombre
-        : "Cliente WhatsApp",
-      cliente_email: this.clienteData ? this.clienteData.email || "" : "",
-      cliente_whatsapp: this.clienteData
-        ? this.clienteData.telefono
-        : this.tiendaData.whatsapp,
+      cliente_nombre: "Cliente WhatsApp",
+      cliente_email: "",
+      cliente_whatsapp: this.tiendaData.whatsapp,
     };
 
     const response = await fetch(`/api/comerciantes/${this.slug}/pedidos`, {
@@ -910,6 +797,7 @@ ${
     const result = await response.json();
 
     if (!response.ok) {
+      // Si hay problemas de stock, mostrar detalle
       if (result.detalles && result.detalles.length > 0) {
         const problemas = result.detalles
           .map(

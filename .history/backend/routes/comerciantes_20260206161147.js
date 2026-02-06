@@ -428,7 +428,6 @@ router.post("/:slug/pedidos", async (req, res) => {
       cliente_nombre,
       cliente_email,
       cliente_whatsapp,
-      cliente_direccion,
     } = req.body;
 
     // Obtener comerciante_id del slug
