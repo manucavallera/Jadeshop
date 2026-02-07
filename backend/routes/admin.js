@@ -49,24 +49,24 @@ router.get("/dashboard", requireAuth, async (req, res) => {
     // Total de pedidos del comerciante
     const totalPedidos = await pool.query(
       "SELECT COUNT(*) FROM pedidos WHERE comerciante_id = $1",
-      [comerciante_id]
+      [comerciante_id],
     );
 
     // Total de ventas del comerciante
     const totalVentas = await pool.query(
       "SELECT SUM(total) FROM pedidos WHERE estado IN ('confirmado', 'preparando', 'enviado', 'entregado') AND comerciante_id = $1",
-      [comerciante_id]
+      [comerciante_id],
     );
     // Pedidos pendientes del comerciante
     const pedidosPendientes = await pool.query(
       "SELECT COUNT(*) FROM pedidos WHERE estado = $1 AND comerciante_id = $2",
-      ["pendiente", comerciante_id]
+      ["pendiente", comerciante_id],
     );
 
     // Total productos del comerciante
     const totalProductos = await pool.query(
       "SELECT COUNT(*) FROM productos WHERE comerciante_id = $1 AND activo = true",
-      [comerciante_id]
+      [comerciante_id],
     );
 
     // Productos más vendidos del comerciante (top 5)
@@ -81,7 +81,7 @@ router.get("/dashboard", requireAuth, async (req, res) => {
       ORDER BY total_vendido DESC
       LIMIT 5
     `,
-      [comerciante_id]
+      [comerciante_id],
     );
 
     // Ventas por día del comerciante - SOLO pedidos confirmados o entregados
@@ -95,7 +95,7 @@ router.get("/dashboard", requireAuth, async (req, res) => {
   GROUP BY DATE(created_at)
   ORDER BY fecha ASC
 `,
-      [comerciante_id]
+      [comerciante_id],
     );
 
     res.json({
@@ -127,7 +127,7 @@ router.get("/productos", requireAuth, async (req, res) => {
        LEFT JOIN categorias c ON p.categoria_id = c.id
        WHERE p.comerciante_id = $1 
        ORDER BY p.created_at DESC`,
-      [comerciante_id]
+      [comerciante_id],
     );
 
     // Sincronizar imagen_url con la imagen principal de la galería
@@ -135,7 +135,7 @@ router.get("/productos", requireAuth, async (req, res) => {
       if (!producto.imagen_url) {
         const imagenPrincipal = await pool.query(
           "SELECT imagen_url FROM producto_imagenes WHERE producto_id = $1 AND es_principal = true LIMIT 1",
-          [producto.id]
+          [producto.id],
         );
 
         if (imagenPrincipal.rows.length > 0) {
@@ -173,13 +173,13 @@ router.post("/productos", requireAuth, async (req, res) => {
     // Verificar límite de productos para plan gratis
     const userPlan = await pool.query(
       "SELECT plan FROM comerciantes WHERE id = $1",
-      [comerciante_id]
+      [comerciante_id],
     );
 
     if (userPlan.rows[0].plan === "gratis") {
       const countResult = await pool.query(
         "SELECT COUNT(*) FROM productos WHERE comerciante_id = $1",
-        [comerciante_id]
+        [comerciante_id],
       );
 
       if (parseInt(countResult.rows[0].count) >= 10) {
@@ -206,7 +206,7 @@ router.post("/productos", requireAuth, async (req, res) => {
         imagen_url,
         tiktok_video_url,
         mostrar_stock !== undefined ? mostrar_stock : true, // $12 - default true
-      ]
+      ],
     );
 
     res.status(201).json(result.rows[0]);
@@ -251,7 +251,7 @@ router.put("/productos/:id", requireAuth, async (req, res) => {
         mostrar_stock !== undefined ? mostrar_stock : true, // $11
         id, // $12
         comerciante_id, // $13
-      ]
+      ],
     );
 
     if (result.rows.length === 0) {
@@ -276,7 +276,7 @@ router.delete("/productos/:id", requireAuth, async (req, res) => {
 
     const result = await pool.query(
       "DELETE FROM productos WHERE id = $1 AND comerciante_id = $2 RETURNING *",
-      [id, comerciante_id]
+      [id, comerciante_id],
     );
 
     if (result.rowCount === 0) {
@@ -319,7 +319,7 @@ router.get("/pedidos", requireAuth, async (req, res) => {
       GROUP BY p.id
       ORDER BY p.created_at DESC
     `,
-      [comerciante_id]
+      [comerciante_id],
     );
 
     res.json(result.rows);
@@ -367,7 +367,7 @@ router.post("/pedidos", requireAuth, async (req, res) => {
         cliente_nombre, // $8
         cliente_email, // $9
         cliente_whatsapp, // $10
-      ]
+      ],
     );
     const pedidoId = result.rows[0].id;
 
@@ -381,7 +381,7 @@ router.post("/pedidos", requireAuth, async (req, res) => {
           producto.producto_id,
           producto.cantidad,
           producto.precio_unitario,
-        ]
+        ],
       );
     }
 
@@ -397,6 +397,7 @@ router.post("/pedidos", requireAuth, async (req, res) => {
   }
 });
 
+// PUT /api/admin/pedidos/:id/estado - Actualizar estado del pedido
 // PUT /api/admin/pedidos/:id/estado - Actualizar estado del pedido
 router.put("/pedidos/:id/estado", requireAuth, async (req, res) => {
   try {
@@ -417,16 +418,54 @@ router.put("/pedidos/:id/estado", requireAuth, async (req, res) => {
       return res.status(400).json({ error: "Estado no válido" });
     }
 
-    const result = await pool.query(
-      "UPDATE pedidos SET estado = $1, updated_at = NOW() WHERE id = $2 AND comerciante_id = $3 RETURNING *",
-      [estado, id, comerciante_id]
+    // Obtener estado actual del pedido
+    const pedidoActual = await pool.query(
+      "SELECT estado FROM pedidos WHERE id = $1 AND comerciante_id = $2",
+      [id, comerciante_id],
     );
 
-    if (result.rows.length === 0) {
+    if (pedidoActual.rows.length === 0) {
       return res.status(404).json({
         error: "Pedido no encontrado o no pertenece a este comerciante",
       });
     }
+
+    const estadoAnterior = pedidoActual.rows[0].estado;
+
+    // Si se cancela y antes NO estaba cancelado, devolver stock
+    if (estado === "cancelado" && estadoAnterior !== "cancelado") {
+      const detalles = await pool.query(
+        "SELECT producto_id, cantidad FROM detalle_pedidos WHERE pedido_id = $1",
+        [id],
+      );
+
+      for (const item of detalles.rows) {
+        await pool.query(
+          "UPDATE productos SET stock = stock + $1 WHERE id = $2",
+          [item.cantidad, item.producto_id],
+        );
+      }
+    }
+
+    // Si se reactiva un pedido que estaba cancelado, volver a descontar stock
+    if (estadoAnterior === "cancelado" && estado !== "cancelado") {
+      const detalles = await pool.query(
+        "SELECT producto_id, cantidad FROM detalle_pedidos WHERE pedido_id = $1",
+        [id],
+      );
+
+      for (const item of detalles.rows) {
+        await pool.query(
+          "UPDATE productos SET stock = stock - $1 WHERE id = $2 AND stock >= $1",
+          [item.cantidad, item.producto_id],
+        );
+      }
+    }
+
+    const result = await pool.query(
+      "UPDATE pedidos SET estado = $1, updated_at = NOW() WHERE id = $2 AND comerciante_id = $3 RETURNING *",
+      [estado, id, comerciante_id],
+    );
 
     res.json(result.rows[0]);
   } catch (error) {
@@ -434,7 +473,6 @@ router.put("/pedidos/:id/estado", requireAuth, async (req, res) => {
     res.status(500).json({ error: "Error interno del servidor" });
   }
 });
-
 // ===================
 // INFORMACIÓN DEL COMERCIANTE
 // ===================
@@ -451,7 +489,7 @@ router.get("/comerciante/:id", async (req, res) => {
       LEFT JOIN tiendas t ON c.id = t.comerciante_id 
       WHERE c.id = $1
     `,
-      [id]
+      [id],
     );
 
     if (result.rows.length === 0) {
@@ -473,7 +511,7 @@ router.get("/tienda-config", requireAuth, async (req, res) => {
       `SELECT c.nombre, c.slug, c.whatsapp
        FROM comerciantes c 
        WHERE c.id = $1`,
-      [comerciante_id]
+      [comerciante_id],
     );
 
     if (result.rows.length === 0) {
@@ -515,7 +553,7 @@ router.put("/tienda-config", requireAuth, async (req, res) => {
     // Actualizar comerciantes
     const result = await pool.query(
       "UPDATE comerciantes SET nombre = $1, whatsapp = $2 WHERE id = $3 RETURNING nombre, slug, whatsapp",
-      [nombre, whatsappClean, comerciante_id]
+      [nombre, whatsappClean, comerciante_id],
     );
 
     if (result.rows.length === 0) {
@@ -525,7 +563,7 @@ router.put("/tienda-config", requireAuth, async (req, res) => {
     // Actualizar tiendas también
     await pool.query(
       "UPDATE tiendas SET nombre = $1 WHERE comerciante_id = $2",
-      [nombre, comerciante_id]
+      [nombre, comerciante_id],
     );
 
     req.session.comerciante_nombre = nombre;
@@ -569,7 +607,7 @@ router.post(
             (error, result) => {
               if (error) reject(error);
               else resolve(result);
-            }
+            },
           )
           .end(req.file.buffer);
       });
@@ -583,7 +621,7 @@ router.post(
       console.error("Error subiendo imagen:", error);
       res.status(500).json({ error: "Error subiendo imagen" });
     }
-  }
+  },
 );
 
 // GESTIÓN DE CATEGORÍAS
@@ -600,7 +638,7 @@ router.get("/categorias", requireAuth, async (req, res) => {
        WHERE c.comerciante_id = $1 AND c.activa = true
        GROUP BY c.id 
        ORDER BY c.created_at DESC`,
-      [comerciante_id]
+      [comerciante_id],
     );
 
     res.json(result.rows);
@@ -622,7 +660,7 @@ router.post("/categorias", requireAuth, async (req, res) => {
 
     const result = await pool.query(
       "INSERT INTO categorias (nombre, descripcion, comerciante_id) VALUES ($1, $2, $3) RETURNING *",
-      [nombre.trim(), descripcion?.trim(), comerciante_id]
+      [nombre.trim(), descripcion?.trim(), comerciante_id],
     );
 
     res.status(201).json(result.rows[0]);
@@ -646,7 +684,7 @@ router.put("/categorias/:id", requireAuth, async (req, res) => {
 
     const result = await pool.query(
       "UPDATE categorias SET nombre=$1, descripcion=$2 WHERE id=$3 AND comerciante_id=$4 RETURNING *",
-      [nombre.trim(), descripcion?.trim(), id, comerciante_id]
+      [nombre.trim(), descripcion?.trim(), id, comerciante_id],
     );
 
     if (result.rows.length === 0) {
@@ -668,7 +706,7 @@ router.delete("/categorias/:id", requireAuth, async (req, res) => {
 
     const checkProducts = await pool.query(
       "SELECT COUNT(*) FROM productos WHERE categoria_id = $1",
-      [id]
+      [id],
     );
 
     if (parseInt(checkProducts.rows[0].count) > 0) {
@@ -679,7 +717,7 @@ router.delete("/categorias/:id", requireAuth, async (req, res) => {
 
     const result = await pool.query(
       "DELETE FROM categorias WHERE id = $1 AND comerciante_id = $2 RETURNING *",
-      [id, comerciante_id]
+      [id, comerciante_id],
     );
 
     if (result.rowCount === 0) {
@@ -703,7 +741,7 @@ router.get("/verificar-productos-categorias", requireAuth, async (req, res) => {
        FROM productos 
        WHERE comerciante_id = $1 
        ORDER BY id`,
-      [comerciante_id]
+      [comerciante_id],
     );
 
     const categorias = await pool.query(
@@ -711,7 +749,7 @@ router.get("/verificar-productos-categorias", requireAuth, async (req, res) => {
        FROM categorias 
        WHERE comerciante_id = $1 
        ORDER BY id`,
-      [comerciante_id]
+      [comerciante_id],
     );
 
     res.json({
@@ -816,7 +854,7 @@ router.post(
       // Verificar que el producto pertenece al comerciante
       const productoCheck = await pool.query(
         "SELECT id FROM productos WHERE id = $1 AND comerciante_id = $2",
-        [id, comerciante_id]
+        [id, comerciante_id],
       );
 
       if (productoCheck.rows.length === 0) {
@@ -834,7 +872,7 @@ router.post(
       // Obtener el orden máximo actual
       const maxOrdenResult = await pool.query(
         "SELECT COALESCE(MAX(orden), -1) as max_orden FROM producto_imagenes WHERE producto_id = $1",
-        [id]
+        [id],
       );
       let currentOrden = maxOrdenResult.rows[0].max_orden + 1;
 
@@ -856,7 +894,7 @@ router.post(
               (error, result) => {
                 if (error) reject(error);
                 else resolve(result);
-              }
+              },
             )
             .end(file.buffer);
         });
@@ -866,7 +904,7 @@ router.post(
           `INSERT INTO producto_imagenes (producto_id, imagen_url, orden, es_principal)
            VALUES ($1, $2, $3, $4)
            RETURNING *`,
-          [id, result.secure_url, currentOrden, false]
+          [id, result.secure_url, currentOrden, false],
         );
 
         imagenesSubidas.push(insertResult.rows[0]);
@@ -876,7 +914,7 @@ router.post(
       // Marcar el producto como que usa galería
       await pool.query(
         "UPDATE productos SET usa_galeria = true WHERE id = $1",
-        [id]
+        [id],
       );
 
       res.json({
@@ -888,7 +926,7 @@ router.post(
       console.error("Error subiendo imágenes:", error);
       res.status(500).json({ error: "Error subiendo imágenes" });
     }
-  }
+  },
 );
 
 // GET /api/admin/productos/:id/imagenes - Obtener imágenes de un producto
@@ -900,7 +938,7 @@ router.get("/productos/:id/imagenes", requireAuth, async (req, res) => {
     // Verificar que el producto pertenece al comerciante
     const productoCheck = await pool.query(
       "SELECT id FROM productos WHERE id = $1 AND comerciante_id = $2",
-      [id, comerciante_id]
+      [id, comerciante_id],
     );
 
     if (productoCheck.rows.length === 0) {
@@ -913,7 +951,7 @@ router.get("/productos/:id/imagenes", requireAuth, async (req, res) => {
       `SELECT * FROM producto_imagenes 
        WHERE producto_id = $1 
        ORDER BY orden ASC, created_at ASC`,
-      [id]
+      [id],
     );
 
     res.json(result.rows);
@@ -938,7 +976,7 @@ router.put(
         `SELECT pi.* FROM producto_imagenes pi
        JOIN productos p ON pi.producto_id = p.id
        WHERE pi.id = $1 AND p.id = $2 AND p.comerciante_id = $3`,
-        [imagen_id, id, comerciante_id]
+        [imagen_id, id, comerciante_id],
       );
 
       if (check.rows.length === 0) {
@@ -951,7 +989,7 @@ router.put(
       if (es_principal) {
         await pool.query(
           "UPDATE producto_imagenes SET es_principal = false WHERE producto_id = $1",
-          [id]
+          [id],
         );
       }
 
@@ -962,7 +1000,7 @@ router.put(
            es_principal = COALESCE($2, es_principal)
        WHERE id = $3
        RETURNING *`,
-        [orden, es_principal, imagen_id]
+        [orden, es_principal, imagen_id],
       );
 
       res.json(result.rows[0]);
@@ -970,7 +1008,7 @@ router.put(
       console.error("Error actualizando imagen:", error);
       res.status(500).json({ error: "Error actualizando imagen" });
     }
-  }
+  },
 );
 
 // DELETE /api/admin/productos/:id/imagenes/:imagen_id - Eliminar una imagen
@@ -987,7 +1025,7 @@ router.delete(
         `SELECT pi.imagen_url FROM producto_imagenes pi
        JOIN productos p ON pi.producto_id = p.id
        WHERE pi.id = $1 AND p.id = $2 AND p.comerciante_id = $3`,
-        [imagen_id, id, comerciante_id]
+        [imagen_id, id, comerciante_id],
       );
 
       if (check.rows.length === 0) {
@@ -1026,7 +1064,7 @@ router.delete(
          WHERE producto_id = $1
        ) subq 
        WHERE producto_imagenes.id = subq.id`,
-        [id]
+        [id],
       );
 
       res.json({
@@ -1037,7 +1075,7 @@ router.delete(
       console.error("Error eliminando imagen:", error);
       res.status(500).json({ error: "Error eliminando imagen" });
     }
-  }
+  },
 );
 
 // PUT /api/admin/productos/:id/imagenes/reordenar - Reordenar todas las imágenes
@@ -1059,7 +1097,7 @@ router.put(
       // Verificar permisos
       const check = await pool.query(
         "SELECT id FROM productos WHERE id = $1 AND comerciante_id = $2",
-        [id, comerciante_id]
+        [id, comerciante_id],
       );
 
       if (check.rows.length === 0) {
@@ -1072,7 +1110,7 @@ router.put(
       for (let i = 0; i < orden.length; i++) {
         await pool.query(
           "UPDATE producto_imagenes SET orden = $1 WHERE id = $2 AND producto_id = $3",
-          [i, orden[i], id]
+          [i, orden[i], id],
         );
       }
 
@@ -1081,7 +1119,7 @@ router.put(
         `SELECT * FROM producto_imagenes 
        WHERE producto_id = $1 
        ORDER BY orden ASC`,
-        [id]
+        [id],
       );
 
       res.json({
@@ -1093,7 +1131,7 @@ router.put(
       console.error("Error reordenando imágenes:", error);
       res.status(500).json({ error: "Error reordenando imágenes" });
     }
-  }
+  },
 );
 
 module.exports = router;

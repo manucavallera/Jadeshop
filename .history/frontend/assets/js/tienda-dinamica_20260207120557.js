@@ -850,7 +850,6 @@ ${
 
     try {
       const resultado = await this.crearPedidoEnBD();
-      this.ultimoCodigoPedido = resultado.codigo_pedido;
       this.showToast(`Pedido ${resultado.codigo_pedido} creado`, "success");
 
       modal.hide();
