@@ -1198,31 +1198,6 @@ class AdminPanel {
     }
   }
 
-  async deleteOrder(orderId) {
-    if (
-      !confirm(
-        "¿Estás seguro de eliminar este pedido? Esta acción no se puede deshacer.",
-      )
-    )
-      return;
-
-    try {
-      const response = await fetch(`/api/admin/pedidos/${orderId}`, {
-        method: "DELETE",
-      });
-
-      if (response.ok) {
-        this.showAlert("Pedido eliminado correctamente", "success");
-        this.loadPedidos();
-      } else {
-        throw new Error("Error eliminando pedido");
-      }
-    } catch (error) {
-      console.error("Error eliminando pedido:", error);
-      this.showAlert("Error al eliminar el pedido", "danger");
-    }
-  }
-
   async viewOrderDetails(orderId) {
     try {
       const response = await fetch("/api/admin/pedidos");

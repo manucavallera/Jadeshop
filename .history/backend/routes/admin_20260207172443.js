@@ -473,47 +473,6 @@ router.put("/pedidos/:id/estado", requireAuth, async (req, res) => {
   }
 });
 
-// DELETE /api/admin/pedidos/:id - Eliminar pedido
-router.delete("/pedidos/:id", requireAuth, async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { comerciante_id } = req;
-
-    const pedido = await pool.query(
-      "SELECT estado FROM pedidos WHERE id = $1 AND comerciante_id = $2",
-      [id, comerciante_id],
-    );
-
-    if (pedido.rows.length === 0) {
-      return res.status(404).json({ error: "Pedido no encontrado" });
-    }
-
-    if (pedido.rows[0].estado !== "cancelado") {
-      const detalles = await pool.query(
-        "SELECT producto_id, cantidad FROM detalle_pedidos WHERE pedido_id = $1",
-        [id],
-      );
-
-      for (const item of detalles.rows) {
-        await pool.query(
-          "UPDATE productos SET stock = stock + $1 WHERE id = $2",
-          [item.cantidad, item.producto_id],
-        );
-      }
-    }
-
-    await pool.query("DELETE FROM detalle_pedidos WHERE pedido_id = $1", [id]);
-    await pool.query(
-      "DELETE FROM pedidos WHERE id = $1 AND comerciante_id = $2",
-      [id, comerciante_id],
-    );
-
-    res.json({ success: true, message: "Pedido eliminado correctamente" });
-  } catch (error) {
-    console.error("Error eliminando pedido:", error);
-    res.status(500).json({ error: "Error interno del servidor" });
-  }
-});
 // ===================
 // INFORMACIÓN DEL COMERCIANTE
 // ===================

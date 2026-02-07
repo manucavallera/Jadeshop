@@ -472,7 +472,6 @@ router.put("/pedidos/:id/estado", requireAuth, async (req, res) => {
     res.status(500).json({ error: "Error interno del servidor" });
   }
 });
-
 // DELETE /api/admin/pedidos/:id - Eliminar pedido
 router.delete("/pedidos/:id", requireAuth, async (req, res) => {
   try {
