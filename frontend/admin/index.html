@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
@@ -941,6 +941,42 @@
                       </small>
                     </div>
 
+                    <!-- Feature 1: Logo Upload -->
+                    <div class="mb-4">
+                      <label class="form-label">
+                        <i class="fas fa-image me-1"></i>
+                        Logo de la Tienda
+                      </label>
+                      <input
+                        type="file"
+                        class="form-control"
+                        id="logoFile"
+                        accept="image/*"
+                      />
+                      <small class="form-text text-muted">
+                        Formatos soportados: JPG, PNG, GIF. Máximo 5MB.
+                      </small>
+                      <div
+                        id="logoPreviewContainer"
+                        class="mt-3"
+                        style="display: none"
+                      >
+                        <label class="form-label">Logo actual:</label>
+                        <div class="border rounded p-2 text-center">
+                          <img
+                            id="logoPreview"
+                            src=""
+                            alt="Logo Preview"
+                            style="
+                              max-width: 200px;
+                              max-height: 200px;
+                              object-fit: contain;
+                            "
+                          />
+                        </div>
+                      </div>
+                    </div>
+
                     <div class="mb-3">
                       <label class="form-label text-muted"
                         >URL de tu tienda:</label
@@ -1260,7 +1296,7 @@
               <div class="card-body">
                 <form id="nuevaCategoriaForm">
                   <div class="row">
-                    <div class="col-md-8 mb-3">
+                    <div class="col-md-5 mb-3">
                       <label class="form-label">Nombre de la Categoría *</label>
                       <input
                         type="text"
@@ -1271,6 +1307,12 @@
                       />
                     </div>
                     <div class="col-md-4 mb-3">
+                      <label class="form-label">Categoría Padre</label>
+                      <select class="form-select" id="padreCategoria">
+                        <option value="">Sin categoría padre</option>
+                      </select>
+                    </div>
+                    <div class="col-md-3 mb-3">
                       <label class="form-label">&nbsp;</label>
                       <button type="submit" class="btn btn-success w-100">
                         <i class="fas fa-plus me-1"></i>
@@ -1305,6 +1347,7 @@
                     <thead>
                       <tr>
                         <th>Nombre</th>
+                        <th>Padre</th>
                         <th>Descripción</th>
                         <th class="text-center">Productos</th>
                         <th class="text-center">Acciones</th>
@@ -1312,7 +1355,7 @@
                     </thead>
                     <tbody id="categoriasTableBody">
                       <tr>
-                        <td colspan="4" class="text-center py-3">
+                        <td colspan="5" class="text-center py-3">
                           <div
                             class="spinner-border spinner-border-sm text-primary me-2"
                           ></div>
@@ -1353,6 +1396,12 @@
                   id="editNombreCategoria"
                   required
                 />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Categoría Padre</label>
+                <select class="form-select" id="editPadreCategoria">
+                  <option value="">Sin categoría padre</option>
+                </select>
               </div>
               <div class="mb-3">
                 <label class="form-label">Descripción</label>

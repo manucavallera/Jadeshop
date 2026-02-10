@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
@@ -414,172 +414,171 @@
         #productos-section .btn-group .btn {
           width: 100%;
           padding: 0.75rem;
+        }
+        /* ========== PEDIDOS SECTION RESPONSIVE ========== */
 
-          /* ========== PEDIDOS SECTION RESPONSIVE ========== */
+        /* Header de pedidos responsive */
+        #pedidos-section .d-flex.justify-content-between {
+          flex-direction: column;
+          align-items: stretch !important;
+          gap: 1rem;
+        }
 
-          /* Header de pedidos responsive */
-          #pedidos-section .d-flex.justify-content-between {
-            flex-direction: column;
-            align-items: stretch !important;
-            gap: 1rem;
-          }
+        #pedidos-section h2 {
+          font-size: 1.4rem;
+        }
 
-          #pedidos-section h2 {
-            font-size: 1.4rem;
-          }
+        /* Contenedor de tabla */
+        #pedidos-section .bg-white.rounded {
+          padding: 0.75rem;
+          overflow: visible;
+        }
 
-          /* Contenedor de tabla */
-          #pedidos-section .bg-white.rounded {
-            padding: 0.75rem;
-            overflow: visible;
-          }
+        #pedidos-section .table-responsive {
+          overflow-x: auto !important;
+          -webkit-overflow-scrolling: touch;
+          margin: 0 -0.75rem;
+          padding: 0 0.75rem 1rem;
+        }
 
-          #pedidos-section .table-responsive {
-            overflow-x: auto !important;
-            -webkit-overflow-scrolling: touch;
-            margin: 0 -0.75rem;
-            padding: 0 0.75rem 1rem;
-          }
+        /* TABLA PEDIDOS - Ancho fijo para scroll */
+        #pedidosTable {
+          min-width: 800px;
+          width: 800px;
+          table-layout: fixed;
+          font-size: 12px;
+        }
 
-          /* TABLA PEDIDOS - Ancho fijo para scroll */
-          #pedidosTable {
-            min-width: 800px;
-            width: 800px;
-            table-layout: fixed;
-            font-size: 12px;
-          }
+        /* Ocultar ID en móvil */
+        #pedidosTable th:nth-child(1),
+        #pedidosTable td:nth-child(1) {
+          display: none;
+        }
 
-          /* Ocultar ID en móvil */
-          #pedidosTable th:nth-child(1),
-          #pedidosTable td:nth-child(1) {
-            display: none;
-          }
+        /* ANCHOS POR COLUMNA */
 
-          /* ANCHOS POR COLUMNA */
+        /* Cliente - 120px */
+        #pedidosTable th:nth-child(2),
+        #pedidosTable td:nth-child(2) {
+          width: 120px;
+          min-width: 120px;
+          font-weight: 600;
+        }
 
-          /* Cliente - 120px */
-          #pedidosTable th:nth-child(2),
-          #pedidosTable td:nth-child(2) {
-            width: 120px;
-            min-width: 120px;
-            font-weight: 600;
-          }
+        /* Email - 150px */
+        #pedidosTable th:nth-child(3),
+        #pedidosTable td:nth-child(3) {
+          width: 150px;
+          min-width: 150px;
+          font-size: 11px;
+          word-break: break-word;
+        }
 
-          /* Email - 150px */
-          #pedidosTable th:nth-child(3),
-          #pedidosTable td:nth-child(3) {
-            width: 150px;
-            min-width: 150px;
-            font-size: 11px;
-            word-break: break-word;
-          }
+        /* Total - 90px */
+        #pedidosTable th:nth-child(4),
+        #pedidosTable td:nth-child(4) {
+          width: 90px;
+          min-width: 90px;
+          font-weight: 700;
+          color: #059669;
+          font-size: 13px;
+        }
 
-          /* Total - 90px */
-          #pedidosTable th:nth-child(4),
-          #pedidosTable td:nth-child(4) {
-            width: 90px;
-            min-width: 90px;
-            font-weight: 700;
-            color: #059669;
-            font-size: 13px;
-          }
+        /* Estado - 140px (select más ancho) */
+        #pedidosTable th:nth-child(5),
+        #pedidosTable td:nth-child(5) {
+          width: 140px;
+          min-width: 140px;
+        }
 
-          /* Estado - 140px (select más ancho) */
-          #pedidosTable th:nth-child(5),
-          #pedidosTable td:nth-child(5) {
-            width: 140px;
-            min-width: 140px;
-          }
+        /* Fecha - 100px */
+        #pedidosTable th:nth-child(6),
+        #pedidosTable td:nth-child(6) {
+          width: 100px;
+          min-width: 100px;
+          font-size: 11px;
+        }
 
-          /* Fecha - 100px */
-          #pedidosTable th:nth-child(6),
-          #pedidosTable td:nth-child(6) {
-            width: 100px;
-            min-width: 100px;
-            font-size: 11px;
-          }
+        /* Acciones - Sticky derecha */
+        #pedidosTable th:nth-child(7),
+        #pedidosTable td:nth-child(7) {
+          width: 80px;
+          min-width: 80px;
+          position: sticky;
+          right: 0;
+          background: white;
+          box-shadow: -2px 0 8px rgba(0, 0, 0, 0.08);
+          z-index: 10;
+          text-align: center;
+        }
 
-          /* Acciones - Sticky derecha */
-          #pedidosTable th:nth-child(7),
-          #pedidosTable td:nth-child(7) {
-            width: 80px;
-            min-width: 80px;
-            position: sticky;
-            right: 0;
-            background: white;
-            box-shadow: -2px 0 8px rgba(0, 0, 0, 0.08);
-            z-index: 10;
-            text-align: center;
-          }
+        /* Headers sticky */
+        #pedidosTable thead th {
+          position: sticky;
+          top: 0;
+          background: #f8f9fa;
+          z-index: 5;
+          padding: 0.75rem 0.5rem;
+        }
 
-          /* Headers sticky */
-          #pedidosTable thead th {
-            position: sticky;
-            top: 0;
-            background: #f8f9fa;
-            z-index: 5;
-            padding: 0.75rem 0.5rem;
-          }
+        #pedidosTable thead th:nth-child(7) {
+          z-index: 15;
+        }
 
-          #pedidosTable thead th:nth-child(7) {
-            z-index: 15;
-          }
+        /* Celdas */
+        #pedidosTable td {
+          padding: 0.75rem 0.5rem;
+          vertical-align: middle;
+        }
 
-          /* Celdas */
-          #pedidosTable td {
-            padding: 0.75rem 0.5rem;
-            vertical-align: middle;
-          }
+        /* Select de estado más compacto */
+        #pedidosTable .form-select-sm {
+          font-size: 11px;
+          padding: 0.4rem 0.6rem;
+          min-height: auto;
+        }
 
-          /* Select de estado más compacto */
-          #pedidosTable .form-select-sm {
-            font-size: 11px;
-            padding: 0.4rem 0.6rem;
-            min-height: auto;
-          }
+        /* Botones de acción */
+        #pedidosTable .btn-sm {
+          padding: 6px 10px;
+          font-size: 11px;
+        }
 
-          /* Botones de acción */
-          #pedidosTable .btn-sm {
-            padding: 6px 10px;
-            font-size: 11px;
-          }
+        /* Scrollbar visible */
+        #pedidos-section .table-responsive::-webkit-scrollbar {
+          height: 8px;
+        }
 
-          /* Scrollbar visible */
-          #pedidos-section .table-responsive::-webkit-scrollbar {
-            height: 8px;
-          }
+        #pedidos-section .table-responsive::-webkit-scrollbar-track {
+          background: #e5e7eb;
+          border-radius: 4px;
+        }
 
-          #pedidos-section .table-responsive::-webkit-scrollbar-track {
-            background: #e5e7eb;
-            border-radius: 4px;
-          }
+        #pedidos-section .table-responsive::-webkit-scrollbar-thumb {
+          background: #3b82f6;
+          border-radius: 4px;
+        }
 
-          #pedidos-section .table-responsive::-webkit-scrollbar-thumb {
-            background: #3b82f6;
-            border-radius: 4px;
-          }
+        #pedidos-section .table-responsive::-webkit-scrollbar-thumb:hover {
+          background: #2563eb;
+        }
 
-          #pedidos-section .table-responsive::-webkit-scrollbar-thumb:hover {
-            background: #2563eb;
-          }
+        /* Firefox */
+        #pedidos-section .table-responsive {
+          scrollbar-width: thin;
+          scrollbar-color: #3b82f6 #e5e7eb;
+        }
 
-          /* Firefox */
-          #pedidos-section .table-responsive {
-            scrollbar-width: thin;
-            scrollbar-color: #3b82f6 #e5e7eb;
-          }
-
-          /* Hint visual */
-          #pedidos-section .table-responsive::after {
-            content: "← Desliza para ver más →";
-            display: block;
-            text-align: center;
-            font-size: 11px;
-            color: #6b7280;
-            padding: 0.5rem 0 0;
-            margin-top: 0.5rem;
-            border-top: 1px solid #e5e7eb;
-          }
+        /* Hint visual */
+        #pedidos-section .table-responsive::after {
+          content: "← Desliza para ver más →";
+          display: block;
+          text-align: center;
+          font-size: 11px;
+          color: #6b7280;
+          padding: 0.5rem 0 0;
+          margin-top: 0.5rem;
+          border-top: 1px solid #e5e7eb;
         }
       }
     </style>
@@ -942,6 +941,42 @@
                       </small>
                     </div>
 
+                    <!-- Feature 1: Logo Upload -->
+                    <div class="mb-4">
+                      <label class="form-label">
+                        <i class="fas fa-image me-1"></i>
+                        Logo de la Tienda
+                      </label>
+                      <input
+                        type="file"
+                        class="form-control"
+                        id="logoFile"
+                        accept="image/*"
+                      />
+                      <small class="form-text text-muted">
+                        Formatos soportados: JPG, PNG, GIF. Máximo 5MB.
+                      </small>
+                      <div
+                        id="logoPreviewContainer"
+                        class="mt-3"
+                        style="display: none"
+                      >
+                        <label class="form-label">Logo actual:</label>
+                        <div class="border rounded p-2 text-center">
+                          <img
+                            id="logoPreview"
+                            src=""
+                            alt="Logo Preview"
+                            style="
+                              max-width: 200px;
+                              max-height: 200px;
+                              object-fit: contain;
+                            "
+                          />
+                        </div>
+                      </div>
+                    </div>
+
                     <div class="mb-3">
                       <label class="form-label text-muted"
                         >URL de tu tienda:</label
@@ -1056,6 +1091,27 @@
                     required
                   />
                 </div>
+                <div class="col-md-6 mb-3">
+                  <label class="form-label d-block"
+                    >Visibilidad del Stock</label
+                  >
+                  <div class="form-check form-switch mt-2">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      id="productoMostrarStock"
+                      checked
+                    />
+                    <label class="form-check-label" for="productoMostrarStock">
+                      <i class="fas fa-eye me-1"></i>
+                      Mostrar stock en la tienda
+                    </label>
+                  </div>
+                  <small class="text-muted">
+                    Si está activado, los clientes verán cuántas unidades quedan
+                    disponibles
+                  </small>
+                </div>
               </div>
 
               <div class="mb-3">
@@ -1095,15 +1151,26 @@
                   <i class="fab fa-tiktok me-1"></i>
                   URL de Video TikTok (opcional)
                 </label>
-                <input
-                  type="url"
-                  class="form-control"
-                  id="productoTiktokUrl"
-                  placeholder="https://www.tiktok.com/@usuario/video/1234567890"
-                />
+                <div class="input-group">
+                  <input
+                    type="url"
+                    class="form-control"
+                    id="productoTiktokUrl"
+                    placeholder="https://www.tiktok.com/@usuario/video/..."
+                  />
+                  <a
+                    href="/tik-tok-viewer.html"
+                    target="_blank"
+                    class="btn btn-outline-secondary"
+                    title="Previsualizar video antes de guardar"
+                  >
+                    <i class="fas fa-play-circle me-1"></i>
+                    Previsualizar
+                  </a>
+                </div>
                 <small class="text-muted">
-                  Pega el link completo del video de TikTok que quieres mostrar
-                  en la página del producto
+                  Funciona con enlaces móviles (vm.tiktok.com) y desktop. Usa
+                  "Previsualizar" para verificar antes de guardar.
                 </small>
               </div>
               <div class="mb-3">
@@ -1149,6 +1216,7 @@
                       class="form-control"
                       id="productoImagenFile"
                       accept="image/*"
+                      multiple
                     />
                     <small class="form-text text-muted"
                       >Formatos soportados: JPG, PNG, GIF. Máximo 5MB.</small
@@ -1228,7 +1296,7 @@
               <div class="card-body">
                 <form id="nuevaCategoriaForm">
                   <div class="row">
-                    <div class="col-md-8 mb-3">
+                    <div class="col-md-5 mb-3">
                       <label class="form-label">Nombre de la Categoría *</label>
                       <input
                         type="text"
@@ -1239,6 +1307,12 @@
                       />
                     </div>
                     <div class="col-md-4 mb-3">
+                      <label class="form-label">Categoría Padre</label>
+                      <select class="form-select" id="padreCategoria">
+                        <option value="">Sin categoría padre</option>
+                      </select>
+                    </div>
+                    <div class="col-md-3 mb-3">
                       <label class="form-label">&nbsp;</label>
                       <button type="submit" class="btn btn-success w-100">
                         <i class="fas fa-plus me-1"></i>
@@ -1273,6 +1347,7 @@
                     <thead>
                       <tr>
                         <th>Nombre</th>
+                        <th>Padre</th>
                         <th>Descripción</th>
                         <th class="text-center">Productos</th>
                         <th class="text-center">Acciones</th>
@@ -1280,7 +1355,7 @@
                     </thead>
                     <tbody id="categoriasTableBody">
                       <tr>
-                        <td colspan="4" class="text-center py-3">
+                        <td colspan="5" class="text-center py-3">
                           <div
                             class="spinner-border spinner-border-sm text-primary me-2"
                           ></div>
@@ -1321,6 +1396,12 @@
                   id="editNombreCategoria"
                   required
                 />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Categoría Padre</label>
+                <select class="form-select" id="editPadreCategoria">
+                  <option value="">Sin categoría padre</option>
+                </select>
               </div>
               <div class="mb-3">
                 <label class="form-label">Descripción</label>
