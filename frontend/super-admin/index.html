@@ -1,0 +1,459 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Super Admin - Jade Shop</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      :root {
+        --sa-primary: #dc2626;
+        --sa-dark: #1e1e2e;
+        --sa-sidebar: 250px;
+      }
+
+      .login-container {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #1e1e2e 0%, #dc2626 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .login-card {
+        background: white;
+        border-radius: 1rem;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        padding: 2rem;
+        width: 100%;
+        max-width: 400px;
+      }
+
+      .sidebar {
+        width: var(--sa-sidebar);
+        height: 100vh;
+        position: fixed;
+        top: 0;
+        left: 0;
+        background: var(--sa-dark);
+        color: white;
+        z-index: 1000;
+        overflow-y: auto;
+      }
+
+      .sidebar .nav-link {
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 1.5rem;
+        color: rgba(255, 255, 255, 0.7);
+        text-decoration: none;
+        transition: all 0.2s;
+      }
+
+      .sidebar .nav-link:hover,
+      .sidebar .nav-link.active {
+        background: rgba(220, 38, 38, 0.3);
+        color: white;
+      }
+
+      .sidebar .nav-link i {
+        width: 20px;
+        margin-right: 0.75rem;
+      }
+
+      .main-content {
+        margin-left: var(--sa-sidebar);
+        padding: 1.5rem;
+        min-height: 100vh;
+        background-color: #f1f5f9;
+      }
+
+      .stat-card {
+        background: white;
+        border-radius: 0.75rem;
+        padding: 1.25rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        text-align: center;
+        transition: transform 0.2s;
+      }
+
+      .stat-card:hover {
+        transform: translateY(-2px);
+      }
+
+      .stat-card .stat-number {
+        font-size: 1.8rem;
+        font-weight: 700;
+      }
+
+      .stat-card .stat-label {
+        font-size: 0.85rem;
+        color: #6b7280;
+      }
+
+      @media (max-width: 768px) {
+        .sidebar {
+          display: none;
+        }
+        .main-content {
+          margin-left: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- LOGIN -->
+    <div id="loginContainer" class="login-container">
+      <div class="login-card">
+        <div class="text-center mb-4">
+          <i class="fas fa-shield-alt text-danger" style="font-size: 3rem"></i>
+          <h2 class="mt-2 text-dark">Super Admin</h2>
+          <p class="text-muted">Jade Shop - Panel de Control</p>
+        </div>
+        <form id="loginForm">
+          <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-control" id="loginEmail" required />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Contraseña</label>
+            <input
+              type="password"
+              class="form-control"
+              id="loginPassword"
+              required
+            />
+          </div>
+          <button type="submit" class="btn btn-danger w-100" id="loginBtn">
+            <i class="fas fa-lock me-2"></i>Ingresar
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- PANEL -->
+    <div id="panelContainer" class="d-none">
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <div class="p-3 border-bottom border-secondary">
+          <h5 class="mb-0 text-danger">
+            <i class="fas fa-shield-alt me-2"></i>Super Admin
+          </h5>
+          <small class="text-secondary">Jade Shop</small>
+        </div>
+        <ul class="nav flex-column mt-3">
+          <li>
+            <a href="#" class="nav-link active" data-section="dashboard">
+              <i class="fas fa-chart-pie"></i> Dashboard
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-link" data-section="comerciantes">
+              <i class="fas fa-store"></i> Comerciantes
+            </a>
+          </li>
+          <li class="mt-4">
+            <a href="#" class="nav-link text-warning" id="logoutBtn">
+              <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Main Content -->
+      <div class="main-content">
+        <!-- DASHBOARD -->
+        <div id="dashboard-section" class="content-section">
+          <h3 class="mb-4">
+            <i class="fas fa-chart-pie me-2 text-danger"></i>Dashboard General
+          </h3>
+
+          <div class="row g-3 mb-4">
+            <div class="col-lg-3 col-6">
+              <div class="stat-card">
+                <div class="stat-number text-primary" id="totalComerciantes">
+                  -
+                </div>
+                <div class="stat-label">Total Tiendas</div>
+              </div>
+            </div>
+            <div class="col-lg-3 col-6">
+              <div class="stat-card">
+                <div class="stat-number text-success" id="comerciantesActivos">
+                  -
+                </div>
+                <div class="stat-label">Activas</div>
+              </div>
+            </div>
+            <div class="col-lg-3 col-6">
+              <div class="stat-card">
+                <div class="stat-number text-danger" id="comerciantesInactivos">
+                  -
+                </div>
+                <div class="stat-label">Pausadas</div>
+              </div>
+            </div>
+            <div class="col-lg-3 col-6">
+              <div class="stat-card">
+                <div class="stat-number text-info" id="registrosRecientes">
+                  -
+                </div>
+                <div class="stat-label">Nuevas (30 días)</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row g-3 mb-4">
+            <div class="col-lg-4 col-6">
+              <div class="stat-card">
+                <div class="stat-number text-primary" id="totalProductos">
+                  -
+                </div>
+                <div class="stat-label">Productos Totales</div>
+              </div>
+            </div>
+            <div class="col-lg-4 col-6">
+              <div class="stat-card">
+                <div class="stat-number text-info" id="totalPedidos">-</div>
+                <div class="stat-label">Pedidos Totales</div>
+              </div>
+            </div>
+            <div class="col-lg-4 col-12">
+              <div class="stat-card">
+                <div class="stat-number text-success" id="ventasTotales">-</div>
+                <div class="stat-label">Ventas Totales</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row g-3">
+            <div class="col-lg-6">
+              <div class="card">
+                <div class="card-header">
+                  <h6 class="mb-0">
+                    <i class="fas fa-tags me-2"></i>Distribución por Plan
+                  </h6>
+                </div>
+                <div class="card-body" id="planesBreakdown">
+                  <span class="text-muted">Cargando...</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-6">
+              <div class="card">
+                <div class="card-header">
+                  <h6 class="mb-0">
+                    <i class="fas fa-trophy me-2"></i>Top 5 Tiendas
+                  </h6>
+                </div>
+                <div class="card-body p-0">
+                  <table class="table table-sm table-hover mb-0">
+                    <thead class="table-light">
+                      <tr>
+                        <th>#</th>
+                        <th>Tienda</th>
+                        <th class="text-center">Pedidos</th>
+                        <th class="text-end">Ventas</th>
+                      </tr>
+                    </thead>
+                    <tbody id="topTiendas">
+                      <tr>
+                        <td colspan="4" class="text-center py-3 text-muted">
+                          Cargando...
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- COMERCIANTES -->
+        <div id="comerciantes-section" class="content-section d-none">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3>
+              <i class="fas fa-store me-2 text-danger"></i>Comerciantes
+              <small class="text-muted fs-6" id="totalCount"></small>
+            </h3>
+          </div>
+
+          <!-- Filtros -->
+          <div class="card mb-3">
+            <div class="card-body">
+              <div class="row g-2 align-items-end">
+                <div class="col-md-4">
+                  <label class="form-label small">Buscar</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="searchInput"
+                    placeholder="Nombre, email, slug..."
+                  />
+                </div>
+                <div class="col-md-2">
+                  <label class="form-label small">Plan</label>
+                  <select class="form-select" id="filterPlan">
+                    <option value="">Todos</option>
+                    <option value="gratis">Gratis</option>
+                    <option value="basico">Básico</option>
+                    <option value="premium">Premium</option>
+                    <option value="enterprise">Enterprise</option>
+                  </select>
+                </div>
+                <div class="col-md-2">
+                  <label class="form-label small">Estado</label>
+                  <select class="form-select" id="filterActivo">
+                    <option value="">Todos</option>
+                    <option value="true">Activos</option>
+                    <option value="false">Pausados</option>
+                  </select>
+                </div>
+                <div class="col-md-2">
+                  <label class="form-label small">Ordenar</label>
+                  <select class="form-select" id="sortBy">
+                    <option value="recientes">Más recientes</option>
+                    <option value="antiguos">Más antiguos</option>
+                    <option value="nombre">Nombre A-Z</option>
+                    <option value="pedidos">Más pedidos</option>
+                    <option value="ventas">Más ventas</option>
+                  </select>
+                </div>
+                <div class="col-md-2">
+                  <button
+                    class="btn btn-outline-primary w-100"
+                    onclick="panel.loadComerciantes()"
+                  >
+                    <i class="fas fa-sync-alt me-1"></i>Actualizar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tabla -->
+          <div class="card">
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Comerciante</th>
+                      <th>Slug</th>
+                      <th>Plan</th>
+                      <th class="text-center">Productos</th>
+                      <th class="text-center">Pedidos</th>
+                      <th class="text-end">Ventas</th>
+                      <th>Estado</th>
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody id="comerciantesTableBody">
+                    <tr>
+                      <td colspan="8" class="text-center py-4">
+                        <div class="spinner-border text-danger"></div>
+                        <div class="mt-2">Cargando...</div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL EDITAR COMERCIANTE -->
+    <div class="modal fade" id="editComercianteModal" tabindex="-1">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header bg-danger text-white">
+            <h5 class="modal-title" id="editModalTitle">Editar Comerciante</h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <input type="hidden" id="editId" />
+
+            <!-- Stats -->
+            <div class="bg-light rounded p-3 mb-4" id="editStats"></div>
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Nombre</label>
+                <input type="text" class="form-control" id="editNombre" />
+              </div>
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control" id="editEmail" />
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <label class="form-label">WhatsApp</label>
+                <input type="text" class="form-control" id="editWhatsapp" />
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Plan</label>
+                <select class="form-select" id="editPlan">
+                  <option value="gratis">Gratis</option>
+                  <option value="basico">Básico</option>
+                  <option value="premium">Premium</option>
+                  <option value="enterprise">Enterprise</option>
+                </select>
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label">País</label>
+                <input type="text" class="form-control" id="editPais" />
+              </div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Rubro</label>
+              <input type="text" class="form-control" id="editRubro" />
+            </div>
+          </div>
+          <div class="modal-footer justify-content-between">
+            <button
+              type="button"
+              class="btn btn-outline-warning"
+              id="resetPasswordBtn"
+            >
+              <i class="fas fa-key me-1"></i>Resetear Contraseña
+            </button>
+            <div>
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                class="btn btn-danger"
+                id="guardarComercianteBtn"
+              >
+                <i class="fas fa-save me-1"></i>Guardar Cambios
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/super-admin.js"></script>
+  </body>
+</html>

@@ -6,7 +6,7 @@ const helmet = require("helmet");
 const morgan = require("morgan");
 const path = require("path");
 const session = require("express-session");
-require("dotenv").config();
+require("dotenv").config({ path: "../.env", override: true });
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -49,7 +49,7 @@ app.use(
         ],
       },
     },
-  })
+  }),
 );
 app.use(cors());
 app.use(morgan("combined"));
@@ -65,7 +65,7 @@ app.use(
       secure: false,
       maxAge: 24 * 60 * 60 * 1000,
     },
-  })
+  }),
 );
 
 // Servir archivos estáticos del frontend
@@ -101,6 +101,7 @@ app.use("/api/webhooks", require("./routes/webhooks"));
 app.use("/api/admin", require("./routes/admin"));
 app.use("/api/comerciantes", require("./routes/comerciantes"));
 app.use("/api/auth", require("./routes/auth"));
+app.use("/api/super-admin", require("./routes/super-admin"));
 
 // 🗑️ ELIMINAR esta ruta duplicada - ya existe en /api/comerciantes/:slug
 // ❌ COMENTAR O ELIMINAR ESTAS LÍNEAS (90-110):
@@ -118,7 +119,7 @@ app.get("/api/check-slug/:slug", async (req, res) => {
 
     const result = await pool.query(
       "SELECT id FROM comerciantes WHERE slug = $1",
-      [slug.toLowerCase()]
+      [slug.toLowerCase()],
     );
 
     res.json({
@@ -184,6 +185,11 @@ app.get("/api/tiktok-oembed", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+// Super Admin Panel
+app.get("/super-admin", (req, res) => {
+  res.sendFile(path.join(__dirname, "../frontend/super-admin/index.html"));
+});
+
 // 🔧 MEJORAR: Ruta dinámica para tiendas - DEBE IR AL FINAL
 app.get("/:slug", async (req, res) => {
   try {
@@ -203,7 +209,7 @@ app.get("/:slug", async (req, res) => {
        FROM comerciantes c 
        JOIN tiendas t ON c.id = t.comerciante_id 
        WHERE t.subdominio = $1 AND c.activo = true AND t.activa = true`,
-      [slug]
+      [slug],
     );
 
     if (result.rows.length === 0) {
@@ -212,7 +218,7 @@ app.get("/:slug", async (req, res) => {
 
     // 🔧 Log para debug
     console.log(
-      `Sirviendo tienda: ${slug} para comerciante ID: ${result.rows[0].comerciante_id}`
+      `Sirviendo tienda: ${slug} para comerciante ID: ${result.rows[0].comerciante_id}`,
     );
 
     // Servir la tienda personalizada

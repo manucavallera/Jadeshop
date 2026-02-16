@@ -568,7 +568,6 @@ WHERE c.id = $1`,
       whatsapp: data.whatsapp || "",
       slug: data.slug,
       logo_url: data.logo_url || "",
-      plan: data.plan || "gratis",
     });
   } catch (error) {
     console.error("Error obteniendo configuración:", error);
