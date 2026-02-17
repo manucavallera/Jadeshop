@@ -18,7 +18,7 @@ router.post("/login", async (req, res) => {
     // Buscar comerciante por email
     const result = await pool.query(
       "SELECT * FROM comerciantes WHERE email = $1 AND activo = true",
-      [email.toLowerCase().trim()]
+      [email.toLowerCase().trim()],
     );
 
     if (result.rows.length === 0) {
@@ -33,7 +33,7 @@ router.post("/login", async (req, res) => {
     // Verificar contraseña
     const validPassword = await bcrypt.compare(
       password,
-      comerciante.password_hash
+      comerciante.password_hash,
     );
 
     if (!validPassword) {
@@ -122,7 +122,7 @@ router.post("/register", async (req, res) => {
     // Verificar que el slug no exista
     const slugCheck = await pool.query(
       "SELECT id FROM comerciantes WHERE slug = $1",
-      [nombreUsuario.toLowerCase()]
+      [nombreUsuario.toLowerCase()],
     );
 
     if (slugCheck.rows.length > 0) {
@@ -135,7 +135,7 @@ router.post("/register", async (req, res) => {
     // Verificar que el email no exista
     const emailCheck = await pool.query(
       "SELECT id FROM comerciantes WHERE email = $1",
-      [email.toLowerCase()]
+      [email.toLowerCase()],
     );
 
     if (emailCheck.rows.length > 0) {
@@ -147,12 +147,11 @@ router.post("/register", async (req, res) => {
 
     // Hash de contraseña
     const hashedPassword = await bcrypt.hash(password, 10);
-
     // Insertar comerciante
     const result = await pool.query(
-      `INSERT INTO comerciantes (nombre, slug, email, password_hash, whatsapp, pais, rubro, plan, activo)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, true)
-       RETURNING id, nombre, slug, email`,
+      `INSERT INTO comerciantes (nombre, slug, email, password_hash, whatsapp, pais, rubro, plan, mercadopago_subscription_id, plataforma, activo)
+   VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, true)
+   RETURNING id, nombre, slug, email`,
       [
         nombreComercio,
         nombreUsuario.toLowerCase(),
@@ -162,7 +161,9 @@ router.post("/register", async (req, res) => {
         pais,
         rubroComercio,
         plan,
-      ]
+        req.body.subscription_id || null,
+        process.env.PLATAFORMA || "mentes",
+      ],
     );
 
     const comerciante = result.rows[0];
@@ -171,7 +172,7 @@ router.post("/register", async (req, res) => {
     await pool.query(
       `INSERT INTO tiendas (comerciante_id, nombre, subdominio, activa)
    VALUES ($1, $2, $3, true)`,
-      [comerciante.id, nombreComercio, nombreUsuario.toLowerCase()]
+      [comerciante.id, nombreComercio, nombreUsuario.toLowerCase()],
     );
 
     // Crear sesión automáticamente

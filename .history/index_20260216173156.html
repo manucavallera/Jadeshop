@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
   <head>
     <link rel="icon" type="image/ico" href="/favicon.ico" />
@@ -52,8 +52,8 @@
 
         /* Typography */
         --font-primary: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
-        --font-display: "Space Grotesk", -apple-system, BlinkMacSystemFont,
-          sans-serif;
+        --font-display:
+          "Space Grotesk", -apple-system, BlinkMacSystemFont, sans-serif;
 
         /* Legacy colors for compatibility */
         --primary-color: var(--jade-primary);
@@ -334,6 +334,463 @@
           transparent 100%
         );
       }
+
+      /* ========================================
+   JADESHOP RESPONSIVE CSS
+   Mobile & Tablet Optimization
+   ======================================== */
+
+      /* TABLET (768px - 991px) */
+      @media (max-width: 991px) {
+        /* Hero Section - Tablets */
+        .hero-gradient h1 {
+          font-size: 2.5rem !important;
+          line-height: 1.2;
+        }
+
+        .hero-gradient .fs-3 {
+          font-size: 1.5rem !important;
+        }
+
+        /* Cards y Features */
+        .feature-card,
+        .example-card {
+          margin-bottom: 1.5rem;
+        }
+
+        /* Iconos circulares */
+        .icon-circle {
+          width: 3.5rem;
+          height: 3.5rem;
+          font-size: 1.5rem;
+        }
+
+        /* Planes - Ajuste de columnas */
+        #planes .col-lg-3 {
+          max-width: 50%;
+          flex: 0 0 50%;
+        }
+      }
+
+      /* MOBILE (hasta 767px) */
+      @media (max-width: 767px) {
+        /* Navbar Mobile */
+        .navbar {
+          padding-top: 0.75rem !important;
+          padding-bottom: 0.75rem !important;
+        }
+
+        .navbar-brand .fs-4 {
+          font-size: 1.25rem !important;
+        }
+
+        .navbar-collapse {
+          margin-top: 1rem;
+          padding: 1rem 0;
+        }
+
+        .navbar-nav {
+          gap: 0.5rem;
+        }
+
+        .navbar .btn {
+          width: 100%;
+          margin: 0.25rem 0;
+        }
+
+        /* Hero Section - Mobile */
+        .hero-gradient {
+          padding: 2rem 0 !important;
+        }
+
+        .hero-gradient h1 {
+          font-size: 2rem !important;
+          line-height: 1.2;
+          margin-bottom: 1rem !important;
+        }
+
+        .hero-gradient .fs-3 {
+          font-size: 1.1rem !important;
+          line-height: 1.5;
+          margin-bottom: 1.5rem !important;
+        }
+
+        .hero-gradient .display-6 {
+          font-size: 1.75rem !important;
+        }
+
+        /* Glass effect cards en hero */
+        .glass-effect {
+          padding: 1rem !important;
+          font-size: 0.85rem;
+        }
+
+        .glass-effect i {
+          font-size: 1rem !important;
+        }
+
+        /* Botones Hero */
+        .hero-gradient .btn-lg {
+          padding: 0.875rem 1.5rem !important;
+          font-size: 1rem !important;
+          width: 100%;
+        }
+
+        .hero-gradient .d-flex.gap-3 {
+          gap: 0.75rem !important;
+        }
+
+        /* Floating element - Reducir en mobile */
+        .floating-element {
+          margin-top: 2rem;
+        }
+
+        .floating-element .glass-effect {
+          padding: 2rem 1rem !important;
+        }
+
+        /* Secciones - Padding mobile */
+        section {
+          padding: 2.5rem 0 !important;
+        }
+
+        .py-5 {
+          padding-top: 2.5rem !important;
+          padding-bottom: 2.5rem !important;
+        }
+
+        /* Títulos de sección */
+        .display-2 {
+          font-size: 2rem !important;
+        }
+
+        .display-4 {
+          font-size: 1.75rem !important;
+        }
+
+        .display-5 {
+          font-size: 1.5rem !important;
+        }
+
+        .fs-4 {
+          font-size: 1.1rem !important;
+        }
+
+        /* Cómo funciona - Iconos */
+        .icon-circle {
+          width: 3rem;
+          height: 3rem;
+          font-size: 1.25rem;
+          margin-bottom: 1rem !important;
+        }
+
+        /* Comparación - Before/After cards */
+        #comparacion .before-after-card {
+          padding: 1.5rem !important;
+          margin-bottom: 1rem;
+        }
+
+        #comparacion .feature-icon {
+          width: 50px;
+          height: 50px;
+          border-radius: 50%;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        #comparacion h4 {
+          font-size: 1.25rem !important;
+        }
+
+        #comparacion li {
+          font-size: 0.9rem;
+          margin-bottom: 0.75rem !important;
+        }
+
+        #comparacion i {
+          font-size: 1rem !important;
+        }
+
+        /* Features Section */
+        #funciones .feature-card {
+          padding: 2rem !important;
+        }
+
+        #funciones .feature-card h4 {
+          font-size: 1.2rem;
+        }
+
+        #funciones .feature-card p {
+          font-size: 0.95rem;
+        }
+
+        #funciones .feature-card > div > div {
+          width: 60px !important;
+          height: 60px !important;
+        }
+
+        #funciones .feature-card i {
+          font-size: 1.5rem !important;
+        }
+
+        /* JadeBro Section */
+        #jadebro .icon-circle {
+          width: 3rem;
+          height: 3rem;
+          font-size: 1.25rem;
+          margin-right: 0.75rem !important;
+        }
+
+        #jadebro h3 {
+          font-size: 2rem !important;
+        }
+
+        #jadebro .fs-5 {
+          font-size: 1rem !important;
+        }
+
+        #jadebro .fs-4 {
+          font-size: 1.1rem !important;
+        }
+
+        #jadebro .jadebro-card {
+          margin-top: 2rem;
+          padding: 2rem !important;
+        }
+
+        #jadebro .btn-lg {
+          padding: 0.875rem 1.5rem !important;
+          font-size: 1rem !important;
+          width: 100%;
+          margin-bottom: 0.5rem;
+        }
+
+        /* TikTok Live Section */
+        .bg-jade-secondary h3 {
+          font-size: 1.75rem !important;
+        }
+
+        .bg-jade-secondary .fs-4 {
+          font-size: 1.1rem !important;
+        }
+
+        .bg-jade-secondary .icon-circle {
+          width: 2.5rem !important;
+          height: 2.5rem !important;
+          font-size: 0.9rem !important;
+        }
+
+        .bg-jade-secondary .display-6 {
+          font-size: 2rem !important;
+        }
+
+        .bg-jade-secondary .fab.fa-tiktok {
+          font-size: 4rem !important;
+        }
+
+        /* Ejemplos */
+        #ejemplos .example-card {
+          margin-bottom: 1rem;
+        }
+
+        #ejemplos .card-body {
+          padding: 1.5rem !important;
+        }
+
+        /* Planes y Precios */
+        #planes .card {
+          margin-bottom: 1.5rem;
+        }
+
+        #planes .card-body {
+          padding: 2rem 1.5rem !important;
+        }
+
+        #planes .display-4,
+        #planes .display-5 {
+          font-size: 2rem !important;
+        }
+
+        #planes h4 {
+          font-size: 1.3rem !important;
+        }
+
+        #planes .list-unstyled li {
+          font-size: 0.9rem;
+          margin-bottom: 0.5rem !important;
+        }
+
+        #planes .btn-lg {
+          padding: 0.875rem 1.5rem !important;
+          font-size: 1rem !important;
+        }
+
+        /* Badge "MÁS POPULAR" */
+        #planes .position-absolute.top-0 {
+          transform: translate(-50%, -50%) !important;
+        }
+
+        #planes .badge {
+          font-size: 0.7rem !important;
+          padding: 0.35rem 0.75rem !important;
+        }
+
+        /* CTA Section */
+        .bg-gray-900 h3 {
+          font-size: 1.75rem !important;
+        }
+
+        .bg-gray-900 .fs-4 {
+          font-size: 1.1rem !important;
+        }
+
+        .bg-gray-900 .btn-lg {
+          padding: 0.875rem 2rem !important;
+          font-size: 1rem !important;
+          width: 100%;
+        }
+
+        .bg-gray-900 .d-flex.gap-3 {
+          gap: 0.75rem !important;
+        }
+
+        /* Footer */
+        footer .fs-4 {
+          font-size: 1.25rem !important;
+        }
+
+        footer .fs-3 {
+          font-size: 1.5rem !important;
+        }
+
+        footer .row {
+          text-align: center;
+        }
+
+        footer .d-flex {
+          justify-content: center !important;
+          margin-top: 1rem;
+        }
+
+        /* Brand Badge */
+        .brand-badge {
+          font-size: 0.65rem !important;
+          padding: 4px 8px !important;
+        }
+
+        /* Botones generales en mobile */
+        .btn-jade-primary,
+        .btn-jadebro {
+          padding: 0.875rem 1.5rem !important;
+          font-size: 1rem !important;
+        }
+
+        /* Ajuste de márgenes generales */
+        .mb-5 {
+          margin-bottom: 2rem !important;
+        }
+
+        .mb-4 {
+          margin-bottom: 1.5rem !important;
+        }
+
+        .mb-3 {
+          margin-bottom: 1rem !important;
+        }
+
+        /* Container padding */
+        .container {
+          padding-left: 1rem;
+          padding-right: 1rem;
+        }
+      }
+
+      /* MOBILE PEQUEÑO (hasta 575px) */
+      @media (max-width: 575px) {
+        /* Hero aún más compacto */
+        .hero-gradient h1 {
+          font-size: 1.75rem !important;
+        }
+
+        .hero-gradient .fs-3 {
+          font-size: 1rem !important;
+        }
+
+        /* Planes - Una columna completa */
+        #planes .col-lg-3,
+        #planes .col-md-6 {
+          max-width: 100%;
+          flex: 0 0 100%;
+        }
+
+        /* Glass effect más pequeño */
+        .glass-effect p {
+          font-size: 0.8rem;
+        }
+
+        /* Iconos TikTok section */
+        .bg-jade-secondary .fab.fa-tiktok {
+          font-size: 3rem !important;
+        }
+
+        /* Botones más compactos */
+        .btn-lg {
+          padding: 0.75rem 1.25rem !important;
+          font-size: 0.95rem !important;
+        }
+
+        /* Títulos de sección más pequeños */
+        .display-4 {
+          font-size: 1.5rem !important;
+        }
+
+        .display-5 {
+          font-size: 1.35rem !important;
+        }
+      }
+
+      /* LANDSCAPE MOBILE (orientación horizontal) */
+      @media (max-width: 767px) and (orientation: landscape) {
+        .hero-gradient {
+          padding: 1.5rem 0 !important;
+        }
+
+        section {
+          padding: 2rem 0 !important;
+        }
+
+        .py-5 {
+          padding-top: 2rem !important;
+          padding-bottom: 2rem !important;
+        }
+      }
+
+      /* Optimización para touch */
+      @media (hover: none) and (pointer: coarse) {
+        .btn {
+          min-height: 44px;
+          min-width: 44px;
+        }
+
+        .nav-link {
+          padding: 0.75rem 1rem !important;
+        }
+
+        .card {
+          cursor: pointer;
+        }
+      }
+
+      /* Fix para evitar zoom en inputs en iOS */
+      @media (max-width: 767px) {
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"],
+        textarea {
+          font-size: 16px !important;
+        }
+      }
     </style>
   </head>
   <body class="bg-gray-50">
@@ -391,6 +848,11 @@
                 class="btn btn-jade-primary pulse-animation fw-bold"
                 >Crear Tienda</a
               >
+              <li class="nav-item">
+                <a class="nav-link fw-medium" href="/super-admin">
+                  <i class="fas fa-shield-alt me-1"></i>Super Admin
+                </a>
+              </li>
             </div>
           </div>
         </nav>
@@ -422,7 +884,7 @@
                   <div class="glass-effect p-3 rounded-3">
                     <div class="d-flex align-items-center">
                       <i class="fas fa-gift me-2 fs-5"></i>
-                      <span class="fw-medium">Gratis para empezar</span>
+                      <span class="fw-medium">Desde 20$USD al mes</span>
                     </div>
                   </div>
                 </div>
@@ -430,7 +892,7 @@
                   <div class="glass-effect p-3 rounded-3">
                     <div class="d-flex align-items-center">
                       <i class="fab fa-whatsapp me-2 fs-5"></i>
-                      <span class="fw-medium">Integración WhatsApp</span>
+                      <span class="fw-medium">JadeBro IA 24/7</span>
                     </div>
                   </div>
                 </div>
@@ -452,10 +914,10 @@
                   <i class="fas fa-rocket me-2"></i>Empezar Gratis Ahora
                 </a>
                 <a
-                  href="#ejemplos"
+                  href="#jadebro"
                   class="btn btn-outline-light btn-lg px-4 py-3 fw-medium"
                 >
-                  <i class="fas fa-eye me-2"></i>Ver Ejemplos
+                  <i class="fas fa-robot me-2"></i>Conocer JadeBro IA
                 </a>
               </div>
 
@@ -544,127 +1006,226 @@
       </div>
     </section>
 
-    <!-- Features Section -->
-    <section id="funciones" class="py-5 bg-white">
+    <!-- Comparación: Antes vs Ahora -->
+    <section id="comparacion" class="comparison-section py-5">
       <div class="container">
         <div class="text-center mb-5">
-          <h3 class="display-5 fw-bold text-gray-900 mb-3">
-            ¿Por qué elegir JadeShop?
-          </h3>
-          <p class="fs-4 text-gray-600">La forma más simple de vender online</p>
+          <h2 class="display-4 fw-bold text-gray-900 mb-3">
+            ¿Cansado de perder ventas con catálogos básicos?
+          </h2>
+          <p class="fs-3 text-gray-600 fw-light">
+            Mira la transformación que logras con JadeShop
+          </p>
         </div>
 
         <div class="row g-4">
-          <div class="col-lg-4 col-md-6">
+          <div class="col-lg-6">
             <div
-              class="card h-100 text-center p-4 feature-card border-0 shadow"
+              class="before-after-card bg-white border-danger border-2 rounded-4 p-5 h-100 shadow"
             >
-              <div class="card-body">
-                <div class="icon-circle bg-primary-custom text-white">
-                  <i class="fab fa-whatsapp fs-3"></i>
+              <div class="text-center mb-4">
+                <div class="feature-icon bg-danger text-white mb-3">
+                  <i class="fas fa-times"></i>
                 </div>
-                <h4 class="card-title fs-4 fw-semibold text-gray-900 mb-3">
-                  Integración WhatsApp
-                </h4>
-                <p class="card-text text-gray-600">
-                  Los pedidos llegan automáticamente a tu WhatsApp. Sin
-                  complicaciones.
-                </p>
+                <h4 class="text-danger fw-bold">❌ Con Catálogo Básico</h4>
               </div>
+              <ul class="list-unstyled">
+                <li class="mb-4 d-flex align-items-start">
+                  <i
+                    class="fas fa-exclamation-triangle text-warning me-3 mt-1 fs-5"
+                  ></i>
+                  <span class="fs-6"
+                    >Clientes se confunden y abandonan el proceso</span
+                  >
+                </li>
+                <li class="mb-4 d-flex align-items-start">
+                  <i class="fas fa-clock text-warning me-3 mt-1 fs-5"></i>
+                  <span class="fs-6"
+                    >Respondes consultas repetitivas las 24 horas</span
+                  >
+                </li>
+                <li class="mb-4 d-flex align-items-start">
+                  <i class="fas fa-mobile-alt text-warning me-3 mt-1 fs-5"></i>
+                  <span class="fs-6">Difícil de usar durante TikTok Lives</span>
+                </li>
+                <li class="mb-4 d-flex align-items-start">
+                  <i class="fas fa-calculator text-warning me-3 mt-1 fs-5"></i>
+                  <span class="fs-6"
+                    >Calculas totales y envíos manualmente</span
+                  >
+                </li>
+                <li class="mb-0 d-flex align-items-start">
+                  <i class="fas fa-chart-down text-warning me-3 mt-1 fs-5"></i>
+                  <span class="fs-6"
+                    >Pierdes ventas por procesos lentos y confusos</span
+                  >
+                </li>
+              </ul>
             </div>
           </div>
 
-          <div class="col-lg-4 col-md-6">
+          <div class="col-lg-6">
             <div
-              class="card h-100 text-center p-4 feature-card border-0 shadow"
+              class="before-after-card bg-white border-success border-2 rounded-4 p-5 h-100 shadow-lg"
             >
-              <div class="card-body">
-                <div class="icon-circle bg-secondary-custom text-white">
-                  <i class="fas fa-mobile-alt fs-3"></i>
+              <div class="text-center mb-4">
+                <div class="feature-icon bg-jade-primary text-white mb-3">
+                  <i class="fas fa-check"></i>
                 </div>
-                <h4 class="card-title fs-4 fw-semibold text-gray-900 mb-3">
-                  Optimizado para móvil
+                <h4 class="text-jade-primary fw-bold">
+                  ✅ Con JadeShop + JadeBro
                 </h4>
-                <p class="card-text text-gray-600">
-                  Perfecto para lives de TikTok e Instagram. Funciona en
-                  cualquier dispositivo.
-                </p>
               </div>
+              <ul class="list-unstyled">
+                <li class="mb-4 d-flex align-items-start">
+                  <i
+                    class="fas fa-shopping-cart text-jade-primary me-3 mt-1 fs-5"
+                  ></i>
+                  <span class="fs-6"
+                    ><strong>Carrito profesional</strong> - Experiencia de
+                    compra fluida</span
+                  >
+                </li>
+                <li class="mb-4 d-flex align-items-start">
+                  <i
+                    class="fas fa-robot text-jadebro-primary me-3 mt-1 fs-5"
+                  ></i>
+                  <span class="fs-6"
+                    ><strong>JadeBro IA automática</strong> - Vende mientras
+                    duermes</span
+                  >
+                </li>
+                <li class="mb-4 d-flex align-items-start">
+                  <i class="fab fa-tiktok text-danger me-3 mt-1 fs-5"></i>
+                  <span class="fs-6"
+                    ><strong>Videos TikTok integrados</strong> - Cada producto
+                    con video</span
+                  >
+                </li>
+                <li class="mb-4 d-flex align-items-start">
+                  <i class="fas fa-boxes text-jade-primary me-3 mt-1 fs-5"></i>
+                  <span class="fs-6"
+                    ><strong>Control de stock automático</strong> - Nunca vendas
+                    sin stock</span
+                  >
+                </li>
+                <li class="mb-0 d-flex align-items-start">
+                  <i class="fas fa-chart-up text-success me-3 mt-1 fs-5"></i>
+                  <span class="fs-6"
+                    ><strong>Panel inteligente</strong> - Alertas y analytics
+                    avanzados</span
+                  >
+                </li>
+              </ul>
             </div>
           </div>
+        </div>
+      </div>
+    </section>
 
+    <!-- Features Section -->
+    <section id="funciones" class="py-5 bg-gray-50">
+      <div class="container">
+        <div class="text-center mb-5">
+          <h3 class="display-4 fw-bold text-gray-900 mb-3">
+            Funcionalidades que marcan la diferencia
+          </h3>
+          <p class="fs-4 text-gray-600 fw-light">
+            Todo lo que necesitas para gestionar tu negocio como un profesional
+          </p>
+        </div>
+
+        <div class="row g-5 justify-content-center">
+          <!-- Control de Stock Inteligente -->
           <div class="col-lg-4 col-md-6">
             <div
-              class="card h-100 text-center p-4 feature-card border-0 shadow"
+              class="text-center bg-white rounded-4 p-5 h-100 shadow-sm feature-card"
             >
-              <div class="card-body">
-                <div class="icon-circle bg-accent-custom text-white">
-                  <i class="fas fa-palette fs-3"></i>
-                </div>
-                <h4 class="card-title fs-4 fw-semibold text-gray-900 mb-3">
-                  Personalizable
-                </h4>
-                <p class="card-text text-gray-600">
-                  Colores, logo, redes sociales. Tu tienda refleja tu marca.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-4 col-md-6">
-            <div
-              class="card h-100 text-center p-4 feature-card border-0 shadow"
-            >
-              <div class="card-body">
-                <div class="icon-circle bg-jadebro-gradient text-white">
-                  <i class="fas fa-robot fs-3"></i>
-                </div>
-                <h4 class="card-title fs-4 fw-semibold text-gray-900 mb-3">
-                  JadeBro IA 24/7
-                </h4>
-                <p class="card-text text-gray-600">
-                  Agente de IA que atiende y vende en WhatsApp las 24 horas.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-4 col-md-6">
-            <div
-              class="card h-100 text-center p-4 feature-card border-0 shadow"
-            >
-              <div class="card-body">
-                <div class="icon-circle bg-primary-custom text-white">
-                  <i class="fas fa-boxes fs-3"></i>
-                </div>
-                <h4 class="card-title fs-4 fw-semibold text-gray-900 mb-3">
-                  Control de Stock
-                </h4>
-                <p class="card-text text-gray-600">
-                  Gestión automática de inventario con alertas inteligentes.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-4 col-md-6">
-            <div
-              class="card h-100 text-center p-4 feature-card border-0 shadow"
-            >
-              <div class="card-body">
+              <div class="mb-4">
                 <div
-                  class="icon-circle text-white"
-                  style="background: linear-gradient(45deg, #ff0050, #25f4ee)"
+                  class="d-inline-flex align-items-center justify-content-center rounded-3 p-3"
+                  style="
+                    background: linear-gradient(135deg, #10b981, #059669);
+                    width: 80px;
+                    height: 80px;
+                  "
                 >
-                  <i class="fab fa-tiktok fs-3"></i>
+                  <i
+                    class="fas fa-boxes text-white"
+                    style="font-size: 2rem"
+                  ></i>
                 </div>
-                <h4 class="card-title fs-4 fw-semibold text-gray-900 mb-3">
-                  TikTok Live Ready
-                </h4>
-                <p class="card-text text-gray-600">
-                  Diseñado específicamente para Live Commerce y ventas rápidas.
-                </p>
               </div>
+              <h4 class="fw-bold mb-3 text-gray-900">
+                Control de Stock Inteligente
+              </h4>
+              <p class="text-gray-600 mb-0">
+                Controla el inventario de cada producto automáticamente. Recibe
+                alertas cuando el stock esté bajo y evita vender productos
+                agotados.
+              </p>
+            </div>
+          </div>
+
+          <!-- Videos TikTok por Producto -->
+          <div class="col-lg-4 col-md-6">
+            <div
+              class="text-center bg-white rounded-4 p-5 h-100 shadow-sm feature-card"
+            >
+              <div class="mb-4">
+                <div
+                  class="d-inline-flex align-items-center justify-content-center rounded-3 p-3"
+                  style="
+                    background: linear-gradient(45deg, #ff0050, #25f4ee);
+                    width: 80px;
+                    height: 80px;
+                  "
+                >
+                  <i
+                    class="fab fa-tiktok text-white"
+                    style="font-size: 2rem"
+                  ></i>
+                </div>
+              </div>
+              <h4 class="fw-bold mb-3 text-gray-900">
+                Videos TikTok por Producto
+              </h4>
+              <p class="text-gray-600 mb-0">
+                Agrega links de tus videos de TikTok a cada producto. Tus
+                clientes ven toda la información, reviews y demostraciones antes
+                de comprar.
+              </p>
+            </div>
+          </div>
+
+          <!-- Panel de Control Inteligente -->
+          <div class="col-lg-4 col-md-6">
+            <div
+              class="text-center bg-white rounded-4 p-5 h-100 shadow-sm feature-card"
+            >
+              <div class="mb-4">
+                <div
+                  class="d-inline-flex align-items-center justify-content-center rounded-3 p-3"
+                  style="
+                    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+                    width: 80px;
+                    height: 80px;
+                  "
+                >
+                  <i
+                    class="fas fa-chart-line text-white"
+                    style="font-size: 2rem"
+                  ></i>
+                </div>
+              </div>
+              <h4 class="fw-bold mb-3 text-gray-900">
+                Panel de Control Inteligente
+              </h4>
+              <p class="text-gray-600 mb-0">
+                Analytics avanzados que te muestran productos con stock bajo,
+                baja rotación y oportunidades de mejora para maximizar tus
+                ventas.
+              </p>
             </div>
           </div>
         </div>
@@ -1037,9 +1598,9 @@
               <div class="card-body p-4 text-center">
                 <h4 class="fw-bold mb-3 text-jade-primary">Comercio Pro</h4>
                 <div class="mb-4">
-                  <div class="display-5 fw-bold text-jade-primary">$30.000</div>
+                  <div class="display-5 fw-bold text-jade-primary">$15.000</div>
                   <div class="fw-bold text-jade-primary">ARS</div>
-                  <small class="text-muted">USD $20</small>
+                  <small class="text-muted">USD $10</small>
                   <p class="text-muted">/mes</p>
                 </div>
                 <ul class="list-unstyled text-start mb-4">
