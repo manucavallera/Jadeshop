@@ -137,8 +137,8 @@ class TiendaDinamica {
 
       if (result.success) {
         this.productos = result.data;
-        this.categorias = result.categorias || [];
         this.productosFiltrados = [...this.productos];
+        this.categorias = result.categorias || []; // Feature 3: guardar categorías
 
         this.updateCategoryFilters();
         this.renderProductos();
@@ -156,124 +156,83 @@ class TiendaDinamica {
   updateCategoryFilters() {
     const container = document.getElementById("categoryFilters");
 
-    let filtersHTML = `
-            <button class="btn btn-primary btn-sm filter-btn active" data-categoria="todos">
-                TODOS
-            </button>
-        `;
-
+    // Usar categorías del backend si están disponibles
     if (this.categorias && this.categorias.length > 0) {
       const principales = this.categorias.filter((c) => !c.padre_id);
-      const subcategorias = this.categorias.filter((c) => c.padre_id);
 
-      if (principales.length > 0 && subcategorias.length > 0) {
-        // Tiene jerarquía padre-hijo
-        principales.forEach((cat) => {
-          const hijas = subcategorias.filter((s) => s.padre_id === cat.id);
+      let filtersHTML = `
+        <button class="btn btn-primary btn-sm filter-btn active" data-categoria="todos">
+          Todos
+        </button>
+      `;
 
-          if (hijas.length > 0) {
-            filtersHTML += `
-              <div class="cat-group">
-                <button class="btn btn-sm filter-btn cat-parent" data-categoria="${cat.nombre}" data-cat-id="${cat.id}">
-                  ${cat.nombre} <i class="fas fa-chevron-down ms-1 cat-arrow"></i>
-                </button>
-                <div class="cat-children" id="children-${cat.id}">
-                  ${hijas
-                    .map(
-                      (h) => `
-                    <button class="btn btn-sm filter-btn cat-child" data-categoria="${h.nombre}" data-cat-id="${h.id}">
-                      ${h.nombre}
-                    </button>
-                  `,
-                    )
-                    .join("")}
-                </div>
-              </div>
-            `;
-          } else {
-            filtersHTML += `
-              <button class="btn btn-outline-primary btn-sm filter-btn" data-categoria="${cat.nombre}" data-cat-id="${cat.id}">
+      principales.forEach((cat) => {
+        const hijas = this.categorias.filter((c) => c.padre_id === cat.id);
+
+        if (hijas.length > 0) {
+          // Categoría con subcategorías → dropdown
+          filtersHTML += `
+            <div class="btn-group">
+              <button class="btn btn-outline-primary btn-sm filter-btn" data-categoria="${cat.nombre}">
                 ${cat.nombre}
               </button>
-            `;
-          }
-        });
-      } else {
-        // Sin jerarquía - todo suelto. Agrupar en grid compacto con "Ver más"
-        const maxVisible = 8;
-        const allCats = principales.length > 0 ? principales : this.categorias;
-
-        allCats.forEach((cat, index) => {
+              <button type="button" class="btn btn-outline-primary btn-sm dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown">
+                <span class="visually-hidden">Subcategorías</span>
+              </button>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item filter-link" href="#" data-categoria="${cat.nombre}">Todas de ${cat.nombre}</a></li>
+                <li><hr class="dropdown-divider"></li>
+                ${hijas.map((h) => `<li><a class="dropdown-item filter-link" href="#" data-categoria="${h.nombre}">↳ ${h.nombre}</a></li>`).join("")}
+              </ul>
+            </div>
+          `;
+        } else {
+          // Categoría simple sin subcategorías
           filtersHTML += `
-            <button class="btn btn-outline-primary btn-sm filter-btn ${index >= maxVisible ? "cat-hidden d-none" : ""}" data-categoria="${cat.nombre}" data-cat-id="${cat.id}">
+            <button class="btn btn-outline-primary btn-sm filter-btn" data-categoria="${cat.nombre}">
               ${cat.nombre}
             </button>
           `;
-        });
-
-        if (allCats.length > maxVisible) {
-          filtersHTML += `
-            <button class="btn btn-sm filter-btn cat-toggle-more" onclick="toggleMoreCats(this)">
-              +${allCats.length - maxVisible} más <i class="fas fa-chevron-down ms-1"></i>
-            </button>
-          `;
         }
-      }
+      });
+
+      // Categorías huérfanas (sin padre y que no son padres)
+      const huerfanas = this.categorias.filter(
+        (c) => c.padre_id && !principales.find((p) => p.id === c.padre_id),
+      );
+      huerfanas.forEach((cat) => {
+        filtersHTML += `
+          <button class="btn btn-outline-primary btn-sm filter-btn" data-categoria="${cat.nombre}">
+            ${cat.nombre}
+          </button>
+        `;
+      });
+
+      container.innerHTML = filtersHTML;
     } else {
+      // Fallback: categorías desde productos
       const categorias = [
         ...new Set(this.productos.map((p) => p.categoria).filter((c) => c)),
       ];
-      const maxVisible = 8;
-      categorias.forEach((categoria, index) => {
+
+      let filtersHTML = `
+        <button class="btn btn-primary btn-sm filter-btn active" data-categoria="todos">
+          Todos
+        </button>
+      `;
+
+      categorias.forEach((categoria) => {
         filtersHTML += `
-          <button class="btn btn-outline-primary btn-sm filter-btn ${index >= maxVisible ? "cat-hidden d-none" : ""}" data-categoria="${categoria}">
+          <button class="btn btn-outline-primary btn-sm filter-btn" data-categoria="${categoria}">
             ${categoria}
           </button>
         `;
       });
-      if (categorias.length > maxVisible) {
-        filtersHTML += `
-          <button class="btn btn-sm filter-btn cat-toggle-more" onclick="toggleMoreCats(this)">
-            +${categorias.length - maxVisible} más <i class="fas fa-chevron-down ms-1"></i>
-          </button>
-        `;
-      }
+
+      container.innerHTML = filtersHTML;
     }
-
-    container.innerHTML = filtersHTML;
-
-    // Listeners para categorías padre (toggle hijos)
-    container.querySelectorAll(".cat-parent").forEach((btn) => {
-      btn.addEventListener("click", (e) => {
-        const catId = btn.dataset.catId;
-        const children = document.getElementById(`children-${catId}`);
-        const arrow = btn.querySelector(".cat-arrow");
-
-        // Cerrar otros abiertos
-        container.querySelectorAll(".cat-children.open").forEach((el) => {
-          if (el.id !== `children-${catId}`) {
-            el.classList.remove("open");
-            el.previousElementSibling
-              .querySelector(".cat-arrow")
-              ?.classList.remove("rotated");
-          }
-        });
-
-        children.classList.toggle("open");
-        arrow.classList.toggle("rotated");
-
-        // También filtra por la categoría padre (muestra padre + hijos)
-        this.filterByCategory(btn, btn.dataset.categoria);
-      });
-    });
-
-    // Listeners para subcategorías hijo
-    container.querySelectorAll(".cat-child").forEach((btn) => {
-      btn.addEventListener("click", (e) => {
-        this.filterByCategory(btn, btn.dataset.categoria);
-      });
-    });
   }
+
   renderProductos() {
     const container = document.getElementById("productGrid");
     const noProducts = document.getElementById("noProducts");
@@ -436,9 +395,14 @@ ${
       this.filtrarProductos(e.target.value);
     });
 
-    // Filtros de categoría
+    // Filtros de categoría (botones y dropdown links)
     document.addEventListener("click", (e) => {
       if (e.target.classList.contains("filter-btn")) {
+        this.filterByCategory(e.target, e.target.dataset.categoria);
+      }
+      // Feature 3: Dropdown subcategoría links
+      if (e.target.classList.contains("filter-link")) {
+        e.preventDefault();
         this.filterByCategory(e.target, e.target.dataset.categoria);
       }
     });
@@ -482,37 +446,58 @@ ${
   }
 
   filterByCategory(button, categoria) {
+    // Actualizar botones activos
     document.querySelectorAll(".filter-btn").forEach((btn) => {
       btn.classList.remove("btn-primary");
       btn.classList.add("btn-outline-primary");
     });
 
-    button.classList.remove("btn-outline-primary");
-    button.classList.add("btn-primary");
+    // Si es un filter-btn, activarlo
+    if (button.classList.contains("filter-btn")) {
+      button.classList.remove("btn-outline-primary");
+      button.classList.add("btn-primary");
+    } else {
+      // Si es dropdown link, activar el botón padre
+      const btnGroup = button.closest(".btn-group");
+      if (btnGroup) {
+        const parentBtn = btnGroup.querySelector(".filter-btn");
+        if (parentBtn) {
+          parentBtn.classList.remove("btn-outline-primary");
+          parentBtn.classList.add("btn-primary");
+        }
+      }
+    }
 
+    // Filtrar productos
     if (categoria === "todos") {
       this.productosFiltrados = [...this.productos];
     } else {
-      // Buscar si es categoría principal con hijas
-      const catId = parseInt(button.dataset.catId);
-      const hijas = this.categorias
-        .filter((c) => c.padre_id === catId)
-        .map((c) => c.nombre);
+      // Feature 3: Buscar si es categoría padre → incluir productos de subcategorías
+      const catObj = this.categorias
+        ? this.categorias.find((c) => c.nombre === categoria)
+        : null;
 
-      if (hijas.length > 0) {
-        // Mostrar productos de la categoría principal + sus subcategorías
-        this.productosFiltrados = this.productos.filter(
-          (p) => p.categoria === categoria || hijas.includes(p.categoria),
+      if (catObj && !catObj.padre_id) {
+        // Es categoría padre → incluir sus hijas
+        const hijasNombres = this.categorias
+          .filter((c) => c.padre_id === catObj.id)
+          .map((c) => c.nombre);
+        const todasCategorias = [categoria, ...hijasNombres];
+
+        this.productosFiltrados = this.productos.filter((producto) =>
+          todasCategorias.includes(producto.categoria),
         );
       } else {
+        // Es subcategoría o categoría simple
         this.productosFiltrados = this.productos.filter(
-          (p) => p.categoria === categoria,
+          (producto) => producto.categoria === categoria,
         );
       }
     }
 
     this.renderProductos();
   }
+
   agregarAlCarrito(productoId) {
     const producto = this.productos.find((p) => p.id === productoId);
     if (!producto || producto.stock === 0) return;
@@ -632,13 +617,11 @@ ${
                         </div>
                         
                         <div class="flex-grow-1 ms-3">
-                         <h6 class="mb-1" style="color: #D4AF37 !important; font-weight: 700;">${
-                           item.nombre
-                         }</h6>
-<span class="fw-bold" style="color: #F4E5B2 !important; font-size: 1.2rem;">$${item.precio.toLocaleString(
-          "es-AR",
-          { minimumFractionDigits: 2 },
-        )}</span>
+                            <h6 class="mb-1">${item.nombre}</h6>
+                            <span class="text-primary fw-bold">$${item.precio.toLocaleString(
+                              "es-AR",
+                              { minimumFractionDigits: 2 },
+                            )}</span>
                             
                             <div class="d-flex align-items-center justify-content-between mt-2">
                                 <div class="btn-group btn-group-sm">
@@ -725,27 +708,51 @@ ${
 
   // REEMPLAZA la función generarMensajeWhatsApp() en tu tienda-dinamica.js con esta versión mejorada:
   generarMensajeWhatsApp() {
-    // Fecha actual
-    const fecha = new Date().toLocaleDateString("es-AR");
+    const fecha = new Date().toLocaleDateString("es-ES", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
 
-    let mensaje = `🛍️ *Nuevo pedido - ${this.tiendaData.nombre}*\n`;
+    const hora = new Date().toLocaleTimeString("es-ES", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+
+    let mensaje = `🛒 *NUEVO PEDIDO - ${this.tiendaData.nombre.toUpperCase()}*\n`;
     if (this.ultimoCodigoPedido) {
       mensaje += `📋 *Código de pedido: ${this.ultimoCodigoPedido}*\n`;
     }
+    mensaje += `=======================================\n`;
+    mensaje += `📅 Fecha: ${fecha}\n`;
+    mensaje += `⏰ Hora: ${hora}\n`;
+    mensaje += `🌐 Tienda: ${window.location.origin}/${this.slug}\n\n`;
+
+    mensaje += `📦 *DETALLE DEL PEDIDO:*\n`;
+    mensaje += `---------------------------------------\n`;
 
     let total = 0;
-
-    // Detalle de productos
-    this.carrito.forEach((item) => {
+    this.carrito.forEach((item, index) => {
       const subtotal = item.precio * item.cantidad;
       total += subtotal;
 
-      mensaje += `• ${item.nombre} x${
-        item.cantidad
-      } — $${subtotal.toLocaleString("es-AR")}\n`;
+      mensaje += `${index + 1}. *${item.nombre}*\n`;
+      mensaje += `   💰 Precio: $${item.precio.toLocaleString("es-AR")}\n`;
+      mensaje += `   📊 Cantidad: ${item.cantidad} unidad${
+        item.cantidad > 1 ? "es" : ""
+      }\n`;
+      mensaje += `   💵 Subtotal: $${subtotal.toLocaleString("es-AR")}\n\n`;
     });
-    mensaje += `\n💰 *Total:* $${total.toLocaleString("es-AR")}\n\n`;
 
+    mensaje += `---------------------------------------\n`;
+    mensaje += `💰 *TOTAL A PAGAR: $${total.toLocaleString("es-AR")}*\n`;
+    mensaje += `📋 *Total de productos: ${this.carrito.reduce(
+      (sum, item) => sum + item.cantidad,
+      0,
+    )}*\n\n`;
+
+    // Datos del cliente
     if (this.clienteData) {
       mensaje += `👤 *DATOS DEL CLIENTE:*\n`;
       mensaje += `---------------------------------------\n`;
@@ -757,7 +764,21 @@ ${
       if (this.clienteData.direccion) {
         mensaje += `📍 Dirección: ${this.clienteData.direccion}\n`;
       }
+      mensaje += `\n`;
     }
+    mensaje += `Entrega: Envío a domicilio\n\n`;
+
+    mensaje += `⚠️ *IMPORTANTE:*\n`;
+    mensaje += `• Los precios pueden variar según stock\n`;
+    mensaje += `• Confirmaremos disponibilidad\n`;
+    mensaje += `• El pedido se reserva por 24hs\n\n`;
+
+    mensaje += `🔔 *¡Responde este mensaje con tus datos para confirmar!*\n\n`;
+
+    mensaje += `=======================================\n`;
+    mensaje += `📱 ${this.tiendaData.nombre}\n`;
+    mensaje += `📞 WhatsApp: ${this.tiendaData.whatsapp}\n`;
+    mensaje += `🙏 ¡Gracias por elegirnos!`;
 
     return mensaje;
   }
@@ -794,7 +815,7 @@ ${
     }
   }
 
-  // MODIFICA la función iniciarCompraWhatsApp() para incluir el guardado:
+  // Iniciar compra - muestra formulario de datos del cliente
   async iniciarCompraWhatsApp() {
     if (this.carrito.length === 0) {
       this.showToast("Tu carrito está vacío", "warning");
@@ -1094,24 +1115,6 @@ ${
 }
 
 // Instancia global
-// Toggle "ver más" categorías
-function toggleMoreCats(btn) {
-  const hidden = document.querySelectorAll(".cat-hidden");
-  const isShowing = btn.dataset.showing === "true";
-
-  hidden.forEach((el) => {
-    el.classList.toggle("d-none", isShowing);
-  });
-
-  if (isShowing) {
-    btn.innerHTML = `+${hidden.length} más <i class="fas fa-chevron-down ms-1"></i>`;
-    btn.dataset.showing = "false";
-  } else {
-    btn.innerHTML = `Ver menos <i class="fas fa-chevron-up ms-1"></i>`;
-    btn.dataset.showing = "true";
-  }
-}
-
 const tienda = new TiendaDinamica();
 
 // Función global para cargar preview de TikTok
