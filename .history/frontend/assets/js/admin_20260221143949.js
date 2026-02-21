@@ -647,9 +647,7 @@ class AdminPanel {
         ? parseFloat(document.getElementById("productoPrecioRebajado").value)
         : null,
       stock: parseInt(document.getElementById("productoStock").value),
-      categoria: categoriaSelect.options[
-        categoriaSelect.selectedIndex
-      ].text.replace(/^\s*↳\s*/, ""),
+      categoria: categoriaSelect.options[categoriaSelect.selectedIndex].text,
       categoria_id: parseInt(
         categoriaSelect.options[categoriaSelect.selectedIndex].dataset
           .categoriaId,
@@ -746,8 +744,6 @@ class AdminPanel {
       document.getElementById("productoCategoria").value = producto.categoria;
       document.getElementById("productoMostrarStock").checked =
         producto.mostrar_stock !== false; // ← AGREGAR ESTA LÍNEA
-
-      this.currentProductImage = producto.imagen_url || null;
 
       // Cambiar título
       document.getElementById("productoModalTitle").textContent =

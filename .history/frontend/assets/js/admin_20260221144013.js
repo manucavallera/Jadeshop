@@ -747,8 +747,6 @@ class AdminPanel {
       document.getElementById("productoMostrarStock").checked =
         producto.mostrar_stock !== false; // ← AGREGAR ESTA LÍNEA
 
-      this.currentProductImage = producto.imagen_url || null;
-
       // Cambiar título
       document.getElementById("productoModalTitle").textContent =
         "Editar Producto";
